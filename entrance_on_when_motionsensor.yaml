@@ -1,0 +1,96 @@
+alias: entrance on when motion sensor
+description: ""
+trigger:
+  - platform: device
+    type: motion
+    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
+    entity_id: edba6ca93c009b956f6a4c0576bb40cf
+    domain: binary_sensor
+    enabled: true
+condition:
+  - condition: device
+    type: is_illuminance
+    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
+    entity_id: 47aa27734897d9ee4a999b25f9947a89
+    domain: sensor
+    below: 28
+  - condition: device
+    type: is_off
+    device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
+    entity_id: c1040ec8c38ec2c4ab3932c5b4055eef
+    domain: light
+action:
+  - choose:
+      - conditions:
+          - condition: time
+            after: "00:00:00"
+            before: "08:00:00"
+        sequence:
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 60
+              brightness_pct: 5
+          - wait_for_trigger:
+              - platform: state
+                entity_id:
+                  - binary_sensor.bewegungssensor1_occupancy
+                from: "on"
+                to: "off"
+                for:
+                  hours: 0
+                  minutes: 0
+                  seconds: 0
+          - service: light.turn_off
+            target:
+              device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
+            data:
+              transition: 20
+      - conditions:
+          - condition: time
+            after: "22:00:00"
+            before: "00:00:00"
+        sequence:
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 60
+              brightness_pct: 10
+          - wait_for_trigger:
+              - platform: state
+                entity_id:
+                  - binary_sensor.bewegungssensor1_occupancy
+                to: "off"
+                for:
+                  hours: 0
+                  minutes: 1
+                  seconds: 0
+          - service: light.turn_off
+            target:
+              device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
+            data:
+              transition: 20
+    default:
+      - service: light.turn_on
+        target:
+          area_id: entrance
+        data:
+          brightness_pct: 100
+          transition: 80
+      - wait_for_trigger:
+          - platform: state
+            entity_id:
+              - binary_sensor.bewegungssensor1_occupancy
+            to: "off"
+            for:
+              hours: 0
+              minutes: 1
+              seconds: 0
+      - service: light.turn_off
+        target:
+          device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
+        data:
+          transition: 20
+mode: restart
