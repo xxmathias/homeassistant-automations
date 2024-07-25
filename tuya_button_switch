@@ -1,0 +1,42 @@
+alias: Tuya Zigbee 4 button remote
+description: ""
+use_blueprint:
+  path: Soulfly999/tuya-4-button-remote-switch-ts0044-1-zigbee2mqtt.yaml
+  input:
+    switch: sensor.0xb43522fffe6cdf15_action
+    button_1_short_press:
+      - service: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          device_id: 0a8928538bebead663704606634535a2
+    button_2_short_press:
+      - service: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          device_id: 024425cd0cf7999600b00b1338909e31
+    button_3_short_press:
+      - service: light.toggle
+        metadata: {}
+        data: {}
+        enabled: true
+        target:
+          area_id: schlafzimmer
+    button_4_short_press:
+      - service: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          area_id: office
+    button_1_hold: []
+    button_3_hold: []
+    button_3_double_press: []
+    button_4_hold: []
+    button_2_hold: []
+    button_2_double_press:
+      - device_id: 024425cd0cf7999600b00b1338909e31
+        domain: light
+        entity_id: 8dece3887712573b8e3fce6e1f85427d
+        type: brightness_increase
+    button_4_double_press: []
