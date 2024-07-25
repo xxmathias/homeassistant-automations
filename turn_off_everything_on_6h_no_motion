@@ -1,0 +1,32 @@
+alias: Turn OFF everything when 6h no motion
+description: ""
+trigger:
+  - type: no_motion
+    platform: device
+    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
+    entity_id: edba6ca93c009b956f6a4c0576bb40cf
+    domain: binary_sensor
+    for:
+      hours: 6
+      minutes: 0
+      seconds: 0
+condition: []
+action:
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      area_id:
+        - schlafzimmer
+        - entrance
+        - office
+        - wohnzimmer
+  - service: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      area_id:
+        - wohnzimmer
+        - office
+        - schlafzimmer
+mode: single
