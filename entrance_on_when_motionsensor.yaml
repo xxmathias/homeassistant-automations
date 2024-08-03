@@ -65,8 +65,13 @@ action:
                 to: "off"
                 for:
                   hours: 0
-                  minutes: 1
+                  minutes: 0
                   seconds: 0
+            timeout:
+              hours: 0
+              minutes: 1
+              seconds: 0
+              milliseconds: 0
           - service: light.turn_off
             target:
               device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
@@ -86,11 +91,11 @@ action:
             to: "off"
             for:
               hours: 0
-              minutes: 2
+              minutes: 3
               seconds: 0
       - service: light.turn_off
         target:
           device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
         data:
-          transition: 20
+          transition: 10
 mode: restart
