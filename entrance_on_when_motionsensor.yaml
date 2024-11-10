@@ -23,8 +23,8 @@ actions:
   - choose:
       - conditions:
           - condition: time
-            after: "00:00:00"
-            before: "08:00:00"
+            after: "02:00:00"
+            before: "06:00:00"
         sequence:
           - target:
               area_id: entrance
@@ -49,14 +49,14 @@ actions:
             action: light.turn_off
       - conditions:
           - condition: time
-            after: "22:00:00"
-            before: "00:00:00"
+            after: "21:00:00"
+            before: "02:00:00"
         sequence:
           - target:
               area_id: entrance
             data:
               transition: 60
-              brightness_pct: 10
+              brightness_pct: 70
             action: light.turn_on
           - wait_for_trigger:
               - entity_id:
@@ -64,14 +64,9 @@ actions:
                 to: "off"
                 for:
                   hours: 0
-                  minutes: 0
+                  minutes: 2
                   seconds: 0
                 trigger: state
-            timeout:
-              hours: 0
-              minutes: 1
-              seconds: 0
-              milliseconds: 0
           - target:
               device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
             data:
@@ -90,7 +85,7 @@ actions:
             to: "off"
             for:
               hours: 0
-              minutes: 7
+              minutes: 5
               seconds: 0
             trigger: state
       - target:
