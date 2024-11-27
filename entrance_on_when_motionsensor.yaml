@@ -64,7 +64,7 @@ actions:
                 to: "off"
                 for:
                   hours: 0
-                  minutes: 2
+                  minutes: 1
                   seconds: 0
                 trigger: state
           - target:
@@ -85,7 +85,7 @@ actions:
             to: "off"
             for:
               hours: 0
-              minutes: 5
+              minutes: 4
               seconds: 0
             trigger: state
       - target:
