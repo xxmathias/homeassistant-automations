@@ -1,5 +1,5 @@
-alias: entrance on when motion sensor
-description: ""
+alias: "Enhanced Entrance Motion Lighting"
+description: "Motion-activated lighting with adaptive brightness and improved timing"
 triggers:
   - type: motion
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
@@ -14,11 +14,6 @@ conditions:
     entity_id: 47aa27734897d9ee4a999b25f9947a89
     domain: sensor
     below: 28
-  - condition: device
-    type: is_off
-    device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
-    entity_id: c1040ec8c38ec2c4ab3932c5b4055eef
-    domain: light
 actions:
   - choose:
       - conditions:
@@ -31,6 +26,7 @@ actions:
             data:
               transition: 60
               brightness_pct: 5
+              kelvin: 2000
             action: light.turn_on
           - wait_for_trigger:
               - entity_id:
@@ -57,6 +53,7 @@ actions:
             data:
               transition: 60
               brightness_pct: 70
+              kelvin: 2837
             action: light.turn_on
           - wait_for_trigger:
               - entity_id:
@@ -85,7 +82,7 @@ actions:
             to: "off"
             for:
               hours: 0
-              minutes: 4
+              minutes: 3
               seconds: 0
             trigger: state
       - target:
