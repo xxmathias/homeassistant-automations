@@ -1,5 +1,5 @@
-alias: "Enhanced Entrance Motion Lighting"
-description: "Motion-activated lighting with adaptive brightness and improved timing"
+alias: Enhanced Entrance Motion Lighting
+description: Motion-activated lighting with adaptive brightness and improved timing
 triggers:
   - type: motion
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
@@ -18,7 +18,7 @@ actions:
   - choose:
       - conditions:
           - condition: time
-            after: "02:00:00"
+            after: "00:00:00"
             before: "06:00:00"
         sequence:
           - target:
@@ -46,7 +46,7 @@ actions:
       - conditions:
           - condition: time
             after: "21:00:00"
-            before: "02:00:00"
+            before: "00:00:00"
         sequence:
           - target:
               area_id: entrance
