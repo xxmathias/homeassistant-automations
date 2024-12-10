@@ -19,7 +19,7 @@ actions:
       - conditions:
           - condition: time
             after: "00:00:00"
-            before: "06:00:00"
+            before: "07:00:00"
         sequence:
           - target:
               area_id: entrance
