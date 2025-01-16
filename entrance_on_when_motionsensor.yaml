@@ -6,13 +6,18 @@ triggers:
     entity_id: edba6ca93c009b956f6a4c0576bb40cf
     domain: binary_sensor
     trigger: device
+  - type: occupied
+    device_id: 88bb57e89f051c39166d0e65e59ad57f
+    entity_id: 56f47dfe3be9b043d5d1e42a0d28a11b
+    domain: binary_sensor
+    trigger: device
 conditions:
   - type: is_illuminance
     condition: device
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
     entity_id: 89ac8aca5a4058a90f0f62a142d5627c
     domain: sensor
-    below: 18
+    below: 25
 actions:
   - choose:
       - conditions:
