@@ -1,19 +1,18 @@
 alias: Enhanced Entrance Motion Lighting
 description: Motion-activated lighting with adaptive brightness and improved timing
 triggers:
-  - type: motion
+  - type: occupied
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
     entity_id: edba6ca93c009b956f6a4c0576bb40cf
     domain: binary_sensor
-    enabled: true
     trigger: device
 conditions:
-  - condition: device
-    type: is_illuminance
+  - type: is_illuminance
+    condition: device
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
-    entity_id: 47aa27734897d9ee4a999b25f9947a89
+    entity_id: 89ac8aca5a4058a90f0f62a142d5627c
     domain: sensor
-    below: 28
+    below: 18
 actions:
   - choose:
       - conditions:
@@ -25,8 +24,8 @@ actions:
               area_id: entrance
             data:
               transition: 60
-              brightness_pct: 5
               kelvin: 2000
+              brightness_pct: 5
             action: light.turn_on
           - wait_for_trigger:
               - entity_id:
