@@ -14,10 +14,10 @@ triggers:
 conditions:
   - type: is_illuminance
     condition: device
-    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
-    entity_id: 89ac8aca5a4058a90f0f62a142d5627c
+    device_id: 88bb57e89f051c39166d0e65e59ad57f
+    entity_id: 98b574e85114ae17112dcad0b4f796d8
     domain: sensor
-    below: 25
+    below: 20
 actions:
   - choose:
       - conditions:
