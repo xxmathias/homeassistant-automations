@@ -17,7 +17,7 @@ conditions:
     device_id: 88bb57e89f051c39166d0e65e59ad57f
     entity_id: 98b574e85114ae17112dcad0b4f796d8
     domain: sensor
-    below: 20
+    below: 28
 actions:
   - choose:
       - conditions:
@@ -28,11 +28,20 @@ actions:
           - target:
               area_id: entrance
             data:
-              transition: 60
+              transition: 20
               kelvin: 2000
               brightness_pct: 5
             action: light.turn_on
           - wait_for_trigger:
+              - entity_id:
+                  - binary_sensor.bewegungssensor2_licht_occupancy
+                from: "on"
+                to: "off"
+                for:
+                  hours: 0
+                  minutes: 0
+                  seconds: 0
+                trigger: state
               - entity_id:
                   - binary_sensor.bewegungssensor1_occupancy
                 from: "on"
@@ -42,11 +51,11 @@ actions:
                   minutes: 0
                   seconds: 0
                 trigger: state
-          - target:
-              device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
-            data:
+          - data:
               transition: 20
             action: light.turn_off
+            target:
+              area_id: entrance
       - conditions:
           - condition: time
             after: "21:00:00"
@@ -55,11 +64,19 @@ actions:
           - target:
               area_id: entrance
             data:
-              transition: 60
+              transition: 20
               brightness_pct: 70
               kelvin: 2837
             action: light.turn_on
           - wait_for_trigger:
+              - entity_id:
+                  - binary_sensor.bewegungssensor2_licht_occupancy
+                to: "off"
+                for:
+                  hours: 0
+                  minutes: 1
+                  seconds: 0
+                trigger: state
               - entity_id:
                   - binary_sensor.bewegungssensor1_occupancy
                 to: "off"
@@ -68,11 +85,11 @@ actions:
                   minutes: 1
                   seconds: 0
                 trigger: state
-          - target:
-              device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
-            data:
+          - data:
               transition: 20
             action: light.turn_off
+            target:
+              area_id: entrance
     default:
       - target:
           area_id: entrance
@@ -82,6 +99,14 @@ actions:
         action: light.turn_on
       - wait_for_trigger:
           - entity_id:
+              - binary_sensor.bewegungssensor2_licht_occupancy
+            to: "off"
+            for:
+              hours: 0
+              minutes: 3
+              seconds: 0
+            trigger: state
+          - entity_id:
               - binary_sensor.bewegungssensor1_occupancy
             to: "off"
             for:
@@ -89,9 +114,9 @@ actions:
               minutes: 3
               seconds: 0
             trigger: state
-      - target:
-          device_id: 7b0d4d742e2cb0a88174bc5e0eda52eb
-        data:
+      - data:
           transition: 10
         action: light.turn_off
+        target:
+          area_id: entrance
 mode: restart
