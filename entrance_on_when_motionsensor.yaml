@@ -2,11 +2,6 @@ alias: Enhanced Entrance Motion Lighting
 description: Motion-activated lighting with adaptive brightness and improved timing
 triggers:
   - type: occupied
-    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
-    entity_id: edba6ca93c009b956f6a4c0576bb40cf
-    domain: binary_sensor
-    trigger: device
-  - type: occupied
     device_id: 88bb57e89f051c39166d0e65e59ad57f
     entity_id: 56f47dfe3be9b043d5d1e42a0d28a11b
     domain: binary_sensor
@@ -17,7 +12,7 @@ conditions:
     device_id: 88bb57e89f051c39166d0e65e59ad57f
     entity_id: 98b574e85114ae17112dcad0b4f796d8
     domain: sensor
-    below: 28
+    below: 25
 actions:
   - choose:
       - conditions:
@@ -28,7 +23,7 @@ actions:
           - target:
               area_id: entrance
             data:
-              transition: 20
+              transition: 10
               kelvin: 2000
               brightness_pct: 5
             action: light.turn_on
@@ -52,7 +47,7 @@ actions:
                   seconds: 0
                 trigger: state
           - data:
-              transition: 20
+              transition: 10
             action: light.turn_off
             target:
               area_id: entrance
@@ -64,7 +59,7 @@ actions:
           - target:
               area_id: entrance
             data:
-              transition: 20
+              transition: 10
               brightness_pct: 70
               kelvin: 2837
             action: light.turn_on
@@ -86,7 +81,7 @@ actions:
                   seconds: 0
                 trigger: state
           - data:
-              transition: 20
+              transition: 10
             action: light.turn_off
             target:
               area_id: entrance
@@ -95,7 +90,7 @@ actions:
           area_id: entrance
         data:
           brightness_pct: 100
-          transition: 80
+          transition: 10
         action: light.turn_on
       - wait_for_trigger:
           - entity_id:
@@ -103,7 +98,7 @@ actions:
             to: "off"
             for:
               hours: 0
-              minutes: 3
+              minutes: 2
               seconds: 0
             trigger: state
           - entity_id:
@@ -111,7 +106,7 @@ actions:
             to: "off"
             for:
               hours: 0
-              minutes: 3
+              minutes: 2
               seconds: 0
             trigger: state
       - data:
