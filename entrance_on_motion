@@ -37,15 +37,6 @@ actions:
                   minutes: 0
                   seconds: 0
                 trigger: state
-              - entity_id:
-                  - binary_sensor.bewegungssensor1_occupancy
-                from: "on"
-                to: "off"
-                for:
-                  hours: 0
-                  minutes: 0
-                  seconds: 0
-                trigger: state
           - data:
               transition: 10
             action: light.turn_off
@@ -72,14 +63,6 @@ actions:
                   minutes: 1
                   seconds: 0
                 trigger: state
-              - entity_id:
-                  - binary_sensor.bewegungssensor1_occupancy
-                to: "off"
-                for:
-                  hours: 0
-                  minutes: 1
-                  seconds: 0
-                trigger: state
           - data:
               transition: 10
             action: light.turn_off
@@ -95,14 +78,6 @@ actions:
       - wait_for_trigger:
           - entity_id:
               - binary_sensor.bewegungssensor2_licht_occupancy
-            to: "off"
-            for:
-              hours: 0
-              minutes: 2
-              seconds: 0
-            trigger: state
-          - entity_id:
-              - binary_sensor.bewegungssensor1_occupancy
             to: "off"
             for:
               hours: 0
