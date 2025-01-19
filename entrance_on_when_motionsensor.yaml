@@ -1,4 +1,4 @@
-alias: Enhanced Entrance Motion Lighting
+alias: entrance_on_motion
 description: Motion-activated lighting with adaptive brightness and improved timing
 triggers:
   - type: occupied
