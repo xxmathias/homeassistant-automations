@@ -95,7 +95,6 @@ actions:
           area_id: entrance
         data:
           brightness_pct: 100
-          transition: 10
         action: light.turn_on
       - wait_for_trigger:
           - entity_id:
@@ -114,8 +113,7 @@ actions:
               minutes: 2
               seconds: 0
             trigger: state
-      - data:
-          transition: 10
+      - data: {}
         action: light.turn_off
         target:
           area_id: entrance
