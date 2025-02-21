@@ -30,7 +30,7 @@ actions:
             data:
               transition: 10
               kelvin: 2000
-              brightness_pct: 5
+              brightness_pct: 20
             action: light.turn_on
           - wait_for_trigger:
               - entity_id:
