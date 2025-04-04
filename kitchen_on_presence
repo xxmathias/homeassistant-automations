@@ -1,0 +1,44 @@
+alias: Kitchen on presence
+trigger:
+  - platform: state
+    entity_id: binary_sensor.praesenzsensor_presence
+    to: "on"
+  - platform: state
+    entity_id: binary_sensor.praesenzsensor_presence
+    to: "off"
+condition:
+  - condition: numeric_state
+    entity_id: sensor.sun_solar_elevation
+    below: 30
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "on"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.kuchenlampe
+            data:
+              brightness_pct: 100
+              transition: 1
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "off"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.kuchenlampe
+            data:
+              brightness_pct: 30
+              transition: 2
+          - delay: "00:00:07"
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "off"
+          - service: light.turn_off
+            target:
+              entity_id: light.kuchenlampe
+mode: restart
