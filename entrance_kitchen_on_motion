@@ -1,4 +1,4 @@
-alias: entrance_on_motion
+alias: entrance_kitchen_on_motion
 description: Motion-activated lighting with adaptive brightness and improved timing
 triggers:
   - entity_id: binary_sensor.bewegungssensor1_occupancy
@@ -9,14 +9,14 @@ triggers:
     trigger: state
 conditions:
   - condition: numeric_state
-    entity_id: sensor.bewegungssensor2_licht_illuminance
-    below: 35
+    entity_id: sensor.sun_solar_elevation
+    below: 30
 actions:
   - choose:
       - conditions:
-          - condition: time
-            after: "00:00:00"
-            before: "07:00:00"
+          - condition: numeric_state
+            entity_id: sensor.sun_solar_elevation
+            below: 10
         sequence:
           - target:
               area_id: entrance
@@ -24,33 +24,27 @@ actions:
               kelvin: 2000
               brightness_pct: 10
             action: light.turn_on
+          - target:
+              entity_id: light.kuchenlampe
+            action: light.turn_on
+            data: {}
           - wait_for_trigger:
-              - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+              - entity_id:
+                  - binary_sensor.bewegungssensor1_occupancy
+                  - binary_sensor.bewegungssensor2_licht_occupancy
                 to: "off"
                 for: "00:02:00"
                 trigger: state
+            timeout: "00:05:00"
           - target:
               area_id: entrance
             action: light.turn_off
             data: {}
-      - conditions:
-          - condition: time
-            after: "21:00:00"
-            before: "00:00:00"
-        sequence:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "off"
           - target:
-              area_id: entrance
-            data:
-              brightness_pct: 40
-              kelvin: 2837
-            action: light.turn_on
-          - wait_for_trigger:
-              - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                to: "off"
-                for: "00:02:00"
-                trigger: state
-          - target:
-              area_id: entrance
+              entity_id: light.kuchenlampe
             action: light.turn_off
             data: {}
     default:
@@ -59,13 +53,24 @@ actions:
         data:
           brightness_pct: 100
         action: light.turn_on
+      - target:
+          entity_id: light.kuchenlampe
+        action: light.turn_on
+        data: {}
       - wait_for_trigger:
-          - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+          - entity_id:
+              - binary_sensor.bewegungssensor1_occupancy
+              - binary_sensor.bewegungssensor2_licht_occupancy
             to: "off"
             for: "00:02:00"
             trigger: state
+        timeout: "00:05:00"
       - target:
           area_id: entrance
+        action: light.turn_off
+        data: {}
+      - target:
+          entity_id: light.kuchenlampe
         action: light.turn_off
         data: {}
 mode: restart
