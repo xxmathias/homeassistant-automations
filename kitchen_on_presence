@@ -1,44 +1,56 @@
 alias: Kitchen on presence
-trigger:
-  - platform: state
-    entity_id: binary_sensor.praesenzsensor_presence
+triggers:
+  - entity_id: binary_sensor.praesenzsensor_presence
     to: "on"
-  - platform: state
-    entity_id: binary_sensor.praesenzsensor_presence
+    id: an
+    trigger: state
+  - entity_id: binary_sensor.praesenzsensor_presence
     to: "off"
-condition:
-  - condition: numeric_state
-    entity_id: sensor.sun_solar_elevation
-    below: 30
-action:
+    for: "00:00:10"
+    id: aus
+    trigger: state
+conditions:
+  - condition: or
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.sun_solar_elevation
+        below: 30
+      - condition: device
+        type: is_illuminance
+        device_id: 88bb57e89f051c39166d0e65e59ad57f
+        entity_id: 98b574e85114ae17112dcad0b4f796d8
+        domain: sensor
+        below: 45
+actions:
   - choose:
       - conditions:
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "on"
+          - condition: trigger
+            id: an
         sequence:
-          - service: light.turn_on
-            target:
+          - target:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 100
               transition: 1
+            action: light.turn_on
       - conditions:
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "off"
+          - condition: trigger
+            id: aus
         sequence:
-          - service: light.turn_on
-            target:
+          - target:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 30
               transition: 2
-          - delay: "00:00:07"
+            action: light.turn_on
+          - wait_template: "{{ is_state('binary_sensor.praesenzsensor_presence', 'off') }}"
+            timeout: "00:01:00"
+            continue_on_timeout: true
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          - service: light.turn_off
-            target:
+          - target:
               entity_id: light.kuchenlampe
+            action: light.turn_off
+            data: {}
 mode: restart
