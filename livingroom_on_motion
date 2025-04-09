@@ -7,16 +7,17 @@ triggers:
     domain: binary_sensor
     trigger: device
 conditions:
-  - type: is_illuminance
-    condition: device
-    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
-    entity_id: 89ac8aca5a4058a90f0f62a142d5627c
-    domain: sensor
-    below: 25
+  - condition: numeric_state
+    entity_id: sensor.sun_solar_elevation
+    below: 30
+  - condition: state
+    entity_id: light.wohnzimmerlampe
+    state: "off"
+  - condition: time
+    after: "10:00:00"
+    before: "23:00:00"
 actions:
-  - data:
-      brightness_pct: 100
-      transition: 10
+  - data: {}
     action: light.turn_on
     target:
       area_id: wohnzimmer
