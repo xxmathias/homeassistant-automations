@@ -38,7 +38,7 @@ actions:
           - target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 30
+              brightness_pct: 50
               transition: 2
             action: light.turn_on
           - condition: device
@@ -68,7 +68,7 @@ actions:
           - target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 30
+              brightness_pct: 50
               transition: 2
             action: light.turn_on
           - condition: device
