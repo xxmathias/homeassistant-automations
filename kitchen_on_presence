@@ -4,9 +4,13 @@ triggers:
     to: "on"
     id: an
     trigger: state
-  - entity_id: binary_sensor.praesenzsensor_presence
+  - entity_id:
+      - binary_sensor.praesenzsensor_presence
     to: "off"
-    for: "00:00:10"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
     id: aus
     trigger: state
 conditions:
