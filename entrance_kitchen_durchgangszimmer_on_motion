@@ -1,0 +1,66 @@
+alias: entrance_kitchen_durchgangszimmer_on_motion
+triggers:
+  - entity_id:
+      - binary_sensor.bewegungssensor1_occupancy
+      - binary_sensor.bewegungssensor2_licht_occupancy
+    to: "on"
+    trigger: state
+conditions:
+  - condition: or
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.sun_solar_elevation
+        below: 30
+      - condition: numeric_state
+        entity_id: sensor.bewegungssensor1_illuminance
+        below: 45
+actions:
+  - choose: []
+    default:
+      - condition: numeric_state
+        entity_id: sensor.bewegungssensor1_illuminance
+        below: 45
+      - condition: state
+        entity_id: binary_sensor.praesenzsensor_presence
+        state: "off"
+      - condition: state
+        entity_id: binary_sensor.praesenzsensor2_presence
+        state: "off"
+      - target:
+          area_id:
+            - entrance
+            - durchgangszimmer
+            - kuche
+        data:
+          transition: 2
+          brightness_pct: 75
+        action: light.turn_on
+  - wait_for_trigger:
+      - entity_id:
+          - binary_sensor.bewegungssensor1_occupancy
+          - binary_sensor.bewegungssensor2_licht_occupancy
+          - binary_sensor.bewegungssensor_durchgangszimmer
+        to: "off"
+        for:
+          hours: 0
+          minutes: 2
+          seconds: 0
+        trigger: state
+    continue_on_timeout: false
+  - condition: and
+    conditions:
+      - condition: state
+        entity_id: binary_sensor.praesenzsensor_presence
+        state: "off"
+      - condition: state
+        entity_id: binary_sensor.praesenzsensor2_presence
+        state: "off"
+  - action: light.turn_off
+    data:
+      transition: 2
+    target:
+      area_id:
+        - kuche
+        - durchgangszimmer
+        - entrance
+mode: restart
