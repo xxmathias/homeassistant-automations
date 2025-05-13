@@ -16,7 +16,6 @@ conditions:
         below: 45
 actions:
   - choose:
-      # Specific case for entrance motion sensor
       - conditions:
           - condition: trigger
             id: binary_sensor.bewegungssensor1_occupancy
@@ -29,10 +28,8 @@ actions:
                 - entrance
             data:
               transition: 2
-              brightness_pct: 75
+              brightness_pct: 100
             action: light.turn_on
-            
-      # Specific case for kitchen/durchgangszimmer motion sensor
       - conditions:
           - condition: trigger
             id: binary_sensor.bewegungssensor2_licht_occupancy
@@ -41,15 +38,35 @@ actions:
             below: 45
         sequence:
           - target:
-              area_id:
-                - durchgangszimmer
-                - kuche
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
             data:
               transition: 2
-              brightness_pct: 75
+              brightness_pct: >-
+                {% if is_state('light.durchgangszimmer1', 'off') and
+                is_state('light.durchgangszimmer2', 'off') %}
+                  75
+                {% else %}
+                  {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
+                  {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+                  {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
+                  {{ [current_pct, 75]|max }}
+                {% endif %}
             action: light.turn_on
-    
-    # Default case if none of the above match
+          - target:
+              entity_id: light.kuchenlampe
+            data:
+              transition: 2
+              brightness_pct: |-
+                {% if is_state('light.kuchenlampe', 'off') %}
+                  75
+                {% else %}
+                  {% set current_brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+                  {% set current_pct = current_brightness / 255 * 100|round(0) %}
+                  {{ [current_pct, 75]|max }}
+                {% endif %}
+            action: light.turn_on
     default:
       - condition: numeric_state
         entity_id: sensor.bewegungssensor1_illuminance
@@ -57,42 +74,74 @@ actions:
       - target:
           area_id:
             - entrance
-            - durchgangszimmer
-            - kuche
         data:
           transition: 2
           brightness_pct: 75
         action: light.turn_on
-        
-  # Wait for motion to stop before turning off lights
+      - target:
+          entity_id:
+            - light.durchgangszimmer1
+            - light.durchgangszimmer2
+        data:
+          transition: 2
+          brightness_pct: >-
+            {% if is_state('light.durchgangszimmer1', 'off') and
+            is_state('light.durchgangszimmer2', 'off') %}
+              75
+            {% else %}
+              {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
+              {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+              {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
+              {{ [current_pct, 75]|max }}
+            {% endif %}
+        action: light.turn_on
+      - target:
+          entity_id: light.kuchenlampe
+        data:
+          transition: 2
+          brightness_pct: |-
+            {% if is_state('light.kuchenlampe', 'off') %}
+              75
+            {% else %}
+              {% set current_brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+              {% set current_pct = current_brightness / 255 * 100|round(0) %}
+              {{ [current_pct, 75]|max }}
+            {% endif %}
+        action: light.turn_on
   - wait_for_trigger:
       - entity_id:
           - binary_sensor.bewegungssensor1_occupancy
           - binary_sensor.bewegungssensor2_licht_occupancy
-          - binary_sensor.bewegungssensor_durchgangszimmer
         to: "off"
         for:
           hours: 0
-          minutes: 2
-          seconds: 0
+          minutes: 0
+          seconds: 10
         trigger: state
     continue_on_timeout: false
-    
-  # Only turn off lights if no presence detected
-  - condition: and
-    conditions:
-      - condition: state
-        entity_id: binary_sensor.praesenzsensor_presence
-        state: "off"
-      - condition: state
-        entity_id: binary_sensor.praesenzsensor2_presence
-        state: "off"
-  - action: light.turn_off
-    data:
-      transition: 2
-    target:
-      area_id:
-        - kuche
-        - durchgangszimmer
-        - entrance
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "off"
+        sequence:
+          - action: light.turn_off
+            data:
+              transition: 2
+            target:
+              entity_id: light.kuchenlampe
+              area_id: entrance
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+        sequence:
+          - action: light.turn_off
+            data:
+              transition: 2
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+              area_id: entrance
 mode: restart
