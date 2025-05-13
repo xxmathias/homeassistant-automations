@@ -15,17 +15,45 @@ conditions:
         entity_id: sensor.bewegungssensor1_illuminance
         below: 45
 actions:
-  - choose: []
+  - choose:
+      # Specific case for entrance motion sensor
+      - conditions:
+          - condition: trigger
+            id: binary_sensor.bewegungssensor1_occupancy
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor1_illuminance
+            below: 45
+        sequence:
+          - target:
+              area_id:
+                - entrance
+            data:
+              transition: 2
+              brightness_pct: 75
+            action: light.turn_on
+            
+      # Specific case for kitchen/durchgangszimmer motion sensor
+      - conditions:
+          - condition: trigger
+            id: binary_sensor.bewegungssensor2_licht_occupancy
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor1_illuminance
+            below: 45
+        sequence:
+          - target:
+              area_id:
+                - durchgangszimmer
+                - kuche
+            data:
+              transition: 2
+              brightness_pct: 75
+            action: light.turn_on
+    
+    # Default case if none of the above match
     default:
       - condition: numeric_state
         entity_id: sensor.bewegungssensor1_illuminance
         below: 45
-      - condition: state
-        entity_id: binary_sensor.praesenzsensor_presence
-        state: "off"
-      - condition: state
-        entity_id: binary_sensor.praesenzsensor2_presence
-        state: "off"
       - target:
           area_id:
             - entrance
@@ -35,6 +63,8 @@ actions:
           transition: 2
           brightness_pct: 75
         action: light.turn_on
+        
+  # Wait for motion to stop before turning off lights
   - wait_for_trigger:
       - entity_id:
           - binary_sensor.bewegungssensor1_occupancy
@@ -47,6 +77,8 @@ actions:
           seconds: 0
         trigger: state
     continue_on_timeout: false
+    
+  # Only turn off lights if no presence detected
   - condition: and
     conditions:
       - condition: state
