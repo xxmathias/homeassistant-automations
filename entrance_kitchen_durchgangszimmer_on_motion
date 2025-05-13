@@ -46,12 +46,12 @@ actions:
               brightness_pct: >-
                 {% if is_state('light.durchgangszimmer1', 'off') and
                 is_state('light.durchgangszimmer2', 'off') %}
-                  75
+                  60
                 {% else %}
                   {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
                   {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
                   {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
-                  {{ [current_pct, 75]|max }}
+                  {{ [current_pct, 60]|max }}
                 {% endif %}
             action: light.turn_on
           - target:
@@ -60,11 +60,11 @@ actions:
               transition: 2
               brightness_pct: |-
                 {% if is_state('light.kuchenlampe', 'off') %}
-                  75
+                  60
                 {% else %}
                   {% set current_brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
                   {% set current_pct = current_brightness / 255 * 100|round(0) %}
-                  {{ [current_pct, 75]|max }}
+                  {{ [current_pct, 60]|max }}
                 {% endif %}
             action: light.turn_on
     default:
@@ -76,7 +76,7 @@ actions:
             - entrance
         data:
           transition: 2
-          brightness_pct: 75
+          brightness_pct: 100
         action: light.turn_on
       - target:
           entity_id:
@@ -87,12 +87,12 @@ actions:
           brightness_pct: >-
             {% if is_state('light.durchgangszimmer1', 'off') and
             is_state('light.durchgangszimmer2', 'off') %}
-              75
+              60
             {% else %}
               {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
               {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
               {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
-              {{ [current_pct, 75]|max }}
+              {{ [current_pct, 60]|max }}
             {% endif %}
         action: light.turn_on
       - target:
@@ -101,11 +101,11 @@ actions:
           transition: 2
           brightness_pct: |-
             {% if is_state('light.kuchenlampe', 'off') %}
-              75
+              60
             {% else %}
               {% set current_brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
               {% set current_pct = current_brightness / 255 * 100|round(0) %}
-              {{ [current_pct, 75]|max }}
+              {{ [current_pct, 60]|max }}
             {% endif %}
         action: light.turn_on
   - wait_for_trigger:
@@ -115,8 +115,8 @@ actions:
         to: "off"
         for:
           hours: 0
-          minutes: 0
-          seconds: 10
+          minutes: 1
+          seconds: 0
         trigger: state
     continue_on_timeout: false
   - choose:
