@@ -6,22 +6,14 @@ triggers:
     to: "on"
     trigger: state
 conditions:
-  - condition: or
-    conditions:
-      - condition: numeric_state
-        entity_id: sensor.sun_solar_elevation
-        below: 30
-      - condition: numeric_state
-        entity_id: sensor.bewegungssensor1_illuminance
-        below: 45
+  - condition: numeric_state
+    entity_id: sensor.bewegungssensor2_licht_illuminance
+    below: 50
 actions:
   - choose:
       - conditions:
           - condition: trigger
             id: binary_sensor.bewegungssensor1_occupancy
-          - condition: numeric_state
-            entity_id: sensor.bewegungssensor1_illuminance
-            below: 45
         sequence:
           - target:
               area_id:
@@ -68,9 +60,6 @@ actions:
                 {% endif %}
             action: light.turn_on
     default:
-      - condition: numeric_state
-        entity_id: sensor.bewegungssensor1_illuminance
-        below: 45
       - target:
           area_id:
             - entrance
