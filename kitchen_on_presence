@@ -31,24 +31,37 @@ actions:
           - condition: trigger
             id: an
         sequence:
-          # Get adaptive brightness
-          - service: script.adaptive_brightness
-            data:
-              mode: normal
-              room: kitchen
-            response_variable: brightness_result
-          # Get adaptive color temperature
-          - service: script.adaptive_color_temp
-            data:
-              force_warm: false
-            response_variable: color_result
-          # Turn on kitchen light
+          # Turn on kitchen light with adaptive settings
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: "{{ brightness_result.brightness }}"
-              kelvin: "{{ color_result.kelvin }}"
+              brightness_pct: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  30
+                {% elif hour >= 18 and hour < 22 %}
+                  70
+                {% elif hour >= 6 and hour < 9 %}
+                  90
+                {% else %}
+                  100
+                {% endif %}
+              kelvin: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  2700
+                {% elif hour >= 18 and hour < 22 %}
+                  3000
+                {% elif hour >= 17 and hour < 18 %}
+                  3500
+                {% elif hour >= 9 and hour < 17 %}
+                  4000
+                {% elif hour >= 6 and hour < 9 %}
+                  5000
+                {% else %}
+                  4000
+                {% endif %}
               transition: 1
       - conditions:
           - condition: trigger

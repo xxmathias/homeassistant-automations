@@ -14,29 +14,7 @@ conditions:
     entity_id: sensor.bewegungssensor2_licht_illuminance
     below: 50
 actions:
-  # Get adaptive brightness
-  - service: script.adaptive_brightness
-    data:
-      mode: >
-        {% set hour = now().hour %}
-        {% if hour >= 22 or hour < 6 %}
-          {% if is_state('light.wohnzimmerlampe', 'off') and 
-              is_state('light.kuchenlampe', 'off') %}
-            night
-          {% else %}
-            normal
-          {% endif %}
-        {% else %}
-          normal
-        {% endif %}
-      room: durchgangszimmer
-    response_variable: brightness_result
-  # Get adaptive color temperature
-  - service: script.adaptive_color_temp
-    data:
-      force_warm: false
-    response_variable: color_result
-  # Turn on durchgangszimmer lights
+  # Turn on durchgangszimmer lights with adaptive settings
   - service: light.turn_on
     target:
       entity_id:
@@ -45,15 +23,44 @@ actions:
     data:
       transition: 2
       brightness_pct: >
+        {% set hour = now().hour %}
+        {% set is_night_mode = hour >= 22 or hour < 6 %}
+        {% set other_lights_off = is_state('light.wohnzimmerlampe', 'off') and is_state('light.kuchenlampe', 'off') %}
+        {% set base_brightness = 100 %}
+        {% if is_night_mode and other_lights_off %}
+          {% set base_brightness = 20 %}
+        {% elif is_night_mode %}
+          {% set base_brightness = 30 %}
+        {% elif hour >= 18 and hour < 22 %}
+          {% set base_brightness = 70 %}
+        {% elif hour >= 6 and hour < 9 %}
+          {% set base_brightness = 90 %}
+        {% endif %}
+        {% set room_multiplier = 0.8 %}
+        {% set target_brightness = (base_brightness * room_multiplier)|int %}
         {% if is_state('light.durchgangszimmer1', 'on') or is_state('light.durchgangszimmer2', 'on') %}
           {% set current_brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
           {% set current_brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
           {% set current_pct = ([current_brightness1, current_brightness2]|max / 255 * 100)|round(0) %}
-          {{ [current_pct, brightness_result.brightness]|max }}
+          {{ [current_pct, target_brightness]|max }}
         {% else %}
-          {{ brightness_result.brightness }}
+          {{ target_brightness }}
         {% endif %}
-      kelvin: "{{ color_result.kelvin }}"
+      kelvin: >
+        {% set hour = now().hour %}
+        {% if hour >= 22 or hour < 6 %}
+          2700
+        {% elif hour >= 18 and hour < 22 %}
+          3000
+        {% elif hour >= 17 and hour < 18 %}
+          3500
+        {% elif hour >= 9 and hour < 17 %}
+          4000
+        {% elif hour >= 6 and hour < 9 %}
+          5000
+        {% else %}
+          4000
+        {% endif %}
   # Only trigger adjacent rooms if this was initial motion and rooms are dark
   - choose:
       - conditions:
@@ -76,7 +83,7 @@ actions:
             data:
               transition: 2
               brightness_pct: 30
-              kelvin: "{{ color_result.kelvin }}"
+              kelvin: 3000
   # Wait for no presence
   - wait_for_trigger:
       - entity_id: binary_sensor.praesenzsensor2_presence

@@ -17,23 +17,36 @@ conditions:
     after: "10:00:00"
     before: "23:00:00"
 actions:
-  # Get adaptive brightness
-  - service: script.adaptive_brightness
-    data:
-      mode: normal
-      room: wohnzimmer
-    response_variable: brightness_result
-  # Get adaptive color temperature
-  - service: script.adaptive_color_temp
-    data:
-      force_warm: false
-    response_variable: color_result
-  # Turn on living room lights
+  # Turn on living room lights with adaptive settings
   - service: light.turn_on
     target:
       area_id: wohnzimmer
     data:
       transition: 2
-      brightness_pct: "{{ brightness_result.brightness }}"
-      kelvin: "{{ color_result.kelvin }}"
+      brightness_pct: >
+        {% set hour = now().hour %}
+        {% if hour >= 22 or hour < 6 %}
+          30
+        {% elif hour >= 18 and hour < 22 %}
+          70
+        {% elif hour >= 6 and hour < 9 %}
+          90
+        {% else %}
+          100
+        {% endif %}
+      kelvin: >
+        {% set hour = now().hour %}
+        {% if hour >= 22 or hour < 6 %}
+          2700
+        {% elif hour >= 18 and hour < 22 %}
+          3000
+        {% elif hour >= 17 and hour < 18 %}
+          3500
+        {% elif hour >= 9 and hour < 17 %}
+          4000
+        {% elif hour >= 6 and hour < 9 %}
+          5000
+        {% else %}
+          4000
+        {% endif %}
 mode: restart
