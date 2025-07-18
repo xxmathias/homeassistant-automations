@@ -25,7 +25,13 @@ actions:
               area_id: entrance
             data:
               transition: 1
-              brightness_pct: 100
+              brightness_pct: >
+                {% set hour = now().hour %}
+                {% if hour >= 23 or hour < 7 %}
+                  30
+                {% else %}
+                  100
+                {% endif %}
               kelvin: >
                 {% set hour = now().hour %}
                 {% if hour >= 22 or hour < 6 %}
@@ -82,35 +88,34 @@ actions:
           - condition: state
             entity_id: binary_sensor.bewegungssensor1_occupancy
             state: "off"
-          # Turn off all pathway lights if no presence detected
+          # Turn off lights based on area presence
           - choose:
+              # Turn off entrance and kitchen if no presence
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
-                  - condition: state
-                    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                    state: "off"
                 sequence:
                   - service: light.turn_off
                     target:
-                      area_id: entrance
                       entity_id: light.kuchenlampe
                     data:
                       transition: 2
-              - conditions:
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor2_presence
-                    state: "off"
-                  - condition: state
-                    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                    state: "off"
-                sequence:
-                  - service: light.turn_off
-                    target:
-                      entity_id:
-                        - light.durchgangszimmer1
-                        - light.durchgangszimmer2
-                    data:
-                      transition: 2
+          # Always turn off entrance (no dedicated presence sensor)
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 2
+          # Turn off durchgangszimmer if no presence
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 2
 mode: restart
