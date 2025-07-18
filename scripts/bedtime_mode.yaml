@@ -1,4 +1,5 @@
-- alias: Bedtime Mode
+bedtime_mode:
+  alias: Bedtime Mode
   description: Turn off all lights except bedroom and prepare for sleep
   sequence:
     - action: light.turn_off

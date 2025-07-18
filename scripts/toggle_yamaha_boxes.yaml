@@ -1,4 +1,5 @@
-- alias: Toggle Yamaha Boxes
+toggle_yamaha_boxes:
+  alias: Toggle Yamaha Boxes
   description: Toggle both Yamaha music boxes (left and right) on/off together
   sequence:
     - choose:
