@@ -36,13 +36,7 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: >
-                {% set hour = now().hour %}
-                {% if hour >= 23 or hour < 7 %}
-                  50
-                {% else %}
-                  100
-                {% endif %}
+              brightness_pct: 100
               kelvin: >
                 {% set hour = now().hour %}
                 {% if hour >= 22 or hour < 6 %}
@@ -63,29 +57,24 @@ actions:
           - condition: trigger
             id: aus
         sequence:
-          # Check if adjacent rooms are occupied
-          - condition: template
-            value_template: >
-              {{ not is_state('binary_sensor.praesenzsensor2_presence', 'on') and
-                 not is_state('binary_sensor.bewegungssensor1_occupancy', 'on') }}
-          # Dim light first
+          # Immediately dim the light when presence is lost
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 30
-              transition: 2
-          # Wait for confirmed vacancy
-          - wait_template: "{{ is_state('binary_sensor.praesenzsensor_presence', 'off') }}"
-            timeout: "00:01:00"
-            continue_on_timeout: true
+              brightness_pct: 20
+              transition: 0.5
+          # Wait 10 seconds
+          - delay:
+              seconds: 10
+          # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          # Turn off light
+          # Turn off light completely
           - service: light.turn_off
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 2
+              transition: 1
 mode: restart
