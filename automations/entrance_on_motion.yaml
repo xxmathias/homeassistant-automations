@@ -59,14 +59,21 @@ actions:
           - condition: trigger
             id: motion_off
         sequence:
-          # Dim the light when motion stops
+          # Wait 1:30 (90 seconds) before dimming
+          - delay:
+              seconds: 90
+          # Check if still no motion
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+          # Dim the light
           - service: light.turn_on
             target:
               area_id: entrance
             data:
               brightness_pct: 30
               transition: 2
-          # Wait 30 seconds before turning off
+          # Wait another 30 seconds (total 2 minutes)
           - delay:
               seconds: 30
           # Check if still no motion
