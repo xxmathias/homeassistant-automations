@@ -7,10 +7,6 @@ triggers:
   - entity_id:
       - binary_sensor.praesenzsensor_presence
     to: "off"
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 30
     id: aus
     trigger: state
 conditions:
@@ -63,10 +59,10 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 60
-              transition: 1
-          # Wait 10 seconds
+              transition: 0
+          # Wait 20 seconds
           - delay:
-              seconds: 10
+              seconds: 20
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence

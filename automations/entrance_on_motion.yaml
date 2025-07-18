@@ -45,11 +45,6 @@ actions:
           minutes: 2
         trigger: state
     continue_on_timeout: false
-  # Check if adjacent rooms are occupied before turning off
-  - condition: template
-    value_template: >
-      {{ not is_state('binary_sensor.praesenzsensor_presence', 'on') and
-         not is_state('binary_sensor.praesenzsensor2_presence', 'on') }}
   # Turn off entrance lights
   - service: light.turn_off
     target:
