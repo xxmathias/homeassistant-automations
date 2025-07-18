@@ -1,23 +1,21 @@
-alias: Toggle Yamaha Boxes
-description: Toggle both Yamaha music boxes (left and right) on/off together
-triggers: []
-conditions: []
-actions:
-  - choose:
-      - conditions:
-          - condition: state
-            entity_id: switch.box_left
-            state: "on"
-        sequence:
-          - action: switch.turn_off
-            target:
-              entity_id:
-                - switch.box_left
-                - switch.box_right
-    default:
-      - action: switch.turn_on
-        target:
-          entity_id:
-            - switch.box_left
-            - switch.box_right
-mode: single
+- alias: Toggle Yamaha Boxes
+  description: Toggle both Yamaha music boxes (left and right) on/off together
+  sequence:
+    - choose:
+        - conditions:
+            - condition: state
+              entity_id: switch.box_left
+              state: "on"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id:
+                  - switch.box_left
+                  - switch.box_right
+      default:
+        - action: switch.turn_on
+          target:
+            entity_id:
+              - switch.box_left
+              - switch.box_right
+  mode: single
