@@ -4,51 +4,79 @@ triggers:
   - entity_id: binary_sensor.bewegungssensor1_occupancy
     to: "on"
     trigger: state
+    id: motion_on
+  - entity_id: binary_sensor.bewegungssensor1_occupancy
+    to: "off"
+    trigger: state
+    id: motion_off
 conditions:
-  - condition: numeric_state
-    entity_id: sensor.bewegungssensor1_illuminance
-    below: 50
+  - condition: or
+    conditions:
+      - condition: trigger
+        id: motion_on
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: motion_off
 actions:
-  # Turn on entrance lights with adaptive settings
-  - service: light.turn_on
-    target:
-      area_id: entrance
-    data:
-      transition: 1
-      brightness_pct: >
-        {% set hour = now().hour %}
-        {% if hour >= 23 or hour < 7 %}
-          30
-        {% else %}
-          100
-        {% endif %}
-      kelvin: >
-        {% set hour = now().hour %}
-        {% if hour >= 22 or hour < 6 %}
-          2700
-        {% elif hour >= 18 and hour < 22 %}
-          3000
-        {% elif hour >= 17 and hour < 18 %}
-          3500
-        {% elif hour >= 9 and hour < 17 %}
-          4000
-        {% elif hour >= 6 and hour < 9 %}
-          5000
-        {% else %}
-          4000
-        {% endif %}
-  # Wait for no motion
-  - wait_for_trigger:
-      - entity_id: binary_sensor.bewegungssensor1_occupancy
-        to: "off"
-        for:
-          minutes: 2
-        trigger: state
-    continue_on_timeout: false
-  # Turn off entrance lights
-  - service: light.turn_off
-    target:
-      area_id: entrance
-    data:
-      transition: 1
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: motion_on
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor1_illuminance
+            below: 50
+        sequence:
+          # Turn on entrance lights with adaptive settings
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 2
+              brightness_pct: >
+                {% set hour = now().hour %}
+                {% if hour >= 23 or hour < 7 %}
+                  30
+                {% else %}
+                  100
+                {% endif %}
+              kelvin: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  2700
+                {% elif hour >= 18 and hour < 22 %}
+                  3000
+                {% elif hour >= 17 and hour < 18 %}
+                  3500
+                {% elif hour >= 9 and hour < 17 %}
+                  4000
+                {% elif hour >= 6 and hour < 9 %}
+                  5000
+                {% else %}
+                  4000
+                {% endif %}
+      - conditions:
+          - condition: trigger
+            id: motion_off
+        sequence:
+          # Dim the light when motion stops
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              brightness_pct: 30
+              transition: 2
+          # Wait 30 seconds before turning off
+          - delay:
+              seconds: 30
+          # Check if still no motion
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+          # Turn off entrance lights
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 2
 mode: restart
