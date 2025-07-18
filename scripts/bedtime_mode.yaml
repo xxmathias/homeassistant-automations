@@ -4,7 +4,6 @@ triggers: []
 conditions: []
 actions:
   - action: light.turn_off
-    metadata: {}
     data:
       transition: 1
     target:
@@ -14,19 +13,19 @@ actions:
         - kuche
         - wohnzimmer
   - action: switch.turn_off
-    metadata: {}
-    data: {}
     target:
       area_id: wohnzimmer
+  - action: switch.turn_off
+    target:
+      entity_id:
+        - switch.box_left
+        - switch.box_right
   - action: light.turn_on
-    metadata: {}
     data:
       transition: 1
     target:
       area_id: schlafzimmer
   - action: switch.turn_on
-    metadata: {}
-    data: {}
     target:
       area_id: schlafzimmer
 mode: single
