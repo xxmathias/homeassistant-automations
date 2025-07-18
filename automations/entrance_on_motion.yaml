@@ -1,11 +1,11 @@
 alias: Entrance on Motion
 description: Motion-activated entrance lighting with adaptive brightness and color
 triggers:
-  - entity_id: binary_sensor.bewegungssensor1_occupancy
+  - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
     trigger: state
     id: motion_on
-  - entity_id: binary_sensor.bewegungssensor1_occupancy
+  - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "off"
     trigger: state
     id: motion_off
@@ -24,7 +24,7 @@ actions:
           - condition: trigger
             id: motion_on
           - condition: numeric_state
-            entity_id: sensor.bewegungssensor1_illuminance
+            entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
         sequence:
           # Turn on entrance lights with adaptive settings
@@ -64,7 +64,7 @@ actions:
               seconds: 90
           # Check if still no motion
           - condition: state
-            entity_id: binary_sensor.bewegungssensor1_occupancy
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
           # Dim the light
           - service: light.turn_on
@@ -78,7 +78,7 @@ actions:
               seconds: 30
           # Check if still no motion
           - condition: state
-            entity_id: binary_sensor.bewegungssensor1_occupancy
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
           # Turn off entrance lights
           - service: light.turn_off
