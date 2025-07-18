@@ -24,25 +24,27 @@ actions:
       transition: 2
       brightness_pct: >
         {% set hour = now().hour %}
-        {% set is_night_mode = hour >= 22 or hour < 6 %}
+        {% set is_night_mode = hour >= 23 or hour < 7 %}
         {% set other_lights_off = is_state('light.wohnzimmerlampe', 'off') and is_state('light.kuchenlampe', 'off') %}
         {% set base_brightness = 100 %}
         {% if is_night_mode and other_lights_off %}
           {% set base_brightness = 20 %}
         {% elif is_night_mode %}
           {% set base_brightness = 30 %}
-        {% elif hour >= 18 and hour < 22 %}
-          {% set base_brightness = 70 %}
-        {% elif hour >= 6 and hour < 9 %}
-          {% set base_brightness = 90 %}
         {% endif %}
         {% set room_multiplier = 0.8 %}
         {% set target_brightness = (base_brightness * room_multiplier)|int %}
+        {% set is_presence_trigger = trigger.id == 'presence' %}
         {% if is_state('light.durchgangszimmer1', 'on') or is_state('light.durchgangszimmer2', 'on') %}
           {% set current_brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
           {% set current_brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
           {% set current_pct = ([current_brightness1, current_brightness2]|max / 255 * 100)|round(0) %}
-          {{ [current_pct, target_brightness]|max }}
+          {% if is_presence_trigger %}
+            {% set boosted_brightness = (current_pct * 1.15)|round(0) %}
+            {{ [boosted_brightness, 100]|min }}
+          {% else %}
+            {{ [current_pct, target_brightness]|max }}
+          {% endif %}
         {% else %}
           {{ target_brightness }}
         {% endif %}

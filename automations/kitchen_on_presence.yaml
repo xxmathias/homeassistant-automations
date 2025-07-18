@@ -38,12 +38,8 @@ actions:
             data:
               brightness_pct: >
                 {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  30
-                {% elif hour >= 18 and hour < 22 %}
-                  70
-                {% elif hour >= 6 and hour < 9 %}
-                  90
+                {% if hour >= 23 or hour < 7 %}
+                  50
                 {% else %}
                   100
                 {% endif %}
