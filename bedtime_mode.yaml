@@ -1,13 +1,6 @@
 alias: Bedtime Mode
 description: Turn off all lights except bedroom and prepare for sleep
-triggers:
-  - trigger: event
-    event_type: call_service
-    event_data:
-      domain: automation
-      service: trigger
-      service_data:
-        entity_id: automation.bedtime_mode
+triggers: []
 conditions: []
 actions:
   - action: light.turn_off
@@ -37,4 +30,3 @@ actions:
     target:
       area_id: schlafzimmer
 mode: single
-icon: mdi:sleep
