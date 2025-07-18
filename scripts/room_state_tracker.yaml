@@ -1,0 +1,65 @@
+alias: Room State Tracker
+description: Tracks which rooms are occupied to prevent unnecessary cross-room activation
+mode: single
+fields:
+  action:
+    description: "Action to perform: check, set_occupied, or set_vacant"
+    example: "check"
+    selector:
+      select:
+        options:
+          - check
+          - set_occupied
+          - set_vacant
+  room:
+    description: "Room to check or update"
+    example: "durchgangszimmer"
+variables:
+  # Define room relationships
+  connected_rooms:
+    entrance: ["kitchen", "durchgangszimmer"]
+    kitchen: ["entrance", "durchgangszimmer"]
+    durchgangszimmer: ["entrance", "kitchen", "wohnzimmer"]
+    wohnzimmer: ["durchgangszimmer", "bedroom"]
+    bedroom: ["wohnzimmer"]
+  # Check current occupancy states
+  entrance_occupied: >
+    {{ is_state('binary_sensor.bewegungssensor1_occupancy', 'on') }}
+  kitchen_occupied: >
+    {{ is_state('binary_sensor.praesenzsensor_presence', 'on') }}
+  durchgangszimmer_occupied: >
+    {{ is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'on') or
+       is_state('binary_sensor.praesenzsensor2_presence', 'on') }}
+  room_occupied: >
+    {% if room == 'entrance' %}
+      {{ entrance_occupied }}
+    {% elif room == 'kitchen' %}
+      {{ kitchen_occupied }}
+    {% elif room == 'durchgangszimmer' %}
+      {{ durchgangszimmer_occupied }}
+    {% else %}
+      false
+    {% endif %}
+sequence:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'check' }}"
+        sequence:
+          - stop: "Return room occupancy status"
+            response_variable: occupied
+            value: "{{ room_occupied }}"
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'set_occupied' }}"
+        sequence:
+          - service: input_boolean.turn_on
+            target:
+              entity_id: "input_boolean.{{ room }}_occupied"
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'set_vacant' }}"
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: "input_boolean.{{ room }}_occupied"

@@ -1,0 +1,37 @@
+alias: Adaptive Color Temperature
+description: Returns appropriate color temperature in Kelvin based on time of day
+mode: single
+fields:
+  force_warm:
+    description: "Force warm temperature regardless of time"
+    example: false
+    default: false
+variables:
+  hour: "{{ now().hour }}"
+  # Time periods
+  is_early_morning: "{{ hour >= 6 and hour < 9 }}"
+  is_day: "{{ hour >= 9 and hour < 17 }}"
+  is_late_afternoon: "{{ hour >= 17 and hour < 18 }}"
+  is_evening: "{{ hour >= 18 and hour < 22 }}"
+  is_night: "{{ hour >= 22 or hour < 6 }}"
+  # Color temperatures in Kelvin
+  color_temp: >
+    {% if force_warm %}
+      2700
+    {% elif is_night %}
+      2700
+    {% elif is_evening %}
+      3000
+    {% elif is_late_afternoon %}
+      3500
+    {% elif is_day %}
+      4000
+    {% elif is_early_morning %}
+      5000
+    {% else %}
+      4000
+    {% endif %}
+sequence:
+  - stop: "Return color temperature"
+    response_variable: kelvin
+    value: "{{ color_temp }}"

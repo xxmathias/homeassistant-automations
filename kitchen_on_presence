@@ -31,30 +31,52 @@ actions:
           - condition: trigger
             id: an
         sequence:
-          - target:
+          # Get adaptive brightness
+          - service: script.adaptive_brightness
+            data:
+              mode: normal
+              room: kitchen
+            response_variable: brightness_result
+          # Get adaptive color temperature
+          - service: script.adaptive_color_temp
+            data:
+              force_warm: false
+            response_variable: color_result
+          # Turn on kitchen light
+          - service: light.turn_on
+            target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 100
+              brightness_pct: "{{ brightness_result.brightness }}"
+              kelvin: "{{ color_result.kelvin }}"
               transition: 1
-            action: light.turn_on
       - conditions:
           - condition: trigger
             id: aus
         sequence:
-          - target:
+          # Check if adjacent rooms are occupied
+          - condition: template
+            value_template: >
+              {{ not is_state('binary_sensor.praesenzsensor2_presence', 'on') and
+                 not is_state('binary_sensor.bewegungssensor1_occupancy', 'on') }}
+          # Dim light first
+          - service: light.turn_on
+            target:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 30
               transition: 2
-            action: light.turn_on
+          # Wait for confirmed vacancy
           - wait_template: "{{ is_state('binary_sensor.praesenzsensor_presence', 'off') }}"
             timeout: "00:01:00"
             continue_on_timeout: true
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          - target:
+          # Turn off light
+          - service: light.turn_off
+            target:
               entity_id: light.kuchenlampe
-            action: light.turn_off
-            data: {}
+            data:
+              transition: 2
 mode: restart

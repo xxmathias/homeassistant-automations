@@ -1,0 +1,101 @@
+alias: Durchgangszimmer on Motion
+description: Motion-activated durchgangszimmer lighting with presence validation
+triggers:
+  - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+    to: "on"
+    trigger: state
+    id: motion
+  - entity_id: binary_sensor.praesenzsensor2_presence
+    to: "on"
+    trigger: state
+    id: presence
+conditions:
+  - condition: numeric_state
+    entity_id: sensor.bewegungssensor2_licht_illuminance
+    below: 50
+actions:
+  # Get adaptive brightness
+  - service: script.adaptive_brightness
+    data:
+      mode: >
+        {% set hour = now().hour %}
+        {% if hour >= 22 or hour < 6 %}
+          {% if is_state('light.wohnzimmerlampe', 'off') and 
+              is_state('light.kuchenlampe', 'off') %}
+            night
+          {% else %}
+            normal
+          {% endif %}
+        {% else %}
+          normal
+        {% endif %}
+      room: durchgangszimmer
+    response_variable: brightness_result
+  # Get adaptive color temperature
+  - service: script.adaptive_color_temp
+    data:
+      force_warm: false
+    response_variable: color_result
+  # Turn on durchgangszimmer lights
+  - service: light.turn_on
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      transition: 2
+      brightness_pct: >
+        {% if is_state('light.durchgangszimmer1', 'on') or is_state('light.durchgangszimmer2', 'on') %}
+          {% set current_brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
+          {% set current_brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+          {% set current_pct = ([current_brightness1, current_brightness2]|max / 255 * 100)|round(0) %}
+          {{ [current_pct, brightness_result.brightness]|max }}
+        {% else %}
+          {{ brightness_result.brightness }}
+        {% endif %}
+      kelvin: "{{ color_result.kelvin }}"
+  # Only trigger adjacent rooms if this was initial motion and rooms are dark
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: motion
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+            for:
+              seconds: 30
+          - condition: template
+            value_template: >
+              {{ not is_state('binary_sensor.praesenzsensor_presence', 'on') and
+                 is_state('light.kuchenlampe', 'off') }}
+        sequence:
+          # Briefly turn on kitchen at low brightness as pathway light
+          - service: light.turn_on
+            target:
+              entity_id: light.kuchenlampe
+            data:
+              transition: 2
+              brightness_pct: 30
+              kelvin: "{{ color_result.kelvin }}"
+  # Wait for no presence
+  - wait_for_trigger:
+      - entity_id: binary_sensor.praesenzsensor2_presence
+        to: "off"
+        for:
+          minutes: 1
+        trigger: state
+      - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+        to: "off"
+        for:
+          minutes: 2
+        trigger: state
+    continue_on_timeout: false
+  # Turn off lights
+  - service: light.turn_off
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      transition: 2
+mode: restart

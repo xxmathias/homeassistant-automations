@@ -1,0 +1,64 @@
+alias: Night Bathroom Mode
+description: Minimal pathway lighting for nighttime bathroom trips
+triggers:
+  - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+    to: "on"
+    trigger: state
+conditions:
+  # Night time condition
+  - condition: time
+    after: "22:00:00"
+    before: "06:00:00"
+  # Living room is off (indicates sleeping time)
+  - condition: state
+    entity_id: light.wohnzimmerlampe
+    state: "off"
+  # Kitchen is off
+  - condition: state
+    entity_id: light.kuchenlampe
+    state: "off"
+  # Low light conditions
+  - condition: numeric_state
+    entity_id: sensor.bewegungssensor2_licht_illuminance
+    below: 30
+actions:
+  # Turn on minimal durchgangszimmer lighting
+  - service: light.turn_on
+    target:
+      entity_id: light.durchgangszimmer1  # Only one light for minimal disturbance
+    data:
+      transition: 1
+      brightness_pct: 15
+      kelvin: 2700  # Very warm light
+  # Optional: Turn on entrance light at very low brightness if needed
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "on"
+        sequence:
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 1
+              brightness_pct: 10
+              kelvin: 2700
+  # Wait for motion to stop with longer timeout for bathroom visits
+  - wait_for_trigger:
+      - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+        to: "off"
+        for:
+          minutes: 5  # Longer timeout for bathroom visits
+        trigger: state
+    continue_on_timeout: true
+  # Turn off lights gradually
+  - service: light.turn_off
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+      area_id: entrance
+    data:
+      transition: 5  # Slow fade out
+mode: single  # Only one instance at a time

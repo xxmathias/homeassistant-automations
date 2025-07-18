@@ -1,0 +1,56 @@
+alias: Entrance on Motion
+description: Motion-activated entrance lighting with adaptive brightness and color
+triggers:
+  - entity_id: binary_sensor.bewegungssensor1_occupancy
+    to: "on"
+    trigger: state
+conditions:
+  - condition: numeric_state
+    entity_id: sensor.bewegungssensor1_illuminance
+    below: 50
+actions:
+  # Get adaptive brightness
+  - service: script.adaptive_brightness
+    data:
+      mode: >
+        {% set hour = now().hour %}
+        {% if hour >= 22 or hour < 6 %}
+          night
+        {% else %}
+          normal
+        {% endif %}
+      room: entrance
+    response_variable: brightness_result
+  # Get adaptive color temperature
+  - service: script.adaptive_color_temp
+    data:
+      force_warm: false
+    response_variable: color_result
+  # Turn on entrance lights
+  - service: light.turn_on
+    target:
+      area_id: entrance
+    data:
+      transition: 2
+      brightness_pct: "{{ brightness_result.brightness }}"
+      kelvin: "{{ color_result.kelvin }}"
+  # Wait for no motion
+  - wait_for_trigger:
+      - entity_id: binary_sensor.bewegungssensor1_occupancy
+        to: "off"
+        for:
+          minutes: 2
+        trigger: state
+    continue_on_timeout: false
+  # Check if adjacent rooms are occupied before turning off
+  - condition: template
+    value_template: >
+      {{ not is_state('binary_sensor.praesenzsensor_presence', 'on') and
+         not is_state('binary_sensor.praesenzsensor2_presence', 'on') }}
+  # Turn off entrance lights
+  - service: light.turn_off
+    target:
+      area_id: entrance
+    data:
+      transition: 2
+mode: restart

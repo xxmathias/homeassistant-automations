@@ -1,5 +1,5 @@
 alias: livingroom_on_motion
-description: Motion-activated lighting
+description: Motion-activated lighting with adaptive brightness and color
 triggers:
   - type: occupied
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
@@ -17,8 +17,23 @@ conditions:
     after: "10:00:00"
     before: "23:00:00"
 actions:
-  - data: {}
-    action: light.turn_on
+  # Get adaptive brightness
+  - service: script.adaptive_brightness
+    data:
+      mode: normal
+      room: wohnzimmer
+    response_variable: brightness_result
+  # Get adaptive color temperature
+  - service: script.adaptive_color_temp
+    data:
+      force_warm: false
+    response_variable: color_result
+  # Turn on living room lights
+  - service: light.turn_on
     target:
       area_id: wohnzimmer
+    data:
+      transition: 2
+      brightness_pct: "{{ brightness_result.brightness }}"
+      kelvin: "{{ color_result.kelvin }}"
 mode: restart
