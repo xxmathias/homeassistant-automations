@@ -63,29 +63,27 @@ actions:
         {% else %}
           4000
         {% endif %}
-  # Only trigger adjacent rooms if this was initial motion and rooms are dark
-  - choose:
-      - conditions:
-          - condition: trigger
-            id: motion
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor2_presence
-            state: "off"
-            for:
-              seconds: 30
-          - condition: template
-            value_template: >
-              {{ not is_state('binary_sensor.praesenzsensor_presence', 'on') and
-                 is_state('light.kuchenlampe', 'off') }}
-        sequence:
-          # Briefly turn on kitchen at low brightness as pathway light
-          - service: light.turn_on
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              transition: 1
-              brightness_pct: 30
-              kelvin: 3000
+  # Turn on kitchen as pathway light
+  - service: light.turn_on
+    target:
+      entity_id: light.kuchenlampe
+    data:
+      transition: 1
+      brightness_pct: >
+        {% if is_state('light.kuchenlampe', 'off') %}
+          60
+        {% else %}
+          {% set current_brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+          {% set current_pct = current_brightness / 255 * 100|round(0) %}
+          {{ [current_pct, 60]|max }}
+        {% endif %}
+      kelvin: >
+        {% set hour = now().hour %}
+        {% if hour >= 22 or hour < 6 %}
+          2700
+        {% else %}
+          3000
+        {% endif %}
   # Wait for presence to turn off
   - wait_for_trigger:
       - entity_id: binary_sensor.praesenzsensor2_presence

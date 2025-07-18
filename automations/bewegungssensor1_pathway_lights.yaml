@@ -1,0 +1,116 @@
+alias: Bewegungssensor1 Pathway Lights
+description: Turn on pathway lights when motion detected by bewegungssensor1
+triggers:
+  - entity_id: binary_sensor.bewegungssensor1_occupancy
+    to: "on"
+    trigger: state
+    id: motion_on
+  - entity_id: binary_sensor.bewegungssensor1_occupancy
+    to: "off"
+    trigger: state
+    id: motion_off
+conditions:
+  - condition: numeric_state
+    entity_id: sensor.bewegungssensor1_illuminance
+    below: 50
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: motion_on
+        sequence:
+          # Turn on entrance at full brightness
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 1
+              brightness_pct: 100
+              kelvin: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  2700
+                {% elif hour >= 18 and hour < 22 %}
+                  3000
+                {% elif hour >= 17 and hour < 18 %}
+                  3500
+                {% elif hour >= 9 and hour < 17 %}
+                  4000
+                {% elif hour >= 6 and hour < 9 %}
+                  5000
+                {% else %}
+                  4000
+                {% endif %}
+          # Turn on durchgangszimmer at 60%
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 1
+              brightness_pct: 60
+              kelvin: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  2700
+                {% else %}
+                  3000
+                {% endif %}
+          # Turn on kitchen at 60%
+          - service: light.turn_on
+            target:
+              entity_id: light.kuchenlampe
+            data:
+              transition: 1
+              brightness_pct: 60
+              kelvin: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  2700
+                {% else %}
+                  3000
+                {% endif %}
+      - conditions:
+          - condition: trigger
+            id: motion_off
+        sequence:
+          # Wait 2 minutes before turning off
+          - delay:
+              minutes: 2
+          # Check if still no motion
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+          # Turn off all pathway lights if no presence detected
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor_presence
+                    state: "off"
+                  - condition: state
+                    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+                    state: "off"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      area_id: entrance
+                      entity_id: light.kuchenlampe
+                    data:
+                      transition: 2
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "off"
+                  - condition: state
+                    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+                    state: "off"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id:
+                        - light.durchgangszimmer1
+                        - light.durchgangszimmer2
+                    data:
+                      transition: 2
+mode: restart

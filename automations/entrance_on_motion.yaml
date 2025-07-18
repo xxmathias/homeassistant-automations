@@ -55,6 +55,31 @@ actions:
                 {% else %}
                   4000
                 {% endif %}
+          # Turn on durchgangszimmer as pathway light
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 1
+              brightness_pct: >
+                {% if is_state('light.durchgangszimmer1', 'off') and
+                is_state('light.durchgangszimmer2', 'off') %}
+                  60
+                {% else %}
+                  {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
+                  {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+                  {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
+                  {{ [current_pct, 60]|max }}
+                {% endif %}
+              kelvin: >
+                {% set hour = now().hour %}
+                {% if hour >= 22 or hour < 6 %}
+                  2700
+                {% else %}
+                  3000
+                {% endif %}
       - conditions:
           - condition: trigger
             id: motion_off
