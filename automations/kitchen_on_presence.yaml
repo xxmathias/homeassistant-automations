@@ -48,7 +48,7 @@ actions:
                 {% else %}
                   4000
                 {% endif %}
-              transition: 1
+              transition: 2
       - conditions:
           - condition: trigger
             id: aus
@@ -59,7 +59,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 60
-              transition: 0
+              transition: 2
           # Wait 20 seconds
           - delay:
               seconds: 20
@@ -72,5 +72,5 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 1
+              transition: 2
 mode: restart
