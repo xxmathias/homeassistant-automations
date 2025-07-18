@@ -62,8 +62,8 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 20
-              transition: 0.5
+              brightness_pct: 60
+              transition: 1
           # Wait 10 seconds
           - delay:
               seconds: 10

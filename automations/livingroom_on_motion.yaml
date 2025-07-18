@@ -22,7 +22,7 @@ actions:
     target:
       area_id: wohnzimmer
     data:
-      transition: 2
+      transition: 1
       brightness_pct: >
         {% set hour = now().hour %}
         {% if hour >= 23 or hour < 7 %}

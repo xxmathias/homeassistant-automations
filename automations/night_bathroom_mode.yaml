@@ -60,5 +60,5 @@ actions:
         - light.durchgangszimmer2
       area_id: entrance
     data:
-      transition: 5  # Slow fade out
+      transition: 1
 mode: single  # Only one instance at a time
