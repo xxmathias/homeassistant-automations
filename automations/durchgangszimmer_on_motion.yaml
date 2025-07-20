@@ -10,9 +10,22 @@ triggers:
     trigger: state
     id: presence
 conditions:
-  - condition: numeric_state
-    entity_id: sensor.bewegungssensor2_licht_illuminance
-    below: 50
+  - condition: or
+    conditions:
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: motion
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor2_licht_illuminance
+            below: 50
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: presence
+          - condition: state
+            entity_id: light.durchgangszimmer1
+            state: "on"
 actions:
   # Turn on durchgangszimmer lights with adaptive settings
   - service: light.turn_on
@@ -63,9 +76,11 @@ actions:
         {% else %}
           4000
         {% endif %}
-  # Turn on kitchen as pathway light (only if kitchen presence is not detected)
+  # Turn on kitchen as pathway light (only for motion trigger)
   - choose:
       - conditions:
+          - condition: trigger
+            id: motion
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
@@ -94,6 +109,9 @@ actions:
               entity_id: light.kuchenlampe
             data:
               transition: 2
+  # Only wait for turn-off if this was a motion trigger
+  - condition: trigger
+    id: motion
   # Wait for presence to turn off
   - wait_for_trigger:
       - entity_id: binary_sensor.praesenzsensor2_presence
