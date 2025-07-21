@@ -1,3 +1,4 @@
+id: entrance_on_motion
 alias: Entrance on Motion
 description: Motion-activated entrance lighting with adaptive brightness and color
 triggers:

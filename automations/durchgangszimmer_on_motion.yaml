@@ -1,3 +1,4 @@
+id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
 description: Motion-activated durchgangszimmer lighting with presence validation
 triggers:

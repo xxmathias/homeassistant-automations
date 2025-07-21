@@ -1,3 +1,4 @@
+id: kitchen_on_presence
 alias: Kitchen on presence
 triggers:
   - entity_id: binary_sensor.praesenzsensor_presence

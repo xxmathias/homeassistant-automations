@@ -1,3 +1,4 @@
+id: bewegungssensor1_pathway_lights
 alias: Bewegungssensor1 Pathway Lights
 description: Turn on pathway lights when motion detected by bewegungssensor1
 triggers:

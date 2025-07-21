@@ -1,3 +1,4 @@
+id: livingroom_on_motion
 alias: livingroom_on_motion
 description: Motion-activated lighting with adaptive brightness and color
 triggers:
