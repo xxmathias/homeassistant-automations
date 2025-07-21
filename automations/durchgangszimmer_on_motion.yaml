@@ -112,10 +112,15 @@ actions:
   # Only wait for turn-off if this was a motion trigger
   - condition: trigger
     id: motion
-  # Wait for presence to turn off
+  # Wait for both presence and motion to be clear
   - wait_for_trigger:
       - entity_id: binary_sensor.praesenzsensor2_presence
         to: "off"
+        trigger: state
+      - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+        to: "off"
+        for:
+          seconds: 5
         trigger: state
     continue_on_timeout: false
   # Immediately dim when presence is lost

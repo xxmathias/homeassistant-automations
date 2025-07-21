@@ -1,0 +1,51 @@
+alias: Away Mode - Turn Off Everything
+description: Turn off all lights and switches when both people leave home
+triggers:
+  - entity_id: device_tracker.pixel_7a
+    to: "not_home"
+    trigger: state
+  - entity_id: device_tracker.oddo
+    to: "not_home"
+    trigger: state
+conditions:
+  # Both people must be away
+  - condition: and
+    conditions:
+      - condition: state
+        entity_id: device_tracker.pixel_7a
+        state: "not_home"
+      - condition: state
+        entity_id: device_tracker.oddo
+        state: "not_home"
+actions:
+  # Turn off all lights
+  - service: light.turn_off
+    target:
+      entity_id:
+        - light.kuchenlampe
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+        - light.wohnzimmerlampe
+      area_id:
+        - entrance
+        - schlafzimmer
+    data:
+      transition: 2
+  # Turn off all switches
+  - service: switch.turn_off
+    target:
+      entity_id:
+        - switch.box_left
+        - switch.box_right
+      area_id:
+        - wohnzimmer
+        - schlafzimmer
+  # Send notification to Pixel 7a
+  - service: notify.mobile_app_pixel_7a
+    data:
+      title: "🏠 Away Mode Activated"
+      message: "All lights and switches have been turned off automatically."
+      data:
+        notification_icon: "mdi:home-export-outline"
+        color: "#2196F3"
+mode: single
