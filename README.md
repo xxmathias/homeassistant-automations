@@ -7,6 +7,14 @@ Smart home automations for adaptive lighting and presence detection.
 Entrance → Kitchen / Bathroom / Durchgangszimmer → Livingroom → Bedroom
 ```
 
+## Areas
+- **bathroom**: Bathroom area
+- **bedroom**: Bedroom area  
+- **durchgangszimmer**: Pass-through room
+- **entrance**: Entrance area
+- **kitchen**: Kitchen area
+- **livingroom**: Living room area
+
 ## Devices
 
 ### Sensors

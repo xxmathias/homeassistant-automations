@@ -22,25 +22,25 @@ actions:
   # Turn off all lights
   - service: light.turn_off
     target:
-      entity_id:
-        - light.kuchenlampe
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-        - light.wohnzimmerlampe
       area_id:
+        - bathroom
+        - bedroom
+        - durchgangszimmer
         - entrance
-        - schlafzimmer
+        - kitchen
+        - livingroom
     data:
       transition: 2
   # Turn off all switches
   - service: switch.turn_off
     target:
-      entity_id:
-        - switch.box_left
-        - switch.box_right
       area_id:
-        - wohnzimmer
-        - schlafzimmer
+        - bathroom
+        - bedroom
+        - durchgangszimmer
+        - entrance
+        - kitchen
+        - livingroom
   # Send notification to Pixel 7a
   - service: notify.mobile_app_pixel_7a
     data:

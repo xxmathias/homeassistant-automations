@@ -13,8 +13,8 @@ triggers:
     trigger: device
 conditions: []
 actions:
-  - metadata: {}
-    data: {}
+  # Turn off all lights in all areas
+  - action: light.turn_off
     target:
       area_id:
         - schlafzimmer
@@ -22,12 +22,27 @@ actions:
         - wohnzimmer
         - kuche
         - durchgangszimmer
-    action: light.turn_off
-  - metadata: {}
-    data: {}
+  # Turn off all individual lights
+  - action: light.turn_off
+    target:
+      entity_id:
+        - light.kuchenlampe
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+        - light.wohnzimmerlampe
+  # Turn off all switches in all areas
+  - action: switch.turn_off
     target:
       area_id:
-        - wohnzimmer
         - schlafzimmer
-    action: switch.turn_off
+        - entrance
+        - wohnzimmer
+        - kuche
+        - durchgangszimmer
+  # Turn off Yamaha boxes specifically
+  - action: switch.turn_off
+    target:
+      entity_id:
+        - switch.box_left
+        - switch.box_right
 mode: single
