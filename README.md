@@ -27,9 +27,10 @@ Entrance → Kitchen / Bathroom / Durchgangszimmer → Livingroom → Bedroom
 
 ### Motion-Activated Lighting
 - **entrance_on_motion**: Turns on entrance + durchgangszimmer pathway lighting. Dims after 1:30, off after 2:00
-- **kitchen_on_presence**: Full brightness on presence, dims to 60% when leaving, off after 20s
-- **durchgangszimmer_on_motion**: Adaptive brightness with 15% boost on presence + kitchen pathway light
-- **livingroom_on_motion**: Motion-activated during low light conditions (10:00-23:00)
+- **kitchen_on_presence**: Full brightness on presence, waits 45s → dims to 60% → 15s → off (1min total)
+- **kitchen_pathway_timer**: Auto-off kitchen pathway light after 30s when no presence
+- **durchgangszimmer_on_motion**: Adaptive brightness with 15% boost on presence. Waits 30s before dimming
+- **livingroom_on_motion**: Motion-activated during low light (10:00-23:00). No brightness control
 - **bewegungssensor1_pathway_lights**: Activates entrance, kitchen, and durchgangszimmer as pathway
 
 ### Special Modes
@@ -46,5 +47,6 @@ Entrance → Kitchen / Bathroom / Durchgangszimmer → Livingroom → Bedroom
 ## Key Features
 - Adaptive brightness: 100% day / 30% night (23:00-07:00)
 - Pathway lighting between rooms
-- Presence-aware turn-off logic
+- Presence-aware turn-off with grace periods (no dimming while present)
 - All transitions use 1-2 second fades
+- Individual room control with no conflicts

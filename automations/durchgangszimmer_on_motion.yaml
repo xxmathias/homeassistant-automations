@@ -118,6 +118,13 @@ actions:
         - delay:
             seconds: 2
   # Kitchen pathway turn-off is now handled by separate timer automation
+  # Wait 30 seconds after sensors clear before dimming
+  - delay:
+      seconds: 30
+  # Only dim if still no presence (don't dim while someone is present!)
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor2_presence
+    state: "off"
   # Dim durchgangszimmer lights
   - service: light.turn_on
     target:

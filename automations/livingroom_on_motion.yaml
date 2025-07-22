@@ -18,32 +18,10 @@ conditions:
     after: "10:00:00"
     before: "23:00:00"
 actions:
-  # Turn on living room lights with adaptive settings
+  # Turn on living room lights
   - service: light.turn_on
     target:
       area_id: wohnzimmer
     data:
       transition: 1
-      brightness_pct: >
-        {% set hour = now().hour %}
-        {% if hour >= 23 or hour < 7 %}
-          30
-        {% else %}
-          100
-        {% endif %}
-      kelvin: >
-        {% set hour = now().hour %}
-        {% if hour >= 22 or hour < 6 %}
-          2700
-        {% elif hour >= 18 and hour < 22 %}
-          3000
-        {% elif hour >= 17 and hour < 18 %}
-          3500
-        {% elif hour >= 9 and hour < 17 %}
-          4000
-        {% elif hour >= 6 and hour < 9 %}
-          5000
-        {% else %}
-          4000
-        {% endif %}
 mode: restart
