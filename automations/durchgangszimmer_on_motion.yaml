@@ -99,73 +99,53 @@ actions:
                 {% else %}
                   3000
                 {% endif %}
-  # Start parallel kitchen pathway turn-off logic
-  - parallel:
-      - sequence:
-          # Kitchen pathway turn-off logic runs in parallel
-          - choose:
-              - conditions:
-                  - condition: trigger
-                    id: motion
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor_presence
-                    state: "off"
-                sequence:
-                  - delay:
-                      seconds: 30
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor_presence
-                    state: "off"
-                  - service: light.turn_off
-                    target:
-                      entity_id: light.kuchenlampe
-                    data:
-                      transition: 2
-      - sequence:
-          # Main durchgangszimmer turn-off logic continues here
-          # Wait for both presence and motion to be clear (max 2 minutes)
-          - repeat:
-              while:
-                - condition: or
-                  conditions:
-                    - condition: state
-                      entity_id: binary_sensor.praesenzsensor2_presence
-                      state: "on"
-                    - condition: state
-                      entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                      state: "on"
-              count: 60
-              sequence:
-                - delay:
-                    seconds: 2
-          # Immediately dim when presence is lost
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              brightness_pct: 20
-              transition: 1
-          # Wait 10 seconds and retry if needed
-          - delay:
-              seconds: 10
-          # Retry turn-off logic with multiple attempts
-          - repeat:
-              count: 3
-              sequence:
-                - condition: template
-                  value_template: >
-                    {{ is_state('binary_sensor.praesenzsensor2_presence', 'off') and
-                       is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
-                - service: light.turn_off
-                  target:
-                    entity_id:
-                      - light.durchgangszimmer1
-                      - light.durchgangszimmer2
-                  data:
-                    transition: 1
-                - stop: "Lights turned off successfully"
-                - delay:
-                    seconds: 2
+  # Wait for both presence and motion to be clear (max 2 minutes)
+  - repeat:
+      while:
+        - condition: and
+          conditions:
+            - condition: template
+              value_template: "{{ repeat.index <= 60 }}"
+            - condition: or
+              conditions:
+                - condition: state
+                  entity_id: binary_sensor.praesenzsensor2_presence
+                  state: "on"
+                - condition: state
+                  entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+                  state: "on"
+      sequence:
+        - delay:
+            seconds: 2
+  # Kitchen pathway turn-off is now handled by separate timer automation
+  # Dim durchgangszimmer lights
+  - service: light.turn_on
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      brightness_pct: 20
+      transition: 1
+  # Wait 10 seconds then turn off
+  - delay:
+      seconds: 10
+  # Final turn-off with retry logic
+  - repeat:
+      count: 3
+      sequence:
+        - condition: template
+          value_template: >
+            {{ is_state('binary_sensor.praesenzsensor2_presence', 'off') and
+               is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
+        - service: light.turn_off
+          target:
+            entity_id:
+              - light.durchgangszimmer1
+              - light.durchgangszimmer2
+          data:
+            transition: 1
+        - stop: "Lights turned off successfully"
+        - delay:
+            seconds: 2
 mode: restart

@@ -16,12 +16,10 @@ conditions:
       - condition: numeric_state
         entity_id: sensor.sun_solar_elevation
         below: 30
-      - condition: device
-        type: is_illuminance
-        device_id: 88bb57e89f051c39166d0e65e59ad57f
-        entity_id: 98b574e85114ae17112dcad0b4f796d8
-        domain: sensor
-        below: 45
+      - condition: template
+        value_template: >
+          {% set illuminance = states('sensor.praesenzsensor_illuminance')|default('unknown') %}
+          {{ illuminance != 'unknown' and illuminance|float < 45 }}
 actions:
   - choose:
       - conditions:

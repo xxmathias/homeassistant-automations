@@ -1,0 +1,38 @@
+id: kitchen_pathway_timer
+alias: Kitchen Pathway Light Timer
+description: Turn off kitchen pathway light after 30 seconds
+triggers:
+  - entity_id: light.kuchenlampe
+    to: "on"
+    trigger: state
+conditions:
+  # Only act if kitchen presence is not detected (pathway lighting scenario)
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor_presence
+    state: "off"
+  # Only act if light was turned on at 60% brightness (pathway lighting level)
+  - condition: template
+    value_template: >
+      {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
+      {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+      {{ brightness_pct >= 58 and brightness_pct <= 62 }}
+actions:
+  # Wait 30 seconds
+  - delay:
+      seconds: 30
+  # Check if still no presence and still at pathway brightness
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor_presence
+    state: "off"
+  - condition: template
+    value_template: >
+      {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
+      {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+      {{ brightness_pct >= 58 and brightness_pct <= 62 }}
+  # Turn off kitchen light
+  - service: light.turn_off
+    target:
+      entity_id: light.kuchenlampe
+    data:
+      transition: 2
+mode: restart
