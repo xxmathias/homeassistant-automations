@@ -77,7 +77,7 @@ actions:
         {% else %}
           4000
         {% endif %}
-  # Turn on kitchen as pathway light (only for motion trigger)
+  # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
   - choose:
       - conditions:
           - condition: trigger
@@ -99,31 +99,42 @@ actions:
                 {% else %}
                   3000
                 {% endif %}
-          # Schedule kitchen to turn off after 30 seconds if no presence
-          - delay:
-              seconds: 30
+  # Start parallel sequence to turn off kitchen light after 30s
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: motion
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          - service: light.turn_off
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              transition: 2
-  # Only wait for turn-off if this was a motion trigger
-  - condition: trigger
-    id: motion
+        sequence:
+          - parallel:
+              - sequence:
+                  - delay:
+                      seconds: 30
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor_presence
+                    state: "off"
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      transition: 2
+  # Continue to turn-off logic for both motion and presence triggers
   # Wait for both presence and motion to be clear
-  - wait_for_trigger:
-      - entity_id: binary_sensor.praesenzsensor2_presence
-        to: "off"
-        trigger: state
-      - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-        to: "off"
-        for:
-          seconds: 5
-        trigger: state
-    continue_on_timeout: false
+  - repeat:
+      while:
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: binary_sensor.praesenzsensor2_presence
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+              state: "on"
+      sequence:
+        - delay:
+            seconds: 2
   # Immediately dim when presence is lost
   - service: light.turn_on
     target:
@@ -133,20 +144,25 @@ actions:
     data:
       brightness_pct: 20
       transition: 1
-  # Wait 10 seconds
+  # Wait 10 seconds and retry if needed
   - delay:
       seconds: 10
-  # Check if still no presence and no motion
-  - condition: template
-    value_template: >
-      {{ is_state('binary_sensor.praesenzsensor2_presence', 'off') and
-         is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
-  # Turn off lights completely
-  - service: light.turn_off
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      transition: 1
+  # Retry turn-off logic with multiple attempts
+  - repeat:
+      count: 3
+      sequence:
+        - condition: template
+          value_template: >
+            {{ is_state('binary_sensor.praesenzsensor2_presence', 'off') and
+               is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
+        - service: light.turn_off
+          target:
+            entity_id:
+              - light.durchgangszimmer1
+              - light.durchgangszimmer2
+          data:
+            transition: 1
+        - stop: "Lights turned off successfully"
+        - delay:
+            seconds: 2
 mode: restart
