@@ -8,12 +8,11 @@ Entrance → Kitchen / Bathroom / Durchgangszimmer → Livingroom → Bedroom
 ```
 
 ## Areas
-- **bathroom**: Bathroom area
-- **bedroom**: Bedroom area  
 - **durchgangszimmer**: Pass-through room
 - **entrance**: Entrance area
-- **kitchen**: Kitchen area
-- **livingroom**: Living room area
+- **kuche**: Kitchen area
+- **schlafzimmer**: Bedroom area
+- **wohnzimmer**: Living room area
 
 ## Devices
 

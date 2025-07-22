@@ -23,24 +23,22 @@ actions:
   - service: light.turn_off
     target:
       area_id:
-        - bathroom
-        - bedroom
+        - schlafzimmer
         - durchgangszimmer
         - entrance
-        - kitchen
-        - livingroom
+        - kuche
+        - wohnzimmer
     data:
       transition: 2
   # Turn off all switches
   - service: switch.turn_off
     target:
       area_id:
-        - bathroom
-        - bedroom
+        - schlafzimmer
         - durchgangszimmer
         - entrance
-        - kitchen
-        - livingroom
+        - kuche
+        - wohnzimmer
   # Send notification to Pixel 7a
   - service: notify.mobile_app_pixel_7a
     data:
