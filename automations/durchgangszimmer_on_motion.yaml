@@ -99,27 +99,7 @@ actions:
                 {% else %}
                   3000
                 {% endif %}
-  # Start parallel sequence to turn off kitchen light after 30s
-  - choose:
-      - conditions:
-          - condition: trigger
-            id: motion
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "off"
-        sequence:
-          - parallel:
-              - sequence:
-                  - delay:
-                      seconds: 30
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor_presence
-                    state: "off"
-                  - service: light.turn_off
-                    target:
-                      entity_id: light.kuchenlampe
-                    data:
-                      transition: 2
+  # Kitchen auto turn-off is now handled by separate automation
   # Continue to turn-off logic for both motion and presence triggers
   # Wait for both presence and motion to be clear
   - repeat:
