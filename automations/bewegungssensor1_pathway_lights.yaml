@@ -108,12 +108,6 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 2
-          # Always turn off entrance (no dedicated presence sensor)
-          - service: light.turn_off
-            target:
-              area_id: entrance
-            data:
-              transition: 2
           # Turn off durchgangszimmer if no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
