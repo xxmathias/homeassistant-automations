@@ -4,7 +4,7 @@ description: ""
 use_blueprint:
   path: Soulfly999/tuya-4-button-remote-switch-ts0044-1-zigbee2mqtt.yaml
   input:
-    switch: tuya_mobil_action
+    switch: sensor.tuya_mobil_action
     button_1_short_press:
       - service: light.toggle
         metadata: {}
