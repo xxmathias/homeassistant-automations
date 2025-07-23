@@ -24,13 +24,12 @@ use_blueprint:
         enabled: true
         target:
           area_id: schlafzimmer
-    button_4_short_press: []
-      # Disabled - office area doesn't exist
-      # - service: light.toggle
-      #   metadata: {}
-      #   data: {}
-      #   target:
-      #     area_id: office
+    button_4_short_press:
+      - service: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          area_id: office
     button_1_hold: []
     button_3_hold: []
     button_3_double_press: []
