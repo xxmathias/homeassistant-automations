@@ -85,9 +85,9 @@ actions:
           - condition: trigger
             id: motion_off
         sequence:
-          # Wait 1:30 (90 seconds) before dimming
+          # Wait 2:30 (150 seconds) before dimming
           - delay:
-              seconds: 90
+              seconds: 150
           # Check if still no motion
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
@@ -99,7 +99,7 @@ actions:
             data:
               brightness_pct: 30
               transition: 2
-          # Wait another 30 seconds (total 2 minutes)
+          # Wait another 30 seconds (total 3:00 minutes)
           - delay:
               seconds: 30
           # Check if still no motion

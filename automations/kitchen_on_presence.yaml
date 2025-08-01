@@ -52,9 +52,9 @@ actions:
           - condition: trigger
             id: aus
         sequence:
-          # Wait 45 seconds before dimming
+          # Wait 90 seconds before dimming
           - delay:
-              seconds: 45
+              seconds: 90
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
@@ -66,7 +66,7 @@ actions:
             data:
               brightness_pct: 60
               transition: 2
-          # Wait 15 more seconds (total 1 minute)
+          # Wait 15 more seconds (total 1:45 minutes)
           - delay:
               seconds: 15
           # Check if still no presence
