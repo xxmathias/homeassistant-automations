@@ -134,9 +134,9 @@ actions:
     data:
       brightness_pct: 20
       transition: 1
-  # Wait 10 seconds then turn off
+  # Wait 30 seconds then turn off
   - delay:
-      seconds: 10
+      seconds: 30
   # Final turn-off with retry logic
   - repeat:
       count: 3

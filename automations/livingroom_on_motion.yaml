@@ -1,6 +1,5 @@
-id: livingroom_on_motion
 alias: livingroom_on_motion
-description: Motion-activated lighting with adaptive brightness and color
+description: Motion-activated lighting
 triggers:
   - type: occupied
     device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
@@ -8,20 +7,30 @@ triggers:
     domain: binary_sensor
     trigger: device
 conditions:
-  - condition: numeric_state
-    entity_id: sensor.sun_solar_elevation
-    below: 30
   - condition: state
-    entity_id: light.wohnzimmerlampe
+    entity_id: switch.smart_desk_lamp
     state: "off"
+  - condition: device
+    type: is_illuminance
+    device_id: 88bb57e89f051c39166d0e65e59ad57f
+    entity_id: 98b574e85114ae17112dcad0b4f796d8
+    domain: sensor
+    below: 20
   - condition: time
-    after: "10:00:00"
-    before: "23:00:00"
+    after: "14:00:00"
+    before: "22:00:00"
 actions:
-  # Turn on living room lights
-  - service: light.turn_on
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
     target:
-      area_id: wohnzimmer
+      device_id: a8165b49d578903f0ba524d9605d6c52
+  - action: light.turn_on
+    metadata: {}
     data:
-      transition: 1
+      transition: 2
+    target:
+      device_id:
+        - 9733a211c8661bc3948a23b0d8ac5457
+        - 78a77b4cd5a1b3128df704ea58caf582
 mode: restart
