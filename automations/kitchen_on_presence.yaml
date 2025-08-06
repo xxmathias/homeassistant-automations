@@ -66,9 +66,9 @@ actions:
             data:
               brightness_pct: 60
               transition: 2
-          # Wait 15 more seconds (total 1:45 minutes)
+          # Wait 30 more seconds (total 2:00 minutes)
           - delay:
-              seconds: 15
+              seconds: 30
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
