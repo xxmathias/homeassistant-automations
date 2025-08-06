@@ -46,7 +46,7 @@ actions:
         {% elif is_night_mode %}
           {% set base_brightness = 30 %}
         {% endif %}
-        {% set room_multiplier = 0.8 %}
+        {% set room_multiplier = 0.8 if is_night_mode else 1.0 %}
         {% set target_brightness = (base_brightness * room_multiplier)|int %}
         {% set is_presence_trigger = trigger.id == 'presence' %}
         {% if is_state('light.durchgangszimmer1', 'on') or is_state('light.durchgangszimmer2', 'on') %}
