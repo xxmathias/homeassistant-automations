@@ -40,7 +40,7 @@ actions:
         - kuche
         - wohnzimmer
   # Send notification to Pixel 5
-  - service: notify.mobile_app_pixel_5
+  - service: notify.mobile_app_pixel_5_5g
     data:
       title: "🏠 Away Mode Activated"
       message: "All lights and switches have been turned off automatically."
