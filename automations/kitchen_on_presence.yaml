@@ -18,13 +18,25 @@ triggers:
 conditions:
   - condition: or
     conditions:
-      - condition: numeric_state
-        entity_id: sensor.sun_solar_elevation
-        below: 30
-      - condition: template
-        value_template: >
-          {% set illuminance = states('sensor.praesenzsensor_illuminance')|default('unknown') %}
-          {{ illuminance != 'unknown' and illuminance|float < 45 }}
+      # Skip illuminance check for pathway boost trigger
+      - condition: trigger
+        id: pathway_boost
+      # Normal illuminance conditions for other triggers
+      - condition: and
+        conditions:
+          - condition: not
+            conditions:
+              - condition: trigger
+                id: pathway_boost
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.sun_solar_elevation
+                below: 30
+              - condition: template
+                value_template: >
+                  {% set illuminance = states('sensor.praesenzsensor_illuminance')|default('unknown') %}
+                  {{ illuminance != 'unknown' and illuminance|float < 45 }}
 actions:
   - choose:
       - conditions:
