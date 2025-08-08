@@ -16,12 +16,9 @@ actions:
   # Wait 30 seconds
   - delay:
       seconds: 30
-  # Check if still at pathway brightness and no movement in durchgangszimmer
+  # Check if still no presence in kitchen and still at pathway brightness
   - condition: state
-    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-    state: "off"
-  - condition: state
-    entity_id: binary_sensor.praesenzsensor2_presence
+    entity_id: binary_sensor.praesenzsensor_presence
     state: "off"
   - condition: template
     value_template: >

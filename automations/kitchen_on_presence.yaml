@@ -20,6 +20,16 @@ conditions:
         value_template: >
           {% set illuminance = states('sensor.praesenzsensor_illuminance')|default('unknown') %}
           {{ illuminance != 'unknown' and illuminance|float < 45 }}
+  # Don't trigger if light is at pathway brightness (60%) - let pathway timer handle it
+  - condition: template
+    value_template: >
+      {% if trigger.id == 'an' %}
+        {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+        {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+        {{ brightness_pct < 58 or brightness_pct > 62 }}
+      {% else %}
+        true
+      {% endif %}
 actions:
   - choose:
       - conditions:
