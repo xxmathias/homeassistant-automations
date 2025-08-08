@@ -6,10 +6,6 @@ triggers:
     to: "on"
     trigger: state
 conditions:
-  # Only act if kitchen presence is not detected (pathway lighting scenario)
-  - condition: state
-    entity_id: binary_sensor.praesenzsensor_presence
-    state: "off"
   # Only act if light was turned on at 60% brightness (pathway lighting level)
   - condition: template
     value_template: >
@@ -20,9 +16,12 @@ actions:
   # Wait 30 seconds
   - delay:
       seconds: 30
-  # Check if still no presence and still at pathway brightness
+  # Check if still at pathway brightness and no movement in durchgangszimmer
   - condition: state
-    entity_id: binary_sensor.praesenzsensor_presence
+    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+    state: "off"
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor2_presence
     state: "off"
   - condition: template
     value_template: >
