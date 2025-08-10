@@ -48,22 +48,31 @@ actions:
                 {% else %}
                   4000
                 {% endif %}
-          # Turn on durchgangszimmer at 60%
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 1
-              brightness_pct: 60
-              kelvin: >
-                {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  2700
-                {% else %}
-                  3000
-                {% endif %}
+          # Turn on durchgangszimmer at 60% only if currently off
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: light.durchgangszimmer1
+                    state: "off"
+                  - condition: state
+                    entity_id: light.durchgangszimmer2
+                    state: "off"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id:
+                        - light.durchgangszimmer1
+                        - light.durchgangszimmer2
+                    data:
+                      transition: 1
+                      brightness_pct: 60
+                      kelvin: >
+                        {% set hour = now().hour %}
+                        {% if hour >= 22 or hour < 6 %}
+                          2700
+                        {% else %}
+                          3000
+                        {% endif %}
           # Turn on kitchen at 60% only if no presence detected
           - choose:
               - conditions:
@@ -108,15 +117,18 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 2
-          # Turn off durchgangszimmer if no presence
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor2_presence
-            state: "off"
-          - service: light.turn_off
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 2
+          # Turn off durchgangszimmer only if no presence there
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "off"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id:
+                        - light.durchgangszimmer1
+                        - light.durchgangszimmer2
+                    data:
+                      transition: 2
 mode: restart
