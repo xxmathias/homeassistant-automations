@@ -34,30 +34,7 @@ actions:
               area_id: entrance
             data:
               transition: 2
-              brightness_pct: >
-                {% set hour = now().hour %}
-                {% set is_night_mode = hour >= 23 or hour < 7 %}
-                {% set base_brightness = 100 %}
-                {% if is_night_mode %}
-                  {% set base_brightness = 30 %}
-                {% endif %}
-                {% set room_multiplier = 0.8 if is_night_mode else 1.0 %}
-                {{ (base_brightness * room_multiplier)|int }}
-              kelvin: >
-                {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  2700
-                {% elif hour >= 18 and hour < 22 %}
-                  3000
-                {% elif hour >= 17 and hour < 18 %}
-                  3500
-                {% elif hour >= 9 and hour < 17 %}
-                  4000
-                {% elif hour >= 6 and hour < 9 %}
-                  5000
-                {% else %}
-                  4000
-                {% endif %}
+              brightness_pct: 100
           # Turn on durchgangszimmer as pathway light
           - service: light.turn_on
             target:
@@ -65,7 +42,7 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 1
+              transition: 2
               brightness_pct: >
                 {% if is_state('light.durchgangszimmer1', 'off') and
                 is_state('light.durchgangszimmer2', 'off') %}
@@ -75,13 +52,6 @@ actions:
                   {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
                   {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
                   {{ [current_pct, 60]|max }}
-                {% endif %}
-              kelvin: >
-                {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  2700
-                {% else %}
-                  3000
                 {% endif %}
       - conditions:
           - condition: trigger

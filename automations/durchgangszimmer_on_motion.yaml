@@ -35,23 +35,8 @@ actions:
         - light.durchgangszimmer1
         - light.durchgangszimmer2
     data:
-      transition: 1
+      transition: 2
       brightness_pct: 100
-      kelvin: >
-        {% set hour = now().hour %}
-        {% if hour >= 22 or hour < 6 %}
-          2700
-        {% elif hour >= 18 and hour < 22 %}
-          3000
-        {% elif hour >= 17 and hour < 18 %}
-          3500
-        {% elif hour >= 9 and hour < 17 %}
-          4000
-        {% elif hour >= 6 and hour < 9 %}
-          5000
-        {% else %}
-          4000
-        {% endif %}
   # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
   - choose:
       - conditions:
@@ -65,15 +50,8 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 1
+              transition: 2
               brightness_pct: 60
-              kelvin: >
-                {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  2700
-                {% else %}
-                  3000
-                {% endif %}
   # Wait for both presence and motion to be clear (max 2 minutes)
   - repeat:
       while:
@@ -108,7 +86,7 @@ actions:
         - light.durchgangszimmer2
     data:
       brightness_pct: 20
-      transition: 1
+      transition: 2
   # Wait 30 seconds then turn off
   - delay:
       seconds: 30
@@ -126,7 +104,7 @@ actions:
               - light.durchgangszimmer1
               - light.durchgangszimmer2
           data:
-            transition: 1
+            transition: 2
         - stop: "Lights turned off successfully"
         - delay:
             seconds: 2

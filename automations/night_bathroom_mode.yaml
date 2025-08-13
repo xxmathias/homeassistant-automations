@@ -26,11 +26,11 @@ actions:
   # Turn on minimal durchgangszimmer lighting
   - service: light.turn_on
     target:
-      entity_id: light.durchgangszimmer1  # Only one light for minimal disturbance
+      entity_id: light.durchgangszimmer1 # Only one light for minimal disturbance
     data:
-      transition: 1
+      transition: 2
       brightness_pct: 15
-      kelvin: 2700  # Very warm light
+      kelvin: 2700 # Very warm light
   # Optional: Turn on entrance light at very low brightness if needed
   - choose:
       - conditions:
@@ -42,7 +42,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 1
+              transition: 2
               brightness_pct: 10
               kelvin: 2700
   # Wait for motion to stop with longer timeout for bathroom visits
@@ -50,7 +50,7 @@ actions:
       - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
         to: "off"
         for:
-          minutes: 5  # Longer timeout for bathroom visits
+          minutes: 5 # Longer timeout for bathroom visits
         trigger: state
     continue_on_timeout: true
   # Turn off lights gradually
@@ -61,5 +61,5 @@ actions:
         - light.durchgangszimmer2
       area_id: entrance
     data:
-      transition: 1
-mode: single  # Only one instance at a time
+      transition: 2
+mode: single # Only one instance at a time

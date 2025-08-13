@@ -64,21 +64,6 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 100
-              kelvin: >
-                {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  2700
-                {% elif hour >= 18 and hour < 22 %}
-                  3000
-                {% elif hour >= 17 and hour < 18 %}
-                  3500
-                {% elif hour >= 9 and hour < 17 %}
-                  4000
-                {% elif hour >= 6 and hour < 9 %}
-                  5000
-                {% else %}
-                  4000
-                {% endif %}
               transition: 2
       - conditions:
           - condition: trigger

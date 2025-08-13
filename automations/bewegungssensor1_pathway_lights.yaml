@@ -25,29 +25,8 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 1
-              brightness_pct: >
-                {% set hour = now().hour %}
-                {% if hour >= 23 or hour < 7 %}
-                  30
-                {% else %}
-                  100
-                {% endif %}
-              kelvin: >
-                {% set hour = now().hour %}
-                {% if hour >= 22 or hour < 6 %}
-                  2700
-                {% elif hour >= 18 and hour < 22 %}
-                  3000
-                {% elif hour >= 17 and hour < 18 %}
-                  3500
-                {% elif hour >= 9 and hour < 17 %}
-                  4000
-                {% elif hour >= 6 and hour < 9 %}
-                  5000
-                {% else %}
-                  4000
-                {% endif %}
+              transition: 2
+              brightness_pct: 100
           # Turn on durchgangszimmer at 60% only if currently off
           - choose:
               - conditions:
@@ -64,15 +43,8 @@ actions:
                         - light.durchgangszimmer1
                         - light.durchgangszimmer2
                     data:
-                      transition: 1
+                      transition: 2
                       brightness_pct: 60
-                      kelvin: >
-                        {% set hour = now().hour %}
-                        {% if hour >= 22 or hour < 6 %}
-                          2700
-                        {% else %}
-                          3000
-                        {% endif %}
           # Turn on kitchen at 60% only if no presence detected
           - choose:
               - conditions:
@@ -84,15 +56,8 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 1
+                      transition: 2
                       brightness_pct: 60
-                      kelvin: >
-                        {% set hour = now().hour %}
-                        {% if hour >= 22 or hour < 6 %}
-                          2700
-                        {% else %}
-                          3000
-                        {% endif %}
       - conditions:
           - condition: trigger
             id: motion_off
