@@ -69,23 +69,16 @@ actions:
           - condition: trigger
             id: aus
         sequence:
-          # Wait 60 seconds before dimming
-          - delay:
-              seconds: 60
-          # Check if still no presence
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "off"
-          # Dim the light when presence is lost
+          # Immediately dim the light when presence is lost
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 60
               transition: 2
-          # Wait 30 more seconds (total 1:30 minutes)
+          # Wait 20 seconds before turning off
           - delay:
-              seconds: 30
+              seconds: 20
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
