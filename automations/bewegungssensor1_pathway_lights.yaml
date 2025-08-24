@@ -96,10 +96,16 @@ actions:
                         - light.durchgangszimmer2
                     data:
                       transition: 2
-          # Turn off entrance light
-          - service: light.turn_off
-            target:
-              area_id: entrance
-            data:
-              transition: 2
+          # Turn off entrance light only if no motion in entrance
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+                    state: "off"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      area_id: entrance
+                    data:
+                      transition: 2
 mode: restart
