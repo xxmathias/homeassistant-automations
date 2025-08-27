@@ -2,7 +2,7 @@ id: away_mode_turn_off_everything
 alias: Away Mode - Turn Off Everything
 description: Turn off all lights and switches when both people leave home
 triggers:
-  - entity_id: device_tracker.pixel_5
+  - entity_id: device_tracker.pixel_9_pro
     to: "not_home"
     trigger: state
   - entity_id: device_tracker.oddo
@@ -13,7 +13,7 @@ conditions:
   - condition: and
     conditions:
       - condition: state
-        entity_id: device_tracker.pixel_5
+        entity_id: device_tracker.pixel_9_pro
         state: "not_home"
       - condition: state
         entity_id: device_tracker.oddo
@@ -39,8 +39,8 @@ actions:
         - entrance
         - kuche
         - wohnzimmer
-  # Send notification to Pixel 5
-  - service: notify.mobile_app_pixel_5_5g
+  # Send notification to Pixel 9 Pro
+  - service: notify.mobile_app_pixel_9_pro
     data:
       title: "🏠 Away Mode Activated"
       message: "All lights and switches have been turned off automatically."
