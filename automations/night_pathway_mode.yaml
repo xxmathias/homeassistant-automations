@@ -11,6 +11,10 @@ triggers:
     trigger: state
     id: motion_off
 conditions:
+  # Night time hours (11 PM - 7 AM)
+  - condition: time
+    after: "23:00:00"
+    before: "07:00:00"
   # Living room light is off (indicates night/sleep time)
   - condition: state
     entity_id: light.wohnzimmerlampe
