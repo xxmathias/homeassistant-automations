@@ -29,15 +29,15 @@ actions:
           - condition: trigger
             id: motion_on
         sequence:
-          # Turn on entrance at 15%
+          # Turn on entrance at 70%
           - service: light.turn_on
             target:
               area_id: entrance
             data:
               transition: 2
-              brightness_pct: 15
-              kelvin: 2700  # Warm light for night
-          # Turn on durchgangszimmer at 15%
+              brightness_pct: 70
+              kelvin: 2700 # Warm light for night
+          # Turn on durchgangszimmer at 20%
           - service: light.turn_on
             target:
               entity_id:
@@ -45,15 +45,15 @@ actions:
                 - light.durchgangszimmer2
             data:
               transition: 2
-              brightness_pct: 15
+              brightness_pct: 20
               kelvin: 2700
-          # Turn on kitchen at 15%
+          # Turn on kitchen at 20%
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
               transition: 2
-              brightness_pct: 15
+              brightness_pct: 20
               kelvin: 2700
       - conditions:
           - condition: trigger
