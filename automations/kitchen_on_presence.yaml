@@ -37,6 +37,25 @@ conditions:
                 value_template: >
                   {% set illuminance = states('sensor.praesenzsensor_illuminance')|default('unknown') %}
                   {{ illuminance != 'unknown' and illuminance|float < 45 }}
+  # Skip if in night pathway mode (night time + living room off) - except for pathway boost
+  - condition: or
+    conditions:
+      # Allow pathway boost regardless of night mode
+      - condition: trigger
+        id: pathway_boost
+      # Otherwise check if NOT in night mode
+      - condition: or
+        conditions:
+          # Not night time hours
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
+          # Or living room is on
+          - condition: state
+            entity_id: light.wohnzimmerlampe
+            state: "on"
 actions:
   - choose:
       - conditions:

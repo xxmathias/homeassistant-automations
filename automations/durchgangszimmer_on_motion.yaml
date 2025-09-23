@@ -20,6 +20,19 @@ conditions:
           - condition: numeric_state
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
+          # Skip if in night pathway mode (night time + living room off)
+          - condition: or
+            conditions:
+              # Not night time hours
+              - condition: not
+                conditions:
+                  - condition: time
+                    after: "23:00:00"
+                    before: "07:00:00"
+              # Or living room is on
+              - condition: state
+                entity_id: light.wohnzimmerlampe
+                state: "on"
       - condition: and
         conditions:
           - condition: trigger
@@ -34,6 +47,7 @@ actions:
       entity_id:
         - light.durchgangszimmer1
         - light.durchgangszimmer2
+        - light.stehlampe
     data:
       transition: 2
       brightness_pct: 100
@@ -84,6 +98,7 @@ actions:
       entity_id:
         - light.durchgangszimmer1
         - light.durchgangszimmer2
+        - light.stehlampe
     data:
       brightness_pct: 20
       transition: 2
@@ -103,6 +118,7 @@ actions:
             entity_id:
               - light.durchgangszimmer1
               - light.durchgangszimmer2
+              - light.stehlampe
           data:
             transition: 2
         - stop: "Lights turned off successfully"
