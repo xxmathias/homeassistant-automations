@@ -13,7 +13,7 @@ conditions:
   - condition: numeric_state
     entity_id: sensor.praesenzsensor2_target_distance
     above: 2.6
-    below: 3.4
+    below: 3.55
   # Not in night pathway mode
   - condition: or
     conditions:
