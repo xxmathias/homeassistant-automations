@@ -47,7 +47,6 @@ actions:
       entity_id:
         - light.durchgangszimmer1
         - light.durchgangszimmer2
-        - light.stehlampe
     data:
       transition: 2
       brightness_pct: 100
@@ -98,7 +97,6 @@ actions:
       entity_id:
         - light.durchgangszimmer1
         - light.durchgangszimmer2
-        - light.stehlampe
     data:
       brightness_pct: 20
       transition: 2
