@@ -2,7 +2,7 @@ id: durchgangszimmer_distance_dimming
 alias: Durchgangszimmer Distance Dimming
 description: Dim lights to 30% when presence detected at 2.6-3.4m distance
 triggers:
-  - entity_id: sensor.praesenzsensor2_distance
+  - entity_id: sensor.praesenzsensor2_target_distance
     trigger: state
 conditions:
   # Only trigger if lights are currently on
@@ -11,7 +11,7 @@ conditions:
     state: "on"
   # Check if distance is between 2.6 and 3.4 meters
   - condition: numeric_state
-    entity_id: sensor.praesenzsensor2_distance
+    entity_id: sensor.praesenzsensor2_target_distance
     above: 2.6
     below: 3.4
   # Not in night pathway mode
@@ -33,7 +33,7 @@ actions:
       seconds: 3
   # Check if still in the distance range
   - condition: numeric_state
-    entity_id: sensor.praesenzsensor2_distance
+    entity_id: sensor.praesenzsensor2_target_distance
     above: 2.6
     below: 3.4
   # Dim the lights to 30%
@@ -47,8 +47,8 @@ actions:
       transition: 2
   # Wait while person is in the distance range
   - wait_template: >
-      {{ states('sensor.praesenzsensor2_distance')|float(0) <= 2.6 or
-         states('sensor.praesenzsensor2_distance')|float(0) >= 3.4 or
+      {{ states('sensor.praesenzsensor2_target_distance')|float(0) <= 2.6 or
+         states('sensor.praesenzsensor2_target_distance')|float(0) >= 3.4 or
          is_state('binary_sensor.praesenzsensor2_presence', 'off') }}
     timeout:
       minutes: 5
@@ -59,11 +59,11 @@ actions:
             conditions:
               # Moved closer than 2.6m
               - condition: numeric_state
-                entity_id: sensor.praesenzsensor2_distance
+                entity_id: sensor.praesenzsensor2_target_distance
                 below: 2.6
               # Moved farther than 3.4m
               - condition: numeric_state
-                entity_id: sensor.praesenzsensor2_distance
+                entity_id: sensor.praesenzsensor2_target_distance
                 above: 3.4
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
