@@ -14,19 +14,6 @@ conditions:
   - condition: numeric_state
     entity_id: sensor.bewegungssensor1_illuminance
     below: 50
-  # Skip if in night pathway mode (night time + living room off)
-  - condition: or
-    conditions:
-      # Not night time hours
-      - condition: not
-        conditions:
-          - condition: time
-            after: "23:00:00"
-            before: "07:00:00"
-      # Or living room is on
-      - condition: state
-        entity_id: light.wohnzimmerlampe
-        state: "on"
 actions:
   - choose:
       - conditions:
