@@ -28,15 +28,9 @@ conditions:
             conditions:
               - condition: trigger
                 id: pathway_boost
-          - condition: or
-            conditions:
-              - condition: numeric_state
-                entity_id: sensor.sun_solar_elevation
-                below: 30
-              - condition: template
-                value_template: >
-                  {% set illuminance = states('sensor.praesenzsensor_illuminance')|default('unknown') %}
-                  {{ illuminance != 'unknown' and illuminance|float < 45 }}
+          - condition: numeric_state
+            entity_id: sensor.sun_solar_elevation
+            below: 30
 actions:
   - choose:
       - conditions:
