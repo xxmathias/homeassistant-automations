@@ -43,7 +43,7 @@ actions:
         - light.durchgangszimmer1
         - light.durchgangszimmer2
     data:
-      brightness_pct: 30
+      brightness_pct: 80
       transition: 2
   # Wait while person is in the distance range
   - wait_template: >
