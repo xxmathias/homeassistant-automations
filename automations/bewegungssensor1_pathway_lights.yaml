@@ -27,7 +27,7 @@ actions:
             data:
               transition: 2
               brightness_pct: 100
-          # Turn on durchgangszimmer at appropriate brightness only if currently off
+          # Turn on durchgangszimmer at 60% only if currently off
           - choose:
               - conditions:
                   - condition: state
@@ -37,36 +37,14 @@ actions:
                     entity_id: light.durchgangszimmer2
                     state: "off"
                 sequence:
-                  - choose:
-                      # Night mode: use 20% brightness
-                      - conditions:
-                          - condition: time
-                            after: "23:00:00"
-                            before: "07:00:00"
-                          - condition: state
-                            entity_id: light.wohnzimmerlampe
-                            state: "off"
-                        sequence:
-                          - service: light.turn_on
-                            target:
-                              entity_id:
-                                - light.durchgangszimmer1
-                                - light.durchgangszimmer2
-                            data:
-                              transition: 2
-                              brightness_pct: 20
-                              kelvin: 2700
-                      # Normal mode: use 60% brightness
-                      - conditions: []
-                        sequence:
-                          - service: light.turn_on
-                            target:
-                              entity_id:
-                                - light.durchgangszimmer1
-                                - light.durchgangszimmer2
-                            data:
-                              transition: 2
-                              brightness_pct: 60
+                  - service: light.turn_on
+                    target:
+                      entity_id:
+                        - light.durchgangszimmer1
+                        - light.durchgangszimmer2
+                    data:
+                      transition: 2
+                      brightness_pct: 60
           # Turn on kitchen at 60% only if no presence detected
           - choose:
               - conditions:
