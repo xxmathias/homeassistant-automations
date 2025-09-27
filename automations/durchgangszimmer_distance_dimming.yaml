@@ -1,6 +1,7 @@
-id: durchgangszimmer_distance_dimming
-alias: Durchgangszimmer Distance Dimming
-description: Dim lights to 30% when presence detected at 2.6-3.4m distance
+# DISABLED - Not needed for now
+# id: durchgangszimmer_distance_dimming
+# alias: Durchgangszimmer Distance Dimming
+# description: Dim lights to 30% when presence detected at 2.6-3.4m distance
 triggers:
   - entity_id: sensor.praesenzsensor2_target_distance
     trigger: state

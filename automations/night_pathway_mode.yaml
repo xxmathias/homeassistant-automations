@@ -19,10 +19,6 @@ conditions:
   - condition: state
     entity_id: light.wohnzimmerlampe
     state: "off"
-  # Low light conditions
-  - condition: numeric_state
-    entity_id: sensor.bewegungssensor2_licht_illuminance
-    below: 50
 actions:
   - choose:
       - conditions:
@@ -35,7 +31,7 @@ actions:
               area_id: entrance
             data:
               transition: 2
-              brightness_pct: 70
+              brightness_pct: 30
               kelvin: 2700 # Warm light for night
           # Turn on durchgangszimmer at 20%
           - service: light.turn_on
@@ -59,9 +55,9 @@ actions:
           - condition: trigger
             id: motion_off
         sequence:
-          # Wait 3 minutes before turning off
+          # Wait 2 minutes before turning off
           - delay:
-              minutes: 3
+              minutes: 2
           # Check if still no motion in entrance
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
