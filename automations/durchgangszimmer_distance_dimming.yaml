@@ -2,81 +2,81 @@
 # id: durchgangszimmer_distance_dimming
 # alias: Durchgangszimmer Distance Dimming
 # description: Dim lights to 30% when presence detected at 2.6-3.4m distance
-triggers:
-  - entity_id: sensor.praesenzsensor2_target_distance
-    trigger: state
-conditions:
-  # Only trigger if lights are currently on
-  - condition: state
-    entity_id: light.durchgangszimmer1
-    state: "on"
-  # Check if distance is between 2.6 and 3.4 meters
-  - condition: numeric_state
-    entity_id: sensor.praesenzsensor2_target_distance
-    above: 2.6
-    below: 3.55
-  # Not in night pathway mode
-  - condition: or
-    conditions:
-      # Not night time hours
-      - condition: not
-        conditions:
-          - condition: time
-            after: "23:00:00"
-            before: "07:00:00"
-      # Or living room is on
-      - condition: state
-        entity_id: light.wohnzimmerlampe
-        state: "on"
-actions:
-  # Wait for the distance to be stable in range for a few seconds
-  - delay:
-      seconds: 3
-  # Check if still in the distance range
-  - condition: numeric_state
-    entity_id: sensor.praesenzsensor2_target_distance
-    above: 2.6
-    below: 3.4
-  # Dim the lights to 30%
-  - service: light.turn_on
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      brightness_pct: 80
-      transition: 2
-  # Wait while person is in the distance range
-  - wait_template: >
-      {{ states('sensor.praesenzsensor2_target_distance')|float(0) <= 2.6 or
-         states('sensor.praesenzsensor2_target_distance')|float(0) >= 3.4 or
-         is_state('binary_sensor.praesenzsensor2_presence', 'off') }}
-    timeout:
-      minutes: 5
-  # Check if presence is still detected but moved out of dimming range
-  - choose:
-      - conditions:
-          - condition: or
-            conditions:
-              # Moved closer than 2.6m
-              - condition: numeric_state
-                entity_id: sensor.praesenzsensor2_target_distance
-                below: 2.6
-              # Moved farther than 3.4m
-              - condition: numeric_state
-                entity_id: sensor.praesenzsensor2_target_distance
-                above: 3.4
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor2_presence
-            state: "on"
-        sequence:
-          # Return to full brightness if moved out of dimming range
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              brightness_pct: 100
-              transition: 2
-mode: restart
+# triggers:
+#   - entity_id: sensor.praesenzsensor2_target_distance
+#     trigger: state
+# conditions:
+#   # Only trigger if lights are currently on
+#   - condition: state
+#     entity_id: light.durchgangszimmer1
+#     state: "on"
+#   # Check if distance is between 2.6 and 3.4 meters
+#   - condition: numeric_state
+#     entity_id: sensor.praesenzsensor2_target_distance
+#     above: 2.6
+#     below: 3.55
+#   # Not in night pathway mode
+#   - condition: or
+#     conditions:
+#       # Not night time hours
+#       - condition: not
+#         conditions:
+#           - condition: time
+#             after: "23:00:00"
+#             before: "07:00:00"
+#       # Or living room is on
+#       - condition: state
+#         entity_id: light.wohnzimmerlampe
+#         state: "on"
+# actions:
+#   # Wait for the distance to be stable in range for a few seconds
+#   - delay:
+#       seconds: 3
+#   # Check if still in the distance range
+#   - condition: numeric_state
+#     entity_id: sensor.praesenzsensor2_target_distance
+#     above: 2.6
+#     below: 3.4
+#   # Dim the lights to 30%
+#   - service: light.turn_on
+#     target:
+#       entity_id:
+#         - light.durchgangszimmer1
+#         - light.durchgangszimmer2
+#     data:
+#       brightness_pct: 80
+#       transition: 2
+#   # Wait while person is in the distance range
+#   - wait_template: >
+#       {{ states('sensor.praesenzsensor2_target_distance')|float(0) <= 2.6 or
+#          states('sensor.praesenzsensor2_target_distance')|float(0) >= 3.4 or
+#          is_state('binary_sensor.praesenzsensor2_presence', 'off') }}
+#     timeout:
+#       minutes: 5
+#   # Check if presence is still detected but moved out of dimming range
+#   - choose:
+#       - conditions:
+#           - condition: or
+#             conditions:
+#               # Moved closer than 2.6m
+#               - condition: numeric_state
+#                 entity_id: sensor.praesenzsensor2_target_distance
+#                 below: 2.6
+#               # Moved farther than 3.4m
+#               - condition: numeric_state
+#                 entity_id: sensor.praesenzsensor2_target_distance
+#                 above: 3.4
+#           - condition: state
+#             entity_id: binary_sensor.praesenzsensor2_presence
+#             state: "on"
+#         sequence:
+#           # Return to full brightness if moved out of dimming range
+#           - service: light.turn_on
+#             target:
+#               entity_id:
+#                 - light.durchgangszimmer1
+#                 - light.durchgangszimmer2
+#             data:
+#               brightness_pct: 100
+#               transition: 2
+# mode: restart
