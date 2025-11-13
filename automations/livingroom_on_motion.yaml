@@ -30,7 +30,5 @@ actions:
     data:
       transition: 2
     target:
-      device_id:
-        - 9733a211c8661bc3948a23b0d8ac5457
-        - 78a77b4cd5a1b3128df704ea58caf582
+      area_id: wohnzimmer
 mode: restart
