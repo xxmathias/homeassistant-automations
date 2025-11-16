@@ -125,7 +125,6 @@ actions:
             entity_id:
               - light.durchgangszimmer1
               - light.durchgangszimmer2
-              - light.stehlampe
           data:
             transition: 2
         - stop: "Lights turned off successfully"
