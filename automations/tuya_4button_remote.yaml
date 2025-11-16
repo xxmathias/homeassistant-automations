@@ -35,4 +35,14 @@ use_blueprint:
             - durchgangszimmer
             - kuche
             - entrance
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          area_id:
+            - schlafzimmer
+            - wohnzimmer
+            - durchgangszimmer
+            - kuche
+            - entrance
     switch: sensor.tuya_mobil_action
