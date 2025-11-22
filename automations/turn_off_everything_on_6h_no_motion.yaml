@@ -1,16 +1,14 @@
 id: turn_off_everything_on_6h_no_motion
-alias: Turn OFF everything when 4h no motion
+alias: Turn OFF everything when 6h no motion
 description: ""
 triggers:
-  - type: no_motion
-    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
-    entity_id: edba6ca93c009b956f6a4c0576bb40cf
-    domain: binary_sensor
+  - entity_id: binary_sensor.praesenzsensor_presence
+    to: "off"
     for:
-      hours: 4
+      hours: 6
       minutes: 0
       seconds: 0
-    trigger: device
+    trigger: state
 conditions: []
 actions:
   # Turn off all lights in all areas
