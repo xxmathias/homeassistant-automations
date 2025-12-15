@@ -1,32 +1,24 @@
 alias: livingroom_on_motion
 description: Motion-activated lighting
 triggers:
-  - type: occupied
-    device_id: b1b329d4ce5d2ab76da71acd1fc3c4a2
-    entity_id: edba6ca93c009b956f6a4c0576bb40cf
-    domain: binary_sensor
-    trigger: device
+  - trigger: state
+    entity_id: binary_sensor.bewegungssensor1_occupancy
+    to: "on"
 conditions:
   - condition: state
     entity_id: switch.smart_desk_lamp
     state: "off"
-  - condition: device
-    type: is_illuminance
-    device_id: 88bb57e89f051c39166d0e65e59ad57f
-    entity_id: 98b574e85114ae17112dcad0b4f796d8
-    domain: sensor
+  - condition: numeric_state
+    entity_id: sensor.bewegungssensor2_licht_illuminance
     below: 20
   - condition: time
     after: "14:00:00"
     before: "22:00:00"
 actions:
   - action: switch.turn_on
-    metadata: {}
-    data: {}
     target:
-      device_id: a8165b49d578903f0ba524d9605d6c52
+      entity_id: switch.smart_desk_lamp
   - action: light.turn_on
-    metadata: {}
     data:
       transition: 2
     target:
