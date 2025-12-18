@@ -23,4 +23,18 @@ actions:
       transition: 2
     target:
       area_id: wohnzimmer
+  - action: light.turn_on
+    data:
+      transition: 2
+      brightness_pct: 100
+    target:
+      entity_id: light.wohnzimmerlampe
+  - action: light.turn_on
+    data:
+      transition: 2
+      brightness_pct: 20
+    target:
+      entity_id:
+        - light.vintage_lampe
+        - light.stehlampe
 mode: restart
