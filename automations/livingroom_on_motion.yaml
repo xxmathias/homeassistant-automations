@@ -6,7 +6,7 @@ triggers:
     to: "on"
 conditions:
   - condition: state
-    entity_id: switch.smart_desk_lamp
+    entity_id: switch.desklamp
     state: "off"
   - condition: numeric_state
     entity_id: sensor.bewegungssensor2_licht_illuminance
@@ -17,7 +17,7 @@ conditions:
 actions:
   - action: switch.turn_on
     target:
-      entity_id: switch.smart_desk_lamp
+      entity_id: switch.desklamp
   - action: light.turn_on
     data:
       transition: 2
