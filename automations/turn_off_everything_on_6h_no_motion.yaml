@@ -2,14 +2,21 @@ id: turn_off_everything_on_6h_no_motion
 alias: Turn OFF everything when 6h no motion
 description: ""
 triggers:
+  # Original trigger: presence changes to off for 6 hours
   - entity_id: binary_sensor.praesenzsensor_presence
     to: "off"
     for:
       hours: 6
-      minutes: 0
-      seconds: 0
     trigger: state
-conditions: []
+  # Periodic check: every hour, in case presence was already off when lights turned on
+  - trigger: time_pattern
+    hours: "/1"
+conditions:
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor_presence
+    state: "off"
+    for:
+      hours: 6
 actions:
   # Turn off all lights in all areas
   - action: light.turn_off
