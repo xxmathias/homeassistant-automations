@@ -5,9 +5,15 @@ triggers:
   - entity_id: device_tracker.pixel_9_pro
     to: "not_home"
     trigger: state
+  - entity_id: device_tracker.oddo
+    to: "not_home"
+    trigger: state
 conditions:
   - condition: state
     entity_id: device_tracker.pixel_9_pro
+    state: "not_home"
+  - condition: state
+    entity_id: device_tracker.oddo
     state: "not_home"
 actions:
   # Turn off all lights
