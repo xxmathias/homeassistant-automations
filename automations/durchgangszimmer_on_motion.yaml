@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting with presence validation
+description: Motion-activated durchgangszimmer lighting - stays on while presence detected
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -11,8 +11,11 @@ triggers:
     trigger: state
     id: presence
 conditions:
+  # Only require low light for motion trigger (presence always works)
   - condition: or
     conditions:
+      - condition: trigger
+        id: presence
       - condition: and
         conditions:
           - condition: trigger
@@ -20,13 +23,6 @@ conditions:
           - condition: numeric_state
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
-      - condition: and
-        conditions:
-          - condition: trigger
-            id: presence
-          - condition: state
-            entity_id: light.durchgangszimmer1
-            state: "on"
 actions:
   # Turn on durchgangszimmer lights with adaptive settings
   - choose:
@@ -74,31 +70,31 @@ actions:
             data:
               transition: 2
               brightness_pct: 60
-  # Wait for both presence and motion to be clear (max 2 minutes)
+  # Wait while presence OR motion is detected (check every 2 seconds, max 10 minutes)
   - repeat:
       while:
-        - condition: and
+        - condition: template
+          value_template: "{{ repeat.index <= 300 }}"
+        - condition: or
           conditions:
-            - condition: template
-              value_template: "{{ repeat.index <= 60 }}"
-            - condition: or
-              conditions:
-                - condition: state
-                  entity_id: binary_sensor.praesenzsensor2_presence
-                  state: "on"
-                - condition: state
-                  entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                  state: "on"
+            - condition: state
+              entity_id: binary_sensor.praesenzsensor2_presence
+              state: "on"
+            - condition: state
+              entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+              state: "on"
       sequence:
         - delay:
             seconds: 2
-  # Kitchen pathway turn-off is now handled by separate timer automation
-  # Wait 60 seconds after sensors clear before dimming
+  # Both sensors are now off - wait 60 seconds before dimming
   - delay:
       seconds: 60
-  # Only dim if still no presence (don't dim while someone is present!)
+  # Check again - if presence returned, stop (automation will restart)
   - condition: state
     entity_id: binary_sensor.praesenzsensor2_presence
+    state: "off"
+  - condition: state
+    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     state: "off"
   # Dim durchgangszimmer lights
   - service: light.turn_on
@@ -112,22 +108,19 @@ actions:
   # Wait 30 seconds then turn off
   - delay:
       seconds: 30
-  # Final turn-off with retry logic
-  - repeat:
-      count: 3
-      sequence:
-        - condition: template
-          value_template: >
-            {{ is_state('binary_sensor.praesenzsensor2_presence', 'off') and
-               is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
-        - service: light.turn_off
-          target:
-            entity_id:
-              - light.durchgangszimmer1
-              - light.durchgangszimmer2
-          data:
-            transition: 2
-        - stop: "Lights turned off successfully"
-        - delay:
-            seconds: 2
+  # Final check before turning off
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor2_presence
+    state: "off"
+  - condition: state
+    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+    state: "off"
+  # Turn off lights
+  - service: light.turn_off
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      transition: 2
 mode: restart
