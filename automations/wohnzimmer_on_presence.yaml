@@ -1,0 +1,80 @@
+id: wohnzimmer_on_presence
+alias: Wohnzimmer on presence
+description: Presence-activated living room lighting
+triggers:
+  - entity_id: binary_sensor.praesenzsensor3_presence
+    to: "on"
+    id: presence_on
+    trigger: state
+  - entity_id: binary_sensor.praesenzsensor3_presence
+    to: "off"
+    id: presence_off
+    trigger: state
+conditions:
+  # Only activate when it's dark enough
+  - condition: numeric_state
+    entity_id: sensor.sun_solar_elevation
+    below: 10
+actions:
+  - choose:
+      # Presence detected - turn on light
+      - conditions:
+          - condition: trigger
+            id: presence_on
+        sequence:
+          - choose:
+              # Night mode: dimmed warm light
+              - conditions:
+                  - condition: time
+                    after: "23:00:00"
+                    before: "07:00:00"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.wohnzimmerlampe
+                    data:
+                      brightness_pct: 50
+                      kelvin: 2700
+                      transition: 2
+              # Normal mode: full brightness
+              - conditions: []
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.wohnzimmerlampe
+                    data:
+                      brightness_pct: 100
+                      transition: 2
+      # Presence lost - start turn-off sequence
+      - conditions:
+          - condition: trigger
+            id: presence_off
+        sequence:
+          # Wait 2 minutes before dimming (living room = longer stays)
+          - delay:
+              minutes: 2
+          # Check if still no presence
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          # Dim the light to 40%
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 40
+              transition: 2
+          # Wait another 60 seconds before turning off
+          - delay:
+              seconds: 60
+          # Check if still no presence
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          # Turn off light
+          - service: light.turn_off
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              transition: 2
+mode: restart
