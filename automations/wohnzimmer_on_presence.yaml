@@ -5,7 +5,7 @@
 #
 # Behavior:
 #   Night mode (23:00-07:00):
-#     - Presence detected: Turn on at 20% warm (2700K), only if light is off
+#     - Presence detected: Turn on at 10% warm (2700K), only if light is off
 #     - Presence lost: Turn off after 5s check
 #
 #   Day mode:
@@ -62,7 +62,7 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 20
+              brightness_pct: 10
               kelvin: 2700
               transition: 1
       # Night mode: presence off - turn off immediately
