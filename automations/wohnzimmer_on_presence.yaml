@@ -1,6 +1,6 @@
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
-description: Presence-activated living room lighting
+description: Presence-activated living room lighting with manual override respect
 triggers:
   - entity_id: binary_sensor.praesenzsensor3_presence
     to: "on"
@@ -17,10 +17,13 @@ conditions:
     below: 10
 actions:
   - choose:
-      # Presence detected - turn on light
+      # Presence detected - turn on light only if it's off (respect manual changes)
       - conditions:
           - condition: trigger
             id: presence_on
+          - condition: state
+            entity_id: light.wohnzimmerlampe
+            state: "off"
         sequence:
           - choose:
               # Night mode: dimmed warm light
@@ -33,7 +36,7 @@ actions:
                     target:
                       entity_id: light.wohnzimmerlampe
                     data:
-                      brightness_pct: 50
+                      brightness_pct: 20
                       kelvin: 2700
                       transition: 2
               # Normal mode: full brightness
@@ -50,23 +53,23 @@ actions:
           - condition: trigger
             id: presence_off
         sequence:
-          # Wait 2 minutes before dimming (living room = longer stays)
+          # Wait 10 minutes before dimming
           - delay:
-              minutes: 2
+              minutes: 10
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Dim the light to 40%
+          # Dim the light to 50%
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 40
+              brightness_pct: 50
               transition: 2
-          # Wait another 60 seconds before turning off
+          # Wait 1 minute before turning off
           - delay:
-              seconds: 60
+              minutes: 1
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence

@@ -1,5 +1,5 @@
-alias: livingroom_on_motion
-description: Motion-activated lighting
+alias: Wohnzimmer on motion
+description: Motion-activated lighting from bewegungssensor1
 triggers:
   - trigger: state
     entity_id: binary_sensor.bewegungssensor1_occupancy
@@ -11,30 +11,62 @@ conditions:
   - condition: numeric_state
     entity_id: sensor.bewegungssensor2_licht_illuminance
     below: 20
-  - condition: time
-    after: "14:00:00"
-    before: "22:00:00"
 actions:
-  - action: switch.turn_on
-    target:
-      entity_id: switch.desklamp
-  - action: light.turn_on
-    data:
-      transition: 2
-    target:
-      area_id: wohnzimmer
-  - action: light.turn_on
-    data:
-      transition: 2
-      brightness_pct: 100
-    target:
-      entity_id: light.wohnzimmerlampe
-  - action: light.turn_on
-    data:
-      transition: 2
-      brightness_pct: 20
-    target:
-      entity_id:
-        - light.vintage_lampe
-        - light.stehlampe
+  - choose:
+      # Night mode: only wohnzimmerlampe at 20%
+      - conditions:
+          - condition: time
+            after: "22:00:00"
+            before: "07:00:00"
+        sequence:
+          - action: light.turn_on
+            data:
+              transition: 2
+              brightness_pct: 20
+              kelvin: 2700
+            target:
+              entity_id: light.wohnzimmerlampe
+      # Daytime very dark (< 10 lux): full setup
+      - conditions:
+          - condition: time
+            after: "14:00:00"
+            before: "22:00:00"
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor2_licht_illuminance
+            below: 10
+        sequence:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.desklamp
+          - action: light.turn_on
+            data:
+              transition: 2
+            target:
+              area_id: wohnzimmer
+          - action: light.turn_on
+            data:
+              transition: 2
+              brightness_pct: 100
+            target:
+              entity_id: light.wohnzimmerlampe
+          - action: light.turn_on
+            data:
+              transition: 2
+              brightness_pct: 20
+            target:
+              entity_id:
+                - light.vintage_lampe
+                - light.stehlampe
+      # Daytime slightly dark (10-20 lux): only desklamp
+      - conditions:
+          - condition: time
+            after: "14:00:00"
+            before: "22:00:00"
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor2_licht_illuminance
+            above: 10
+        sequence:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.desklamp
 mode: restart
