@@ -1,3 +1,23 @@
+# Wohnzimmer Presence Automation
+#
+# Sensors:
+#   - binary_sensor.praesenzsensor3_presence (presence detection)
+#
+# Behavior:
+#   Night mode (23:00-07:00):
+#     - Presence detected: Turn on at 20% warm (2700K), only if light is off
+#     - Presence lost: Turn off after 5s check
+#
+#   Day mode:
+#     - Presence detected: Turn on at 100%, only if light is off (respects manual brightness)
+#     - Presence lost: Dim to 50% after 3s check
+#     - Presence detected while dimmed (45-55%): Boost back to 100%
+#     - After 2 min at 50% with no presence: Turn off
+#
+#   Manual override:
+#     - If light is already on when presence detected, brightness is not changed
+#     - This allows manual control without automation interference
+#
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
 description: Presence-activated living room lighting with immersive dimming
