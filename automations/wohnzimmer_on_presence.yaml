@@ -1,6 +1,6 @@
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
-description: Presence-activated living room lighting with manual override respect
+description: Presence-activated living room lighting with immersive dimming
 triggers:
   - entity_id: binary_sensor.praesenzsensor3_presence
     to: "on"
@@ -10,14 +10,60 @@ triggers:
     to: "off"
     id: presence_off
     trigger: state
+  # Boost trigger: when light turns on at dimmed brightness while presence detected
+  - entity_id: light.wohnzimmerlampe
+    to: "on"
+    id: brightness_boost
+    trigger: state
 conditions:
-  # Only activate when it's dark enough
-  - condition: numeric_state
-    entity_id: sensor.sun_solar_elevation
-    below: 10
+  - condition: or
+    conditions:
+      # Skip sun check for brightness boost
+      - condition: trigger
+        id: brightness_boost
+      # Normal sun check for presence triggers
+      - condition: numeric_state
+        entity_id: sensor.sun_solar_elevation
+        below: 10
 actions:
   - choose:
-      # Presence detected - turn on light only if it's off (respect manual changes)
+      # Night mode: presence on - turn on at 20%
+      - conditions:
+          - condition: trigger
+            id: presence_on
+          - condition: time
+            after: "23:00:00"
+            before: "07:00:00"
+          - condition: state
+            entity_id: light.wohnzimmerlampe
+            state: "off"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 20
+              kelvin: 2700
+              transition: 1
+      # Night mode: presence off - turn off immediately
+      - conditions:
+          - condition: trigger
+            id: presence_off
+          - condition: time
+            after: "23:00:00"
+            before: "07:00:00"
+        sequence:
+          - delay:
+              seconds: 5
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          - service: light.turn_off
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              transition: 2
+      # Day mode: presence on - turn on at 100% (only if off)
       - conditions:
           - condition: trigger
             id: presence_on
@@ -25,56 +71,56 @@ actions:
             entity_id: light.wohnzimmerlampe
             state: "off"
         sequence:
-          - choose:
-              # Night mode: dimmed warm light
-              - conditions:
-                  - condition: time
-                    after: "23:00:00"
-                    before: "07:00:00"
-                sequence:
-                  - service: light.turn_on
-                    target:
-                      entity_id: light.wohnzimmerlampe
-                    data:
-                      brightness_pct: 20
-                      kelvin: 2700
-                      transition: 2
-              # Normal mode: full brightness
-              - conditions: []
-                sequence:
-                  - service: light.turn_on
-                    target:
-                      entity_id: light.wohnzimmerlampe
-                    data:
-                      brightness_pct: 100
-                      transition: 2
-      # Presence lost - start turn-off sequence
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 100
+              transition: 1
+      # Day mode: boost back to 100% when presence detected at dimmed brightness
+      - conditions:
+          - condition: trigger
+            id: brightness_boost
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "on"
+          - condition: template
+            value_template: >
+              {% set brightness = state_attr('light.wohnzimmerlampe', 'brightness')|default(255)|int %}
+              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+              {{ brightness_pct >= 45 and brightness_pct <= 55 }}
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 100
+              transition: 1
+      # Day mode: presence off - dim immediately, then turn off after timeout
       - conditions:
           - condition: trigger
             id: presence_off
         sequence:
-          # Wait 10 minutes before dimming
+          # Small delay to avoid flicker from momentary detection loss
           - delay:
-              minutes: 10
-          # Check if still no presence
+              seconds: 3
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Dim the light to 50%
+          # Dim to 50%
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 50
               transition: 2
-          # Wait 1 minute before turning off
+          # Wait before turning off
           - delay:
-              minutes: 1
-          # Check if still no presence
+              minutes: 2
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Turn off light
+          # Turn off
           - service: light.turn_off
             target:
               entity_id: light.wohnzimmerlampe
