@@ -4,41 +4,35 @@
 #   - binary_sensor.praesenzsensor3_presence (presence detection)
 #
 # Behavior:
-#   Night mode (23:00-07:00):
-#     - Presence detected: Only wohnzimmerlampe at 10% warm (2700K)
-#     - Presence lost: Turn off after 5s check
+#   Presence detected:
+#     - Night (23:00-07:00): Only wohnzimmerlampe at 10% warm
+#     - Day: All lights (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
 #
-#   Day mode (07:00-23:00):
-#     - Presence detected: All lights on (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
-#     - Presence lost: Dim to 50% after 3s, turn off others
-#     - After 2 min at 50%: Flash warning (pulse to 15% and back)
-#     - After 30s more: Turn off all lights
+#   Presence lost:
+#     - Night: Turn off after 5s
+#     - Day: Wait 20s → dim to 50% + turn off others → wait 20s → flash → wait 30s → off
 #
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
-description: Presence-activated living room lighting with immersive dimming
 triggers:
   - entity_id: binary_sensor.praesenzsensor3_presence
     to: "on"
-    id: presence_on
+    id: an
     trigger: state
   - entity_id: binary_sensor.praesenzsensor3_presence
     to: "off"
-    id: presence_off
+    id: aus
     trigger: state
 conditions: []
 actions:
   - choose:
-      # Night mode: presence on - only wohnzimmerlampe at 10%
+      # Presence ON - night mode
       - conditions:
           - condition: trigger
-            id: presence_on
+            id: an
           - condition: time
             after: "23:00:00"
             before: "07:00:00"
-          - condition: state
-            entity_id: light.wohnzimmerlampe
-            state: "off"
         sequence:
           - service: light.turn_on
             target:
@@ -46,32 +40,11 @@ actions:
             data:
               brightness_pct: 10
               kelvin: 2700
-              transition: 1
-      # Night mode: presence off - turn off immediately
-      - conditions:
-          - condition: trigger
-            id: presence_off
-          - condition: time
-            after: "23:00:00"
-            before: "07:00:00"
-        sequence:
-          - delay:
-              seconds: 5
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor3_presence
-            state: "off"
-          - service: light.turn_off
-            target:
-              entity_id: light.wohnzimmerlampe
-            data:
               transition: 2
-      # Day mode: presence on - turn on all lights
+      # Presence ON - day mode
       - conditions:
           - condition: trigger
-            id: presence_on
-          - condition: time
-            after: "07:00:00"
-            before: "23:00:00"
+            id: an
         sequence:
           - service: switch.turn_on
             target:
@@ -90,18 +63,35 @@ actions:
             data:
               brightness_pct: 20
               transition: 2
-      # Day mode: presence off - dim immediately, then turn off after timeout
+      # Presence OFF - night mode
       - conditions:
           - condition: trigger
-            id: presence_off
+            id: aus
+          - condition: time
+            after: "23:00:00"
+            before: "07:00:00"
         sequence:
-          # Small delay to avoid flicker from momentary detection loss
           - delay:
-              seconds: 3
+              seconds: 5
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Dim wohnzimmerlampe to 50%, turn off others
+          - service: light.turn_off
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              transition: 2
+      # Presence OFF - day mode
+      - conditions:
+          - condition: trigger
+            id: aus
+        sequence:
+          - delay:
+              seconds: 20
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          # Dim main light, turn off others
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
@@ -118,13 +108,12 @@ actions:
                 - light.stehlampe
             data:
               transition: 2
-          # Wait before warning
           - delay:
-              minutes: 2
+              seconds: 20
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Flash warning: pulse down and back up
+          # Flash warning
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
@@ -139,7 +128,6 @@ actions:
             data:
               brightness_pct: 50
               transition: 1
-          # Wait 30s after warning
           - delay:
               seconds: 30
           - condition: state
