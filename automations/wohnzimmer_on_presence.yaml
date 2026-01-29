@@ -5,15 +5,15 @@
 #
 # Behavior:
 #   Night mode (23:00-07:00):
-#     - Presence detected: Turn on at 10% warm (2700K), only if light is off
+#     - Presence detected: Only wohnzimmerlampe at 10% warm (2700K)
 #     - Presence lost: Turn off after 5s check
 #
-#   Day mode:
-#     - Presence detected: Turn on at 100%, only if light is off (respects manual brightness)
+#   Day mode (07:00-23:00):
+#     - Presence detected: All lights on (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
 #     - Presence lost: Dim to 50% after 3s check
 #     - Presence detected while dimmed (45-55%): Boost back to 100%
 #     - After 2 min at 50%: Flash warning (pulse to 15% and back)
-#     - After 30s more with no presence: Turn off
+#     - After 30s more: Turn off all lights
 #
 #   Manual override:
 #     - If light is already on when presence detected, brightness is not changed
@@ -39,7 +39,7 @@ triggers:
 conditions: []
 actions:
   - choose:
-      # Night mode: presence on - turn on at 20%
+      # Night mode: presence on - only wohnzimmerlampe at 10%
       - conditions:
           - condition: trigger
             id: presence_on
@@ -75,7 +75,7 @@ actions:
               entity_id: light.wohnzimmerlampe
             data:
               transition: 2
-      # Day mode: presence on - turn on at 100% (only if off)
+      # Day mode: presence on - turn on all lights (only if off)
       - conditions:
           - condition: trigger
             id: presence_on
@@ -83,12 +83,23 @@ actions:
             entity_id: light.wohnzimmerlampe
             state: "off"
         sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.desklamp
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 100
-              transition: 1
+              transition: 2
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.vintage_lampe
+                - light.stehlampe
+            data:
+              brightness_pct: 20
+              transition: 2
       # Day mode: boost back to 100% when presence detected at dimmed brightness
       - conditions:
           - condition: trigger
@@ -102,11 +113,22 @@ actions:
               {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
               {{ brightness_pct >= 45 and brightness_pct <= 55 }}
         sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.desklamp
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 100
+              transition: 1
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.vintage_lampe
+                - light.stehlampe
+            data:
+              brightness_pct: 20
               transition: 1
       # Day mode: presence off - dim immediately, then turn off after timeout
       - conditions:
@@ -119,12 +141,22 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Dim to 50%
+          # Dim wohnzimmerlampe to 50%, turn off others
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 50
+              transition: 2
+          - service: switch.turn_off
+            target:
+              entity_id: switch.desklamp
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.vintage_lampe
+                - light.stehlampe
+            data:
               transition: 2
           # Wait before warning
           - delay:
