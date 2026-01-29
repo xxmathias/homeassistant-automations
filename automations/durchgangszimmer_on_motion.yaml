@@ -11,6 +11,17 @@ triggers:
     trigger: state
     id: presence
 conditions:
+  # Skip during night pathway mode (handled by night_pathway_mode automation)
+  - condition: not
+    conditions:
+      - condition: and
+        conditions:
+          - condition: time
+            after: "23:00:00"
+            before: "07:00:00"
+          - condition: state
+            entity_id: light.wohnzimmerlampe
+            state: "off"
   # Only require low light for motion trigger (presence always works)
   - condition: or
     conditions:
@@ -24,37 +35,16 @@ conditions:
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
 actions:
-  # Turn on durchgangszimmer lights with adaptive settings
-  - choose:
-      # Night mode: use dimmed lighting
-      - conditions:
-          - condition: time
-            after: "23:00:00"
-            before: "07:00:00"
-          - condition: state
-            entity_id: light.wohnzimmerlampe
-            state: "off"
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 2
-              brightness_pct: 20
-              kelvin: 2700
-      # Normal mode: full brightness
-      - conditions: []
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 2
-              brightness_pct: 100
+  # Turn on durchgangszimmer lights at full brightness
+  # (night mode is handled by night_pathway_mode automation)
+  - service: light.turn_on
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      transition: 2
+      brightness_pct: 100
   # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
   - choose:
       - conditions:

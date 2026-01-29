@@ -16,26 +16,7 @@ conditions:
     entity_id: device_tracker.oddo
     state: "not_home"
 actions:
-  # Turn off all lights
-  - service: light.turn_off
-    target:
-      area_id:
-        - schlafzimmer
-        - durchgangszimmer
-        - entrance
-        - kuche
-        - wohnzimmer
-    data:
-      transition: 2
-  # Turn off all switches
-  - service: switch.turn_off
-    target:
-      area_id:
-        - schlafzimmer
-        - durchgangszimmer
-        - entrance
-        - kuche
-        - wohnzimmer
+  - action: script.turn_off_all
   # Send notification to Pixel 9 Pro
   - service: notify.mobile_app_pixel_9_pro
     data:

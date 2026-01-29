@@ -18,33 +18,8 @@ conditions:
     for:
       hours: 6
 actions:
-  # Turn off all lights in all areas
-  - action: light.turn_off
-    target:
-      area_id:
-        - schlafzimmer
-        - entrance
-        - wohnzimmer
-        - kuche
-        - durchgangszimmer
-  # Turn off all individual lights
-  - action: light.turn_off
-    target:
-      entity_id:
-        - light.kuchenlampe
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-        - light.wohnzimmerlampe
-  # Turn off all switches in all areas
-  - action: switch.turn_off
-    target:
-      area_id:
-        - schlafzimmer
-        - entrance
-        - wohnzimmer
-        - kuche
-        - durchgangszimmer
-  # Turn off Yamaha boxes specifically
+  - action: script.turn_off_all
+  # Turn off Yamaha boxes (not assigned to an area)
   - action: switch.turn_off
     target:
       entity_id:

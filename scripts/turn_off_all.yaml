@@ -1,0 +1,23 @@
+turn_off_all:
+  alias: Turn Off All
+  description: Turn off all lights and switches in all areas
+  sequence:
+    - action: light.turn_off
+      target:
+        area_id:
+          - schlafzimmer
+          - durchgangszimmer
+          - entrance
+          - kuche
+          - wohnzimmer
+      data:
+        transition: 2
+    - action: switch.turn_off
+      target:
+        area_id:
+          - schlafzimmer
+          - durchgangszimmer
+          - entrance
+          - kuche
+          - wohnzimmer
+  mode: single
