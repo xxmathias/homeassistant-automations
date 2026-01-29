@@ -10,7 +10,7 @@
 #
 #   Presence lost:
 #     - Night: Turn off after 5s
-#     - Day: Wait 20s → dim to 50% + turn off others → wait 20s → flash → wait 30s → off
+#     - Day: Wait 2min → dim to 50% + turn off others → wait 1min → flash → wait 30s → off
 #
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
@@ -87,7 +87,7 @@ actions:
             id: aus
         sequence:
           - delay:
-              seconds: 20
+              minutes: 2
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
@@ -109,7 +109,7 @@ actions:
             data:
               transition: 2
           - delay:
-              seconds: 20
+              minutes: 1
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
