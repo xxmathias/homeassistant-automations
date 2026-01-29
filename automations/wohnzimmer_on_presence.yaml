@@ -10,14 +10,9 @@
 #
 #   Day mode (07:00-23:00):
 #     - Presence detected: All lights on (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
-#     - Presence lost: Dim to 50% after 3s check
-#     - Presence detected while dimmed (45-55%): Boost back to 100%
+#     - Presence lost: Dim to 50% after 3s, turn off others
 #     - After 2 min at 50%: Flash warning (pulse to 15% and back)
 #     - After 30s more: Turn off all lights
-#
-#   Manual override:
-#     - If light is already on when presence detected, brightness is not changed
-#     - This allows manual control without automation interference
 #
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
@@ -30,11 +25,6 @@ triggers:
   - entity_id: binary_sensor.praesenzsensor3_presence
     to: "off"
     id: presence_off
-    trigger: state
-  # Boost trigger: when light turns on at dimmed brightness while presence detected
-  - entity_id: light.wohnzimmerlampe
-    to: "on"
-    id: brightness_boost
     trigger: state
 conditions: []
 actions:
@@ -75,13 +65,13 @@ actions:
               entity_id: light.wohnzimmerlampe
             data:
               transition: 2
-      # Day mode: presence on - turn on all lights (only if off)
+      # Day mode: presence on - turn on all lights
       - conditions:
           - condition: trigger
             id: presence_on
-          - condition: state
-            entity_id: light.wohnzimmerlampe
-            state: "off"
+          - condition: time
+            after: "07:00:00"
+            before: "23:00:00"
         sequence:
           - service: switch.turn_on
             target:
@@ -100,36 +90,6 @@ actions:
             data:
               brightness_pct: 20
               transition: 2
-      # Day mode: boost back to 100% when presence detected at dimmed brightness
-      - conditions:
-          - condition: trigger
-            id: brightness_boost
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor3_presence
-            state: "on"
-          - condition: template
-            value_template: >
-              {% set brightness = state_attr('light.wohnzimmerlampe', 'brightness')|default(255)|int %}
-              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
-              {{ brightness_pct >= 45 and brightness_pct <= 55 }}
-        sequence:
-          - service: switch.turn_on
-            target:
-              entity_id: switch.desklamp
-          - service: light.turn_on
-            target:
-              entity_id: light.wohnzimmerlampe
-            data:
-              brightness_pct: 100
-              transition: 1
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.vintage_lampe
-                - light.stehlampe
-            data:
-              brightness_pct: 20
-              transition: 1
       # Day mode: presence off - dim immediately, then turn off after timeout
       - conditions:
           - condition: trigger
