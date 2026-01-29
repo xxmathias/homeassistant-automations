@@ -36,16 +36,7 @@ triggers:
     to: "on"
     id: brightness_boost
     trigger: state
-conditions:
-  - condition: or
-    conditions:
-      # Skip sun check for brightness boost
-      - condition: trigger
-        id: brightness_boost
-      # Normal sun check for presence triggers
-      - condition: numeric_state
-        entity_id: sensor.sun_solar_elevation
-        below: 10
+conditions: []
 actions:
   - choose:
       # Night mode: presence on - turn on at 20%
