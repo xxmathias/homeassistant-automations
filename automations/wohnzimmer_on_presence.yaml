@@ -12,7 +12,8 @@
 #     - Presence detected: Turn on at 100%, only if light is off (respects manual brightness)
 #     - Presence lost: Dim to 50% after 3s check
 #     - Presence detected while dimmed (45-55%): Boost back to 100%
-#     - After 2 min at 50% with no presence: Turn off
+#     - After 2 min at 50%: Flash warning (pulse to 15% and back)
+#     - After 30s more with no presence: Turn off
 #
 #   Manual override:
 #     - If light is already on when presence detected, brightness is not changed
@@ -134,9 +135,30 @@ actions:
             data:
               brightness_pct: 50
               transition: 2
-          # Wait before turning off
+          # Wait before warning
           - delay:
               minutes: 2
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          # Flash warning: pulse down and back up
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 15
+              transition: 1
+          - delay:
+              seconds: 1
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 50
+              transition: 1
+          # Wait 30s after warning
+          - delay:
+              seconds: 30
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
