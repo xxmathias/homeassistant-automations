@@ -5,7 +5,7 @@
 #   - sensor.bewegungssensor2_licht_illuminance (light level)
 #
 # Behavior:
-#   Night mode (22:00-07:00):
+#   Night mode (23:00-07:00):
 #     - Only wohnzimmerlampe at 10% warm
 #
 #   Day mode (07:00-22:00):
@@ -27,7 +27,7 @@ actions:
       # Night mode: only wohnzimmerlampe at 10%
       - conditions:
           - condition: time
-            after: "22:00:00"
+            after: "23:00:00"
             before: "07:00:00"
         sequence:
           - action: light.turn_on
