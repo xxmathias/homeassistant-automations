@@ -9,8 +9,8 @@
 #     - Boost from 60% pathway to 100% if presence detected
 #
 #   Presence lost:
-#     - Wait 20s → dim to 60%
-#     - Wait 20s → flash warning (pulse to 20% and back)
+#     - Wait 30s → dim to 60%
+#     - Wait 30s → flash warning (pulse to 20% and back)
 #     - Wait 30s → turn off
 #
 id: kitchen_on_presence
@@ -78,9 +78,9 @@ actions:
           - condition: trigger
             id: aus
         sequence:
-          # Wait 20 seconds before dimming
+          # Wait 30 seconds before dimming
           - delay:
-              seconds: 20
+              seconds: 30
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
@@ -94,7 +94,7 @@ actions:
               transition: 2
           # Wait before warning
           - delay:
-              seconds: 20
+              seconds: 30
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
