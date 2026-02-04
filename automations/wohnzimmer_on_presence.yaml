@@ -105,13 +105,13 @@ actions:
             target:
               entity_id: light.vintage_lampe
             data:
-              brightness_pct: 50
+              brightness_pct: 60
               transition: 2
           - service: light.turn_on
             target:
               entity_id: light.stehlampe
             data:
-              brightness_pct: 5
+              brightness_pct: 30
               transition: 2
       # Distance <= 3.2m - vintage lamp dim, stehlampe bright
       - conditions:
@@ -125,13 +125,13 @@ actions:
             target:
               entity_id: light.vintage_lampe
             data:
-              brightness_pct: 5
+              brightness_pct: 30
               transition: 2
           - service: light.turn_on
             target:
               entity_id: light.stehlampe
             data:
-              brightness_pct: 50
+              brightness_pct: 60
               transition: 2
       # Presence OFF - day mode
       - conditions:
