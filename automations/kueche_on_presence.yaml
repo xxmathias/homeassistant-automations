@@ -73,7 +73,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 100
-              transition: 2
+              transition: 3
       - conditions:
           - condition: trigger
             id: aus
@@ -91,7 +91,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 50
-              transition: 2
+              transition: 3
           # Wait before warning
           - delay:
               seconds: 30
@@ -105,7 +105,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 20
-              transition: 1
+              transition: 2
           - delay:
               seconds: 1
           - service: light.turn_on
@@ -113,7 +113,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 50
-              transition: 1
+              transition: 2
           # Wait 30s after warning
           - delay:
               seconds: 30
@@ -126,5 +126,5 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 2
+              transition: 3
 mode: restart

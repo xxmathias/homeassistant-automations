@@ -25,7 +25,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 2
+              transition: 3
               brightness_pct: 100
           # Turn on durchgangszimmer at 60% only if currently off
           - choose:
@@ -43,7 +43,7 @@ actions:
                         - light.durchgangszimmer1
                         - light.durchgangszimmer2
                     data:
-                      transition: 2
+                      transition: 3
                       brightness_pct: 60
           # Turn on kitchen at 60% only if no presence detected
           - choose:
@@ -56,7 +56,7 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 2
+                      transition: 3
                       brightness_pct: 60
       - conditions:
           - condition: trigger
@@ -81,7 +81,7 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 2
+                      transition: 3
           # Turn off durchgangszimmer only if no presence there
           - choose:
               - conditions:
@@ -95,7 +95,7 @@ actions:
                         - light.durchgangszimmer1
                         - light.durchgangszimmer2
                     data:
-                      transition: 2
+                      transition: 3
           # Turn off entrance light only if no motion in entrance
           - choose:
               - conditions:
@@ -107,5 +107,5 @@ actions:
                     target:
                       area_id: entrance
                     data:
-                      transition: 2
+                      transition: 3
 mode: restart
