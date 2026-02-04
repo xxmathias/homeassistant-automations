@@ -11,17 +11,17 @@ triggers:
     trigger: state
     id: presence
 conditions:
-  # Skip during night pathway mode (handled by night_pathway_mode automation)
+  # Skip during night mode (handled by night_pathway_mode automation)
   - condition: not
     conditions:
-      - condition: and
+      - condition: or
         conditions:
           - condition: time
-            after: "23:00:00"
+            after: "00:00:00"
             before: "07:00:00"
           - condition: state
-            entity_id: light.wohnzimmerlampe
-            state: "off"
+            entity_id: input_boolean.night_mode
+            state: "on"
   # Only require low light for motion trigger (presence always works)
   - condition: or
     conditions:

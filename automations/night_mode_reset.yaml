@@ -1,0 +1,12 @@
+id: night_mode_reset
+alias: Night Mode Reset
+description: Reset night mode at 07:00
+triggers:
+  - trigger: time
+    at: "07:00:00"
+conditions: []
+actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.night_mode
+mode: single
