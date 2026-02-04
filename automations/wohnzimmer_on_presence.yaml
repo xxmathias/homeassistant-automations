@@ -107,12 +107,29 @@ actions:
             data:
               brightness_pct: 60
               transition: 5
+          # Stehlampe stepped fade to 30%
+          - service: light.turn_on
+            target:
+              entity_id: light.stehlampe
+            data:
+              brightness_pct: 50
+              transition: 1
+          - delay:
+              seconds: 1
+          - service: light.turn_on
+            target:
+              entity_id: light.stehlampe
+            data:
+              brightness_pct: 40
+              transition: 1
+          - delay:
+              seconds: 1
           - service: light.turn_on
             target:
               entity_id: light.stehlampe
             data:
               brightness_pct: 30
-              transition: 5
+              transition: 1
       # Distance <= 3.2m - vintage lamp dim, stehlampe bright
       - conditions:
           - condition: trigger
@@ -127,12 +144,29 @@ actions:
             data:
               brightness_pct: 30
               transition: 5
+          # Stehlampe stepped fade to 60%
+          - service: light.turn_on
+            target:
+              entity_id: light.stehlampe
+            data:
+              brightness_pct: 40
+              transition: 1
+          - delay:
+              seconds: 1
+          - service: light.turn_on
+            target:
+              entity_id: light.stehlampe
+            data:
+              brightness_pct: 50
+              transition: 1
+          - delay:
+              seconds: 1
           - service: light.turn_on
             target:
               entity_id: light.stehlampe
             data:
               brightness_pct: 60
-              transition: 5
+              transition: 1
       # Presence OFF - day mode
       - conditions:
           - condition: trigger
