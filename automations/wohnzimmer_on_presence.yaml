@@ -11,7 +11,7 @@
 #
 #   Presence lost:
 #     - Night: Turn off after 5s
-#     - Day: Wait 5min → dim to 50% + turn off others → wait 2min → flash → wait 30s → off
+#     - Day: Wait 5min → dim to 50% + turn off others → wait 30s → flash → wait 30s → off
 #
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
@@ -113,16 +113,16 @@ actions:
             data:
               transition: 2
           - delay:
-              minutes: 2
+              seconds: 30
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Flash warning
+          # Flash warning: pulse down and back up
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 15
+              brightness_pct: 20
               transition: 1
           - delay:
               seconds: 1

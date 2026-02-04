@@ -10,9 +10,10 @@
 #     - Turn on durchgangszimmer as pathway at 60% (or keep current if higher)
 #
 #   Motion lost:
-#     - Wait 90s → dim entrance to 60%
+#     - Wait 120s → dim entrance to 50%
+#     - Wait 30s → flash warning
 #     - Wait 30s → turn off entrance
-#     - Total: 2 min before off
+#     - Total: 3 min before off
 #
 id: entrance_on_motion
 alias: Entrance on Motion
@@ -73,21 +74,43 @@ actions:
           - condition: trigger
             id: motion_off
         sequence:
-          # Wait 1:30 (90 seconds) before dimming
+          # Wait 120 seconds before dimming
           - delay:
-              seconds: 90
+              seconds: 120
           # Check if still no motion
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Dim the light
+          # Dim the light to 50%
           - service: light.turn_on
             target:
               area_id: entrance
             data:
-              brightness_pct: 60
+              brightness_pct: 50
               transition: 2
-          # Wait another 30 seconds (total 2:00 minutes)
+          # Wait before warning
+          - delay:
+              seconds: 30
+          # Check if still no motion
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          # Flash warning: pulse down and back up
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              brightness_pct: 20
+              transition: 1
+          - delay:
+              seconds: 1
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              brightness_pct: 50
+              transition: 1
+          # Wait 30 seconds after warning
           - delay:
               seconds: 30
           # Check if still no motion

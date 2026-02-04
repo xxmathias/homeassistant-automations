@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - stays on while presence detected
+description: Motion-activated durchgangszimmer lighting - 60s→dim 50%→30s→flash→30s→off
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -86,7 +86,26 @@ actions:
   - condition: state
     entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     state: "off"
-  # Dim durchgangszimmer lights
+  # Dim durchgangszimmer lights to 50%
+  - service: light.turn_on
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      brightness_pct: 50
+      transition: 2
+  # Wait before warning
+  - delay:
+      seconds: 30
+  # Check if still no presence/motion
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor2_presence
+    state: "off"
+  - condition: state
+    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+    state: "off"
+  # Flash warning: pulse down and back up
   - service: light.turn_on
     target:
       entity_id:
@@ -94,8 +113,18 @@ actions:
         - light.durchgangszimmer2
     data:
       brightness_pct: 20
-      transition: 2
-  # Wait 30 seconds then turn off
+      transition: 1
+  - delay:
+      seconds: 1
+  - service: light.turn_on
+    target:
+      entity_id:
+        - light.durchgangszimmer1
+        - light.durchgangszimmer2
+    data:
+      brightness_pct: 50
+      transition: 1
+  # Wait 30 seconds after warning
   - delay:
       seconds: 30
   # Final check before turning off

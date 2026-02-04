@@ -55,9 +55,9 @@ actions:
           - condition: trigger
             id: motion_off
         sequence:
-          # Wait 2 minutes before turning off
+          # Wait 60 seconds before turning off
           - delay:
-              minutes: 2
+              seconds: 60
           # Check if still no motion in entrance
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy

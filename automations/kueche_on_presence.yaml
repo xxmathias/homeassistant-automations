@@ -9,7 +9,7 @@
 #     - Boost from 60% pathway to 100% if presence detected
 #
 #   Presence lost:
-#     - Wait 30s → dim to 60%
+#     - Wait 60s → dim to 50%
 #     - Wait 30s → flash warning (pulse to 20% and back)
 #     - Wait 30s → turn off
 #
@@ -78,19 +78,19 @@ actions:
           - condition: trigger
             id: aus
         sequence:
-          # Wait 30 seconds before dimming
+          # Wait 60 seconds before dimming
           - delay:
-              seconds: 30
+              seconds: 60
           # Check if still no presence
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          # Dim the light to 60%
+          # Dim the light to 50%
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 60
+              brightness_pct: 50
               transition: 2
           # Wait before warning
           - delay:
@@ -112,7 +112,7 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 60
+              brightness_pct: 50
               transition: 1
           # Wait 30s after warning
           - delay:
