@@ -14,14 +14,9 @@ conditions:
   # Skip during night mode (handled by night_pathway_mode automation)
   - condition: not
     conditions:
-      - condition: or
-        conditions:
-          - condition: time
-            after: "00:00:00"
-            before: "07:00:00"
-          - condition: state
-            entity_id: input_boolean.night_mode
-            state: "on"
+      - condition: time
+        after: "22:00:00"
+        before: "07:00:00"
   # Only require low light for motion trigger (presence always works)
   - condition: or
     conditions:

@@ -11,15 +11,10 @@ triggers:
     trigger: state
     id: motion_off
 conditions:
-  # Night mode: midnight-7am OR night_mode is on (set by bedtime_mode)
-  - condition: or
-    conditions:
-      - condition: time
-        after: "00:00:00"
-        before: "07:00:00"
-      - condition: state
-        entity_id: input_boolean.night_mode
-        state: "on"
+  # Night mode: midnight-7am
+  - condition: time
+    after: "22:00:00"
+    before: "07:00:00"
 actions:
   - choose:
       - conditions:

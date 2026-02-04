@@ -2,10 +2,6 @@ bedtime_mode:
   alias: Bedtime Mode
   description: Turn off all lights except bedroom and prepare for sleep
   sequence:
-    # Enable night mode for pathway lighting
-    - action: input_boolean.turn_on
-      target:
-        entity_id: input_boolean.night_mode
     - action: light.turn_off
       data:
         transition: 3
