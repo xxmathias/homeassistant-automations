@@ -2,7 +2,7 @@
 #
 # Sensors:
 #   - binary_sensor.praesenzsensor3_presence (presence detection)
-#   - sensor.praesenzsensor3_distance (distance-based lighting)
+#   - sensor.praesenzsensor3_target_distance (distance-based lighting)
 #   - sensor.bewegungssensor2_licht_illuminance (light level check)
 #
 # Behavior:
@@ -29,7 +29,7 @@ triggers:
     to: "off"
     id: aus
     trigger: state
-  - entity_id: sensor.praesenzsensor3_distance
+  - entity_id: sensor.praesenzsensor3_target_distance
     id: distance
     trigger: state
 conditions: []
@@ -98,7 +98,7 @@ actions:
           - condition: trigger
             id: distance
           - condition: numeric_state
-            entity_id: sensor.praesenzsensor3_distance
+            entity_id: sensor.praesenzsensor3_target_distance
             above: 3.2
         sequence:
           - service: light.turn_on
@@ -118,7 +118,7 @@ actions:
           - condition: trigger
             id: distance
           - condition: numeric_state
-            entity_id: sensor.praesenzsensor3_distance
+            entity_id: sensor.praesenzsensor3_target_distance
             below: 3.21
         sequence:
           - service: light.turn_on
