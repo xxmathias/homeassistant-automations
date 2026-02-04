@@ -2,17 +2,12 @@
 #
 # Sensors:
 #   - binary_sensor.praesenzsensor3_presence (presence detection)
-#   - sensor.praesenzsensor3_target_distance (distance-based lighting)
 #   - sensor.bewegungssensor2_licht_illuminance (light level check)
 #
 # Behavior:
 #   Presence detected:
 #     - Night (23:00-07:00): Only wohnzimmerlampe at 10% warm
 #     - Day (illuminance < 40 lux): All lights (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
-#
-#   Distance-based (during presence):
-#     - > 3.2m: vintage lamp 50%, stehlampe 5%
-#     - <= 3.2m: vintage lamp 5%, stehlampe 50%
 #
 #   Presence lost:
 #     - Night: Turn off after 5s
@@ -28,9 +23,6 @@ triggers:
   - entity_id: binary_sensor.praesenzsensor3_presence
     to: "off"
     id: aus
-    trigger: state
-  - entity_id: sensor.praesenzsensor3_target_distance
-    id: distance
     trigger: state
 conditions: []
 actions:
@@ -93,80 +85,6 @@ actions:
               entity_id: light.wohnzimmerlampe
             data:
               transition: 2
-      # Distance > 3.2m - vintage lamp bright, stehlampe dim
-      - conditions:
-          - condition: trigger
-            id: distance
-          - condition: numeric_state
-            entity_id: sensor.praesenzsensor3_target_distance
-            above: 3.2
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id: light.vintage_lampe
-            data:
-              brightness_pct: 60
-              transition: 5
-          # Stehlampe stepped fade to 30%
-          - service: light.turn_on
-            target:
-              entity_id: light.stehlampe
-            data:
-              brightness_pct: 50
-              transition: 1
-          - delay:
-              seconds: 1
-          - service: light.turn_on
-            target:
-              entity_id: light.stehlampe
-            data:
-              brightness_pct: 40
-              transition: 1
-          - delay:
-              seconds: 1
-          - service: light.turn_on
-            target:
-              entity_id: light.stehlampe
-            data:
-              brightness_pct: 30
-              transition: 1
-      # Distance <= 3.2m - vintage lamp dim, stehlampe bright
-      - conditions:
-          - condition: trigger
-            id: distance
-          - condition: numeric_state
-            entity_id: sensor.praesenzsensor3_target_distance
-            below: 3.21
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id: light.vintage_lampe
-            data:
-              brightness_pct: 30
-              transition: 5
-          # Stehlampe stepped fade to 60%
-          - service: light.turn_on
-            target:
-              entity_id: light.stehlampe
-            data:
-              brightness_pct: 40
-              transition: 1
-          - delay:
-              seconds: 1
-          - service: light.turn_on
-            target:
-              entity_id: light.stehlampe
-            data:
-              brightness_pct: 50
-              transition: 1
-          - delay:
-              seconds: 1
-          - service: light.turn_on
-            target:
-              entity_id: light.stehlampe
-            data:
-              brightness_pct: 60
-              transition: 1
       # Presence OFF - day mode
       - conditions:
           - condition: trigger
