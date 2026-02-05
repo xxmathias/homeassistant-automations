@@ -7,14 +7,14 @@ use_blueprint:
       - action: light.toggle
         metadata: {}
         data:
-          transition: 3
+          transition: 2
         target:
           device_id: eefddc4491452c82bb3e629a92e02e79
     button_2_short_press:
       - action: light.toggle
         metadata: {}
         data:
-          transition: 3
+          transition: 2
         target:
           device_id: d42c2cdf70ae19c86a572152f31066fd
     button_3_short_press:
@@ -27,7 +27,7 @@ use_blueprint:
       - action: light.turn_off
         metadata: {}
         data:
-          transition: 3
+          transition: 2
         target:
           area_id:
             - schlafzimmer

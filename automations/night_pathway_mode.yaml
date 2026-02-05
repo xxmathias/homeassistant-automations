@@ -26,7 +26,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 3
+              transition: 2
               brightness_pct: 30
               kelvin: 2700 # Warm light for night
           # Turn on durchgangszimmer at 20%
@@ -36,7 +36,7 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 3
+              transition: 2
               brightness_pct: 20
               kelvin: 2700
           # Turn on kitchen at 20%
@@ -44,7 +44,7 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 3
+              transition: 2
               brightness_pct: 20
               kelvin: 2700
       - conditions:
@@ -63,7 +63,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 3
+              transition: 2
           # Turn off durchgangszimmer if no presence
           - choose:
               - conditions:
@@ -77,7 +77,7 @@ actions:
                         - light.durchgangszimmer1
                         - light.durchgangszimmer2
                     data:
-                      transition: 3
+                      transition: 2
           # Turn off kitchen if no presence
           - choose:
               - conditions:
@@ -89,5 +89,5 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 3
+                      transition: 2
 mode: restart

@@ -4,7 +4,7 @@ bedtime_mode:
   sequence:
     - action: light.turn_off
       data:
-        transition: 3
+        transition: 2
       target:
         area_id:
           - durchgangszimmer
@@ -21,7 +21,7 @@ bedtime_mode:
           - switch.box_right
     - action: light.turn_on
       data:
-        transition: 3
+        transition: 2
       target:
         area_id: schlafzimmer
     - action: switch.turn_on

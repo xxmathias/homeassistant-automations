@@ -50,7 +50,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 3
+              transition: 2
               brightness_pct: 100
           # Turn on durchgangszimmer as pathway light
           - service: light.turn_on
@@ -59,7 +59,7 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 3
+              transition: 2
               brightness_pct: >
                 {% if is_state('light.durchgangszimmer1', 'off') and
                 is_state('light.durchgangszimmer2', 'off') %}
@@ -87,7 +87,7 @@ actions:
               area_id: entrance
             data:
               brightness_pct: 50
-              transition: 3
+              transition: 2
           # Wait before warning
           - delay:
               seconds: 30
@@ -101,7 +101,7 @@ actions:
               area_id: entrance
             data:
               brightness_pct: 20
-              transition: 2
+              transition: 1
           - delay:
               seconds: 1
           - service: light.turn_on
@@ -109,7 +109,7 @@ actions:
               area_id: entrance
             data:
               brightness_pct: 50
-              transition: 2
+              transition: 1
           # Wait 30 seconds after warning
           - delay:
               seconds: 30
@@ -122,5 +122,5 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 3
+              transition: 2
 mode: restart
