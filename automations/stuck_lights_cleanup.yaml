@@ -1,0 +1,103 @@
+# Stuck Lights Cleanup Automation
+#
+# Safety net for lights that got stuck at dimmed brightness (e.g., 50%)
+# due to automation failures or edge cases.
+#
+# Runs every 15 minutes and turns off any light that:
+#   - Is at dimmed brightness (40-60%)
+#   - Has no presence/motion detected
+#   - Has been in this state for more than 5 minutes
+#
+id: stuck_lights_cleanup
+alias: Stuck Lights Cleanup
+description: Turn off lights stuck at dimmed brightness with no presence
+triggers:
+  - trigger: time_pattern
+    minutes: "/15"
+conditions: []
+actions:
+  # Check and fix entrance
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+            for:
+              minutes: 5
+          - condition: template
+            value_template: >
+              {% set brightness = state_attr('light.eingangslampe', 'brightness')|default(0)|int %}
+              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+              {{ brightness_pct >= 40 and brightness_pct <= 60 }}
+        sequence:
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 2
+  # Check and fix kitchen
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "off"
+            for:
+              minutes: 5
+          - condition: template
+            value_template: >
+              {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+              {{ brightness_pct >= 40 and brightness_pct <= 60 }}
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: light.kuchenlampe
+            data:
+              transition: 2
+  # Check and fix durchgangszimmer
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+            for:
+              minutes: 5
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+            for:
+              minutes: 5
+          - condition: template
+            value_template: >
+              {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
+              {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+              {% set brightness_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
+              {{ brightness_pct >= 40 and brightness_pct <= 60 }}
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 2
+  # Check and fix wohnzimmer
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+            for:
+              minutes: 5
+          - condition: template
+            value_template: >
+              {% set brightness = state_attr('light.wohnzimmerlampe', 'brightness')|default(0)|int %}
+              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+              {{ brightness_pct >= 40 and brightness_pct <= 60 }}
+        sequence:
+          - service: light.turn_off
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              transition: 2
+mode: single

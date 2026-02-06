@@ -4,6 +4,8 @@
 #   - binary_sensor.bewegungssensor2_licht_occupancy (motion detection)
 #   - sensor.bewegungssensor2_licht_illuminance (light level)
 #
+# Note: Skips during night mode (22:00-07:00) - handled by night_pathway_mode
+#
 # Behavior:
 #   Motion detected (illuminance < 50 lux):
 #     - Turn on entrance lights at 100%
@@ -28,6 +30,12 @@ triggers:
     trigger: state
     id: motion_off
 conditions:
+  # Skip during night mode (handled by night_pathway_mode automation)
+  - condition: not
+    conditions:
+      - condition: time
+        after: "22:00:00"
+        before: "07:00:00"
   - condition: or
     conditions:
       - condition: trigger
