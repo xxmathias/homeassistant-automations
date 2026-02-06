@@ -26,8 +26,9 @@ actions:
               minutes: 5
           - condition: template
             value_template: >
-              {% set brightness = state_attr('light.eingangslampe', 'brightness')|default(0)|int %}
-              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
+              {% set brightness1 = state_attr('light.entrance', 'brightness')|default(0)|int %}
+              {% set brightness2 = state_attr('light.bewegungssensor2_licht', 'brightness')|default(0)|int %}
+              {% set brightness_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
               {{ brightness_pct >= 40 and brightness_pct <= 60 }}
         sequence:
           - service: light.turn_off
