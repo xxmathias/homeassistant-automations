@@ -29,24 +29,36 @@ actions:
               transition: 2
               brightness_pct: 30
               kelvin: 2700 # Warm light for night
-          # Turn on durchgangszimmer at 20%
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 2
-              brightness_pct: 20
-              kelvin: 2700
-          # Turn on kitchen at 20%
-          - service: light.turn_on
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              transition: 2
-              brightness_pct: 20
-              kelvin: 2700
+          # Turn on durchgangszimmer at 20% only if no presence
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "off"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id:
+                        - light.durchgangszimmer1
+                        - light.durchgangszimmer2
+                    data:
+                      transition: 2
+                      brightness_pct: 20
+                      kelvin: 2700
+          # Turn on kitchen at 20% only if no presence
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor_presence
+                    state: "off"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      transition: 2
+                      brightness_pct: 20
+                      kelvin: 2700
       - conditions:
           - condition: trigger
             id: motion_off
