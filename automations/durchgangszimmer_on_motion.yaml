@@ -15,7 +15,7 @@ conditions:
   - condition: not
     conditions:
       - condition: time
-        after: "22:00:00"
+        after: "23:00:00"
         before: "07:00:00"
   # Only require low light for motion trigger (presence always works)
   - condition: or

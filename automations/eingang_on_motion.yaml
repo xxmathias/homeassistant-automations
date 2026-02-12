@@ -4,7 +4,7 @@
 #   - binary_sensor.bewegungssensor2_licht_occupancy (motion detection)
 #   - sensor.bewegungssensor2_licht_illuminance (light level)
 #
-# Note: Skips during night mode (22:00-07:00) - handled by night_pathway_mode
+# Note: Skips during night mode (23:00-07:00) - handled by night_pathway_mode
 #
 # Behavior:
 #   Motion detected (illuminance < 50 lux):
@@ -34,7 +34,7 @@ conditions:
   - condition: not
     conditions:
       - condition: time
-        after: "22:00:00"
+        after: "23:00:00"
         before: "07:00:00"
   - condition: or
     conditions:
