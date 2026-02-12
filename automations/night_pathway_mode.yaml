@@ -27,7 +27,7 @@ actions:
               area_id: entrance
             data:
               transition: 2
-              brightness_pct: 30
+              brightness_pct: 40
               kelvin: 2700 # Warm light for night
           # Turn on durchgangszimmer at 20% only if no presence
           - choose:
@@ -43,9 +43,9 @@ actions:
                         - light.durchgangszimmer2
                     data:
                       transition: 2
-                      brightness_pct: 20
+                      brightness_pct: 30
                       kelvin: 2700
-          # Turn on kitchen at 20% only if no presence
+          # Turn on kitchen at 30% only if no presence
           - choose:
               - conditions:
                   - condition: state
@@ -57,7 +57,7 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 2
-                      brightness_pct: 20
+                      brightness_pct: 30
                       kelvin: 2700
       - conditions:
           - condition: trigger
