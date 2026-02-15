@@ -90,6 +90,16 @@ actions:
                         - light.durchgangszimmer2
                     data:
                       transition: 2
+          # Turn off stehlampe if no presence in durchgangszimmer
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "off"
+                sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: switch.afrika_stehlampe
           # Turn off kitchen if no presence
           - choose:
               - conditions:

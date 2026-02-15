@@ -55,6 +55,18 @@ actions:
             data:
               transition: 2
               brightness_pct: 60
+  # Turn on stehlampe if person stays for 30 seconds
+  - delay:
+      seconds: 30
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "on"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: switch.afrika_stehlampe
   # Wait while presence OR motion is detected (check every 2 seconds, max 10 minutes)
   - repeat:
       while:
@@ -81,6 +93,10 @@ actions:
   - condition: state
     entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     state: "off"
+  # Turn off stehlampe when room is vacated
+  - service: switch.turn_off
+    target:
+      entity_id: switch.afrika_stehlampe
   # Dim durchgangszimmer lights to 50%
   - service: light.turn_on
     target:

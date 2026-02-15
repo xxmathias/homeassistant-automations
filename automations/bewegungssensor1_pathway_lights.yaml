@@ -96,6 +96,9 @@ actions:
                         - light.durchgangszimmer2
                     data:
                       transition: 2
+                  - service: switch.turn_off
+                    target:
+                      entity_id: switch.afrika_stehlampe
           # Turn off entrance light only if no motion in entrance
           - choose:
               - conditions:
