@@ -55,9 +55,9 @@ actions:
             data:
               transition: 2
               brightness_pct: 60
-  # Turn on stehlampe if person stays for 30 seconds
+  # Turn on stehlampe if person stays for 15 seconds
   - delay:
-      seconds: 30
+      seconds: 15
   - choose:
       - conditions:
           - condition: state
