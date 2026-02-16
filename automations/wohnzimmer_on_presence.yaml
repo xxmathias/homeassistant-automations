@@ -91,9 +91,15 @@ actions:
             state: "off"
           - service: light.turn_off
             target:
-              entity_id: light.wohnzimmerlampe
+              entity_id:
+                - light.wohnzimmerlampe
+                - light.vintage_lampe
+                - light.stehlampe
             data:
               transition: 2
+          - service: switch.turn_off
+            target:
+              entity_id: switch.desklamp
       # Presence OFF - day mode
       - conditions:
           - condition: trigger
