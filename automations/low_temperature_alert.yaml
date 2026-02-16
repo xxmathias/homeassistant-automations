@@ -1,0 +1,23 @@
+id: low_temperature_alert
+alias: Low Temperature Alert
+description: Notify when room temperature drops below 15°C
+triggers:
+  - entity_id: sensor.wohnzimmersensor_temperature
+    below: 15
+    trigger: numeric_state
+    id: Wohnzimmer
+  - entity_id: sensor.badsensor_temperature
+    below: 15
+    trigger: numeric_state
+    id: Bad
+conditions: []
+actions:
+  - service: notify.mobile_app_pixel_9_pro
+    data:
+      title: "Temperatur Warnung"
+      message: "{{ trigger.id }} ist bei {{ trigger.to_state.state | round(1) }}°C"
+  - service: notify.mobile_app_oddo
+    data:
+      title: "Temperatur Warnung"
+      message: "{{ trigger.id }} ist bei {{ trigger.to_state.state | round(1) }}°C"
+mode: single
