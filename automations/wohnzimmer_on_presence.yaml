@@ -50,9 +50,6 @@ actions:
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 40
         sequence:
-          - service: switch.turn_on
-            target:
-              entity_id: switch.desklamp
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
@@ -67,6 +64,18 @@ actions:
             data:
               brightness_pct: 20
               transition: 2
+          # Turn on desklamp if person stays for 15 seconds
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor3_presence
+                    state: "on"
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: switch.desklamp
       # Presence OFF - night mode
       - conditions:
           - condition: trigger
