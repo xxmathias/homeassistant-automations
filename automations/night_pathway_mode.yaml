@@ -76,12 +76,14 @@ actions:
               area_id: entrance
             data:
               transition: 2
-          # Turn off durchgangszimmer if no presence
+          # Turn off durchgangszimmer if no presence (5min debounce)
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
+                    for:
+                      minutes: 5
                 sequence:
                   - service: light.turn_off
                     target:
@@ -90,22 +92,26 @@ actions:
                         - light.durchgangszimmer2
                     data:
                       transition: 2
-          # Turn off stehlampe if no presence in durchgangszimmer
+          # Turn off stehlampe if no presence in durchgangszimmer (5min debounce)
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
+                    for:
+                      minutes: 5
                 sequence:
                   - service: switch.turn_off
                     target:
                       entity_id: switch.afrika_stehlampe
-          # Turn off kitchen if no presence
+          # Turn off kitchen if no presence (5min debounce)
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
+                    for:
+                      minutes: 5
                 sequence:
                   - service: light.turn_off
                     target:

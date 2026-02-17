@@ -89,7 +89,7 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                     for:
-                      minutes: 3
+                      minutes: 5
                 sequence:
                   - service: light.turn_off
                     target:

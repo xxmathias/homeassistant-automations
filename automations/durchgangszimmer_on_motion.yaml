@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 3min grace→dim 50%→30s→flash→30s→off
+description: Motion-activated durchgangszimmer lighting - 5min grace→dim 50%→30s→flash→30s→off
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -10,14 +10,14 @@ triggers:
     to: "on"
     trigger: state
     id: presence
-  # Fires when BOTH sensors have been continuously off for 3 minutes,
+  # Fires when BOTH sensors have been continuously off for 5 minutes,
   # so brief presence sensor dropouts don't trigger the shutdown sequence
   - trigger: template
     value_template: >-
       {{ is_state('binary_sensor.praesenzsensor2_presence', 'off')
          and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
     for:
-      minutes: 3
+      minutes: 5
     id: absence
 conditions:
   # Skip during night mode (handled by night_pathway_mode automation)
