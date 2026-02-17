@@ -45,6 +45,18 @@ actions:
                       transition: 2
                       brightness_pct: 30
                       kelvin: 2700
+          # Turn on stehlampe if person stays in durchgangszimmer for 30 seconds
+          - delay:
+              seconds: 30
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "on"
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: switch.afrika_stehlampe
           # Turn on kitchen at 30% only if no presence
           - choose:
               - conditions:
