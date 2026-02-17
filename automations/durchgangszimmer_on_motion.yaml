@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 60s→dim 50%→30s→flash→30s→off
+description: Motion-activated durchgangszimmer lighting - 3min grace→dim 50%→30s→flash→30s→off
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -67,26 +67,25 @@ actions:
           - service: switch.turn_on
             target:
               entity_id: switch.afrika_stehlampe
-  # Wait while presence OR motion is detected (check every 2 seconds, max 10 minutes)
+  # Wait while room is occupied (check every 2s, max 1 hour)
+  # Requires BOTH sensors to be continuously off for 3+ minutes before exiting,
+  # so brief presence sensor dropouts don't trigger the shutdown sequence
   - repeat:
       while:
         - condition: template
-          value_template: "{{ repeat.index <= 300 }}"
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: binary_sensor.praesenzsensor2_presence
-              state: "on"
-            - condition: state
-              entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-              state: "on"
+          value_template: "{{ repeat.index <= 1800 }}"
+        - condition: template
+          value_template: >-
+            {{ not (
+              is_state('binary_sensor.praesenzsensor2_presence', 'off')
+              and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off')
+              and (now() - states.binary_sensor.praesenzsensor2_presence.last_changed).total_seconds() > 180
+              and (now() - states.binary_sensor.bewegungssensor2_licht_occupancy.last_changed).total_seconds() > 180
+            ) }}
       sequence:
         - delay:
             seconds: 2
-  # Both sensors are now off - wait 60 seconds before dimming
-  - delay:
-      seconds: 60
-  # Check again - if presence returned, stop (automation will restart)
+  # Both sensors have been off for 3+ minutes - confirm before dimming
   - condition: state
     entity_id: binary_sensor.praesenzsensor2_presence
     state: "off"
