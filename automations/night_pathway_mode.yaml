@@ -10,6 +10,14 @@ triggers:
     to: "off"
     trigger: state
     id: motion_off
+  # Turn off durchgangszimmer lights + stehlampe when presence clears
+  - entity_id: binary_sensor.praesenzsensor2_presence
+    to: "off"
+    for:
+      minutes: 1
+      seconds: 30
+    trigger: state
+    id: presence_off
 conditions:
   # Night mode: 23:00-07:00
   - condition: time
@@ -95,7 +103,8 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                     for:
-                      minutes: 5
+                      minutes: 1
+                      seconds: 30
                 sequence:
                   - service: light.turn_off
                     target:
@@ -111,7 +120,8 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                     for:
-                      minutes: 5
+                      minutes: 1
+                      seconds: 30
                 sequence:
                   - service: switch.turn_off
                     target:
@@ -123,11 +133,30 @@ actions:
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
                     for:
-                      minutes: 5
+                      minutes: 1
+                      seconds: 30
                 sequence:
                   - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 2
+      # Durchgangszimmer presence off for 5+ minutes - turn off lights + stehlampe
+      - conditions:
+          - condition: trigger
+            id: presence_off
+        sequence:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 2
+          - service: switch.turn_off
+            target:
+              entity_id: switch.afrika_stehlampe
 mode: restart
