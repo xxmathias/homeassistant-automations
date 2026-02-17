@@ -10,6 +10,15 @@ triggers:
     to: "on"
     trigger: state
     id: presence
+  # Fires when BOTH sensors have been continuously off for 3 minutes,
+  # so brief presence sensor dropouts don't trigger the shutdown sequence
+  - trigger: template
+    value_template: >-
+      {{ is_state('binary_sensor.praesenzsensor2_presence', 'off')
+         and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
+    for:
+      minutes: 3
+    id: absence
 conditions:
   # Skip during night mode (handled by night_pathway_mode automation)
   - condition: not
@@ -17,11 +26,13 @@ conditions:
       - condition: time
         after: "23:00:00"
         before: "07:00:00"
-  # Only require low light for motion trigger (presence always works)
+  # Only require low light for motion trigger (presence/absence always works)
   - condition: or
     conditions:
       - condition: trigger
         id: presence
+      - condition: trigger
+        id: absence
       - condition: and
         conditions:
           - condition: trigger
@@ -30,126 +41,120 @@ conditions:
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
 actions:
-  # Turn on durchgangszimmer lights at full brightness
-  # (night mode is handled by night_pathway_mode automation)
-  - service: light.turn_on
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      transition: 2
-      brightness_pct: 100
-  # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
   - choose:
+      # Presence/motion detected - turn on lights
       - conditions:
           - condition: trigger
-            id: motion
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "off"
+            id:
+              - motion
+              - presence
         sequence:
+          # Turn on durchgangszimmer lights at full brightness
           - service: light.turn_on
             target:
-              entity_id: light.kuchenlampe
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
             data:
               transition: 2
-              brightness_pct: 60
-  # Turn on stehlampe if person stays for 15 seconds
-  - delay:
-      seconds: 15
-  - choose:
+              brightness_pct: 100
+          # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
+          - choose:
+              - conditions:
+                  - condition: trigger
+                    id: motion
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor_presence
+                    state: "off"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      transition: 2
+                      brightness_pct: 60
+          # Turn on stehlampe if person stays for 15 seconds
+          - delay:
+              seconds: 15
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "on"
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: switch.afrika_stehlampe
+      # Both sensors off for 3+ minutes - shutdown sequence
       - conditions:
+          - condition: trigger
+            id: absence
+        sequence:
+          # Confirm both sensors still off
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
-            state: "on"
-        sequence:
-          - service: switch.turn_on
+            state: "off"
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          # Turn off stehlampe
+          - service: switch.turn_off
             target:
               entity_id: switch.afrika_stehlampe
-  # Wait while room is occupied (check every 2s, max 1 hour)
-  # Requires BOTH sensors to be continuously off for 3+ minutes before exiting,
-  # so brief presence sensor dropouts don't trigger the shutdown sequence
-  - repeat:
-      while:
-        - condition: template
-          value_template: "{{ repeat.index <= 1800 }}"
-        - condition: template
-          value_template: >-
-            {{ not (
-              is_state('binary_sensor.praesenzsensor2_presence', 'off')
-              and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off')
-              and (now() - states.binary_sensor.praesenzsensor2_presence.last_changed).total_seconds() > 180
-              and (now() - states.binary_sensor.bewegungssensor2_licht_occupancy.last_changed).total_seconds() > 180
-            ) }}
-      sequence:
-        - delay:
-            seconds: 2
-  # Both sensors have been off for 3+ minutes - confirm before dimming
-  - condition: state
-    entity_id: binary_sensor.praesenzsensor2_presence
-    state: "off"
-  - condition: state
-    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-    state: "off"
-  # Turn off stehlampe when room is vacated
-  - service: switch.turn_off
-    target:
-      entity_id: switch.afrika_stehlampe
-  # Dim durchgangszimmer lights to 50%
-  - service: light.turn_on
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      brightness_pct: 50
-      transition: 2
-  # Wait before warning
-  - delay:
-      seconds: 30
-  # Check if still no presence/motion
-  - condition: state
-    entity_id: binary_sensor.praesenzsensor2_presence
-    state: "off"
-  - condition: state
-    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-    state: "off"
-  # Flash warning: pulse down and back up
-  - service: light.turn_on
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      brightness_pct: 20
-      transition: 1
-  - delay:
-      seconds: 1
-  - service: light.turn_on
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      brightness_pct: 50
-      transition: 1
-  # Wait 30 seconds after warning
-  - delay:
-      seconds: 30
-  # Final check before turning off
-  - condition: state
-    entity_id: binary_sensor.praesenzsensor2_presence
-    state: "off"
-  - condition: state
-    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-    state: "off"
-  # Turn off lights
-  - service: light.turn_off
-    target:
-      entity_id:
-        - light.durchgangszimmer1
-        - light.durchgangszimmer2
-    data:
-      transition: 2
+          # Dim durchgangszimmer lights to 50%
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              brightness_pct: 50
+              transition: 2
+          # Wait before warning
+          - delay:
+              seconds: 30
+          # Check if still no presence/motion
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          # Flash warning: pulse down and back up
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              brightness_pct: 20
+              transition: 1
+          - delay:
+              seconds: 1
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              brightness_pct: 50
+              transition: 1
+          # Wait 30 seconds after warning
+          - delay:
+              seconds: 30
+          # Final check before turning off
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          # Turn off lights
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 2
 mode: restart
