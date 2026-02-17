@@ -6,10 +6,14 @@ triggers:
     below: 15
     trigger: numeric_state
     id: Wohnzimmer
+    for:
+      minutes: 5
   - entity_id: sensor.badsensor_temperature
     below: 15
     trigger: numeric_state
     id: Bad
+    for:
+      minutes: 5
 conditions: []
 actions:
   - service: notify.mobile_app_pixel_9_pro
