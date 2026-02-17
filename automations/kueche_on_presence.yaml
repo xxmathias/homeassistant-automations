@@ -8,8 +8,8 @@
 #     - Turn on at 100%
 #     - Boost from 60% pathway to 100% if presence detected
 #
-#   Presence lost:
-#     - Wait 60s → dim to 50%
+#   Presence lost (3min grace period to handle sensor dropouts):
+#     - Dim to 50%
 #     - Wait 30s → flash warning (pulse to 20% and back)
 #     - Wait 30s → turn off
 #
@@ -23,6 +23,8 @@ triggers:
   - entity_id:
       - binary_sensor.praesenzsensor_presence
     to: "off"
+    for:
+      minutes: 3
     id: aus
     trigger: state
   # Also trigger when light turns on at pathway brightness while presence is already detected
@@ -91,10 +93,8 @@ actions:
           - condition: trigger
             id: aus
         sequence:
-          # Wait 60 seconds before dimming
-          - delay:
-              seconds: 60
-          # Check if still no presence
+          # Sensor has been off for 3+ minutes (handled by trigger `for`)
+          # Confirm still off, then start shutdown
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
