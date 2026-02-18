@@ -110,13 +110,7 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Dim main light, turn off others
-          - service: light.turn_on
-            target:
-              entity_id: light.wohnzimmerlampe
-            data:
-              brightness_pct: 50
-              transition: 2
+          # Turn off accent lights + desklamp immediately
           - service: switch.turn_off
             target:
               entity_id: switch.desklamp
@@ -127,12 +121,19 @@ actions:
                 - light.stehlampe
             data:
               transition: 2
+          # Dim main light to 50%
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 50
+              transition: 2
           - delay:
-              seconds: 30
+              seconds: 10
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
-          # Flash warning: pulse down and back up
+          # Flash warning
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
@@ -148,7 +149,7 @@ actions:
               brightness_pct: 50
               transition: 1
           - delay:
-              seconds: 30
+              seconds: 10
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"

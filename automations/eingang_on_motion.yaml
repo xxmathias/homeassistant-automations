@@ -85,25 +85,22 @@ actions:
           # Wait 4 minutes before dimming
           - delay:
               minutes: 4
-          # Check if still no motion
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Dim the light to 50%
+          # Dim to 50%
           - service: light.turn_on
             target:
               area_id: entrance
             data:
               brightness_pct: 50
               transition: 2
-          # Wait before warning
           - delay:
-              seconds: 30
-          # Check if still no motion
+              seconds: 10
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Flash warning: pulse down and back up
+          # Flash warning
           - service: light.turn_on
             target:
               area_id: entrance
@@ -118,14 +115,12 @@ actions:
             data:
               brightness_pct: 50
               transition: 1
-          # Wait 30 seconds after warning
           - delay:
-              seconds: 30
-          # Check if still no motion
+              seconds: 10
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Turn off entrance lights
+          # Turn off
           - service: light.turn_off
             target:
               area_id: entrance

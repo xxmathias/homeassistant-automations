@@ -101,7 +101,7 @@ actions:
           - service: switch.turn_off
             target:
               entity_id: switch.afrika_stehlampe
-          # Dim durchgangszimmer lights to 50%
+          # Dim to 50%
           - service: light.turn_on
             target:
               entity_id:
@@ -110,17 +110,15 @@ actions:
             data:
               brightness_pct: 50
               transition: 2
-          # Wait before warning
           - delay:
-              seconds: 30
-          # Check if still no presence/motion
+              seconds: 10
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Flash warning: pulse down and back up
+          # Flash warning
           - service: light.turn_on
             target:
               entity_id:
@@ -139,17 +137,15 @@ actions:
             data:
               brightness_pct: 50
               transition: 1
-          # Wait 30 seconds after warning
           - delay:
-              seconds: 30
-          # Final check before turning off
+              seconds: 10
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Turn off lights
+          # Turn off
           - service: light.turn_off
             target:
               entity_id:
