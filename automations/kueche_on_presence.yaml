@@ -109,10 +109,10 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 2
-            # Day mode: wait 1 more min (3min total), then dim→flash→off
+            # Day mode: wait 2 more min (4min total), then dim→flash→off
             default:
               - delay:
-                  minutes: 1
+                  minutes: 2
               - condition: state
                 entity_id: binary_sensor.praesenzsensor_presence
                 state: "off"
