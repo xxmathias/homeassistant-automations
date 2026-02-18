@@ -34,6 +34,9 @@ triggers:
 conditions:
   - condition: or
     conditions:
+      # Always allow off trigger through (lights must turn off regardless of sun)
+      - condition: trigger
+        id: aus
       # Skip illuminance check for pathway boost trigger
       - condition: trigger
         id: pathway_boost
