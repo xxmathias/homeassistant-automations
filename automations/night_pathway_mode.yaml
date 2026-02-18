@@ -14,8 +14,7 @@ triggers:
   - entity_id: binary_sensor.praesenzsensor2_presence
     to: "off"
     for:
-      minutes: 1
-      seconds: 30
+      minutes: 2
     trigger: state
     id: presence_off
 conditions:
@@ -83,9 +82,9 @@ actions:
           - condition: trigger
             id: motion_off
         sequence:
-          # Wait 60 seconds before turning off
+          # Wait 2 minutes before turning off
           - delay:
-              seconds: 60
+              minutes: 2
           # Check if still no motion in entrance
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
@@ -103,8 +102,7 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                     for:
-                      minutes: 1
-                      seconds: 30
+                      minutes: 2
                 sequence:
                   - service: light.turn_off
                     target:
@@ -120,8 +118,7 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                     for:
-                      minutes: 1
-                      seconds: 30
+                      minutes: 2
                 sequence:
                   - service: switch.turn_off
                     target:
@@ -133,8 +130,7 @@ actions:
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
                     for:
-                      minutes: 1
-                      seconds: 30
+                      minutes: 2
                 sequence:
                   - service: light.turn_off
                     target:

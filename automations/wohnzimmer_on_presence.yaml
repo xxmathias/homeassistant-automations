@@ -85,7 +85,7 @@ actions:
             before: "07:00:00"
         sequence:
           - delay:
-              seconds: 5
+              minutes: 2
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
