@@ -101,16 +101,5 @@ actions:
                   - service: switch.turn_off
                     target:
                       entity_id: switch.afrika_stehlampe
-          # Turn off entrance light only if no motion in entrance
-          - choose:
-              - conditions:
-                  - condition: state
-                    entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                    state: "off"
-                sequence:
-                  - service: light.turn_off
-                    target:
-                      area_id: entrance
-                    data:
-                      transition: 2
+          # Entrance lights are handled by eingang_on_motion (4min grace)
 mode: restart
