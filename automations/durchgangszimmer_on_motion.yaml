@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 5min grace→dim 50%→30s→flash→30s→off
+description: Motion-activated durchgangszimmer lighting - 4min grace→dim 50%→flash→off
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -20,12 +20,6 @@ triggers:
       minutes: 4
     id: absence
 conditions:
-  # Skip during night mode (handled by night_pathway_mode automation)
-  - condition: not
-    conditions:
-      - condition: time
-        after: "23:00:00"
-        before: "07:00:00"
   # Only require low light for motion trigger (presence/absence always works)
   - condition: or
     conditions:
@@ -42,12 +36,17 @@ conditions:
             below: 50
 actions:
   - choose:
-      # Presence/motion detected - turn on lights
+      # Presence/motion detected - turn on lights (skip during night mode)
       - conditions:
           - condition: trigger
             id:
               - motion
               - presence
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
         sequence:
           # Turn on durchgangszimmer lights at full brightness
           - service: light.turn_on
