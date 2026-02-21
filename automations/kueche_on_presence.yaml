@@ -5,12 +5,12 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Turn on at 100%
-#     - Boost from 60% pathway to 100% if presence detected
+#     - Turn on at 100% (when sun < 30° or light at pathway brightness)
+#     - Boost from 60% pathway to 100% when presence turns on
 #
 #   Presence lost:
-#     - Night (23:00-07:00): 2min grace → turn off
-#     - Day: 3min grace → dim to 50% → 30s → flash → 30s → turn off
+#     - Night (23:00-07:00): 2min grace → dim → flash → off
+#     - Day: 4min grace → dim to 50% → flash → off
 #
 id: kitchen_on_presence
 alias: Kitchen on presence
@@ -26,20 +26,12 @@ triggers:
       minutes: 2
     id: aus
     trigger: state
-  # Also trigger when light turns on at pathway brightness while presence is already detected
-  - entity_id: light.kuchenlampe
-    to: "on"
-    id: pathway_boost
-    trigger: state
 conditions:
   - condition: or
     conditions:
       # Always allow off trigger through (lights must turn off regardless of sun)
       - condition: trigger
         id: aus
-      # Skip illuminance check for pathway boost trigger
-      - condition: trigger
-        id: pathway_boost
       # Allow presence trigger when light is already on at pathway brightness (boost needed)
       - condition: and
         conditions:
@@ -53,36 +45,15 @@ conditions:
               {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
               {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
               {{ brightness_pct >= 58 and brightness_pct <= 62 }}
-      # Normal illuminance conditions for other triggers
-      - condition: and
-        conditions:
-          - condition: not
-            conditions:
-              - condition: trigger
-                id: pathway_boost
-          - condition: numeric_state
-            entity_id: sensor.sun_solar_elevation
-            below: 30
+      # Normal illuminance conditions
+      - condition: numeric_state
+        entity_id: sensor.sun_solar_elevation
+        below: 30
 actions:
   - choose:
       - conditions:
-          - condition: or
-            conditions:
-              - condition: trigger
-                id: an
-              # Boost from pathway to full brightness when presence is detected
-              - condition: and
-                conditions:
-                  - condition: trigger
-                    id: pathway_boost
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor_presence
-                    state: "on"
-                  - condition: template
-                    value_template: >
-                      {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
-                      {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
-                      {{ brightness_pct >= 58 and brightness_pct <= 62 }}
+          - condition: trigger
+            id: an
         sequence:
           # Turn on kitchen light with adaptive settings
           - service: light.turn_on
