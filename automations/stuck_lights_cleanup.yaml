@@ -35,7 +35,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 2
+              transition: 3
   # Check and fix kitchen
   - choose:
       - conditions:
@@ -54,7 +54,7 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 2
+              transition: 3
   # Check and fix durchgangszimmer
   - choose:
       - conditions:
@@ -81,7 +81,7 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 2
+              transition: 3
   # Check and fix wohnzimmer
   - choose:
       - conditions:
@@ -100,5 +100,5 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              transition: 2
+              transition: 3
 mode: single

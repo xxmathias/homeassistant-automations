@@ -25,7 +25,7 @@ actions:
             target:
               area_id: entrance
             data:
-              transition: 2
+              transition: 3
               brightness_pct: 100
           # Turn on durchgangszimmer as pathway (preserve higher brightness if already on)
           - service: light.turn_on
@@ -34,7 +34,7 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 2
+              transition: 3
               brightness_pct: >
                 {% if is_state('light.durchgangszimmer1', 'off') and
                 is_state('light.durchgangszimmer2', 'off') %}
@@ -56,7 +56,7 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 2
+                      transition: 3
                       brightness_pct: 60
       - conditions:
           - condition: trigger
@@ -81,7 +81,7 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 2
+                      transition: 3
           # Turn off durchgangszimmer only if no presence there
           - choose:
               - conditions:
@@ -97,7 +97,7 @@ actions:
                         - light.durchgangszimmer1
                         - light.durchgangszimmer2
                     data:
-                      transition: 2
+                      transition: 3
                   - service: switch.turn_off
                     target:
                       entity_id: switch.afrika_stehlampe

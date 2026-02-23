@@ -55,7 +55,7 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 2
+              transition: 3
               brightness_pct: 100
           # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
           - choose:
@@ -70,7 +70,7 @@ actions:
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      transition: 2
+                      transition: 3
                       brightness_pct: 60
           # Turn on stehlampe if person stays for 15 seconds
           - delay:
@@ -108,7 +108,7 @@ actions:
                 - light.durchgangszimmer2
             data:
               brightness_pct: 50
-              transition: 2
+              transition: 3
           - delay:
               seconds: 10
           - condition: state
@@ -151,5 +151,5 @@ actions:
                 - light.durchgangszimmer1
                 - light.durchgangszimmer2
             data:
-              transition: 2
+              transition: 3
 mode: restart

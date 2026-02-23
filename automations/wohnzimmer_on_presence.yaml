@@ -41,7 +41,7 @@ actions:
             data:
               brightness_pct: 20
               kelvin: 2700
-              transition: 2
+              transition: 3
       # Presence ON - day mode (only when dark)
       - conditions:
           - condition: trigger
@@ -55,7 +55,7 @@ actions:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 100
-              transition: 2
+              transition: 3
           - service: light.turn_on
             target:
               entity_id:
@@ -63,7 +63,7 @@ actions:
                 - light.stehlampe
             data:
               brightness_pct: 20
-              transition: 2
+              transition: 3
           # Turn on desklamp if person stays for 15 seconds
           - delay:
               seconds: 15
@@ -102,7 +102,7 @@ actions:
                 - light.vintage_lampe
                 - light.stehlampe
             data:
-              transition: 2
+              transition: 3
           - service: switch.turn_off
             target:
               entity_id: switch.desklamp
@@ -126,14 +126,14 @@ actions:
                 - light.vintage_lampe
                 - light.stehlampe
             data:
-              transition: 2
+              transition: 3
           # Dim main light to 50%
           - service: light.turn_on
             target:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 50
-              transition: 2
+              transition: 3
           - delay:
               seconds: 10
           - condition: state
@@ -164,5 +164,5 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              transition: 2
+              transition: 3
 mode: restart

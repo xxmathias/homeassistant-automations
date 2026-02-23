@@ -61,7 +61,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 100
-              transition: 2
+              transition: 3
       - conditions:
           - condition: trigger
             id: aus
@@ -91,7 +91,7 @@ actions:
               entity_id: light.kuchenlampe
             data:
               brightness_pct: 50
-              transition: 2
+              transition: 3
           - delay:
               seconds: 10
           - condition: state
@@ -122,5 +122,5 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              transition: 2
+              transition: 3
 mode: restart
