@@ -9,7 +9,7 @@
 #     - Boost from 60% pathway to 100% when presence turns on
 #
 #   Presence lost:
-#     - Night (23:00-07:00): 2min grace → dim → flash → off
+#     - Night (23:00-07:00): 2min grace → dim → off
 #     - Day: 4min grace → dim to 50% → flash → off
 #
 id: kitchen_on_presence
@@ -97,21 +97,29 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          # Flash warning
-          - service: light.turn_on
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              brightness_pct: 20
-              transition: 1
-          - delay:
-              seconds: 1
-          - service: light.turn_on
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              brightness_pct: 50
-              transition: 1
+          # Flash warning (skip at night)
+          - choose:
+              - conditions:
+                  - condition: not
+                    conditions:
+                      - condition: time
+                        after: "23:00:00"
+                        before: "07:00:00"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      brightness_pct: 20
+                      transition: 1
+                  - delay:
+                      seconds: 1
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      brightness_pct: 50
+                      transition: 1
           - delay:
               seconds: 10
           - condition: state

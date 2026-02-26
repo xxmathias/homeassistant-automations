@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 4min grace→dim 50%→flash→off
+description: Motion-activated durchgangszimmer lighting - 4min grace→dim 50%→flash→off (day only)
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -84,10 +84,15 @@ actions:
                   - service: switch.turn_on
                     target:
                       entity_id: switch.afrika_stehlampe
-      # Both sensors off for 3+ minutes - shutdown sequence
+      # Both sensors off for 3+ minutes - shutdown sequence (skip at night)
       - conditions:
           - condition: trigger
             id: absence
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
         sequence:
           # Confirm both sensors still off
           - condition: state
