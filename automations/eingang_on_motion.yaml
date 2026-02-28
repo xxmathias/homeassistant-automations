@@ -81,6 +81,9 @@ actions:
       - conditions:
           - condition: trigger
             id: motion_off
+          - condition: state
+            entity_id: input_boolean.keep_lights_on
+            state: "off"
         sequence:
           # Wait 4 minutes before dimming
           - delay:

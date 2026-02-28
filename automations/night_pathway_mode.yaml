@@ -81,6 +81,9 @@ actions:
       - conditions:
           - condition: trigger
             id: motion_off
+          - condition: state
+            entity_id: input_boolean.keep_lights_on
+            state: "off"
         sequence:
           # Wait 2 minutes before turning off
           - delay:
@@ -161,6 +164,9 @@ actions:
       - conditions:
           - condition: trigger
             id: presence_off
+          - condition: state
+            entity_id: input_boolean.keep_lights_on
+            state: "off"
         sequence:
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence

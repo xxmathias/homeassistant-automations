@@ -65,6 +65,9 @@ actions:
       - conditions:
           - condition: trigger
             id: aus
+          - condition: state
+            entity_id: input_boolean.keep_lights_on
+            state: "off"
         sequence:
           # Sensor has been off for 2+ minutes (handled by trigger `for`)
           # Confirm still off, then start shutdown
