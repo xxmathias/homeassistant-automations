@@ -19,6 +19,11 @@ actions:
       - conditions:
           - condition: trigger
             id: motion_on
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
         sequence:
           # Turn on entrance at full brightness
           - service: light.turn_on
@@ -61,6 +66,9 @@ actions:
       - conditions:
           - condition: trigger
             id: motion_off
+          - condition: state
+            entity_id: input_boolean.keep_lights_on
+            state: "off"
         sequence:
           # Wait 60 seconds before turning off
           - delay:

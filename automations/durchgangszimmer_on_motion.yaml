@@ -72,9 +72,9 @@ actions:
                     data:
                       transition: 3
                       brightness_pct: 60
-          # Turn on stehlampe if person stays for 15 seconds
+          # Turn on stehlampe if person stays for 90 seconds
           - delay:
-              seconds: 15
+              seconds: 90
           - choose:
               - conditions:
                   - condition: state
@@ -118,34 +118,7 @@ actions:
               brightness_pct: 50
               transition: 3
           - delay:
-              seconds: 10
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor2_presence
-            state: "off"
-          - condition: state
-            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-            state: "off"
-          # Flash warning
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              brightness_pct: 20
-              transition: 1
-          - delay:
-              seconds: 1
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              brightness_pct: 50
-              transition: 1
-          - delay:
-              seconds: 10
+              seconds: 20
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"

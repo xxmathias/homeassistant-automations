@@ -52,9 +52,9 @@ actions:
                       transition: 3
                       brightness_pct: 30
                       kelvin: 2700
-          # Turn on stehlampe if person stays in durchgangszimmer for 30 seconds
+          # Turn on stehlampe if person stays in durchgangszimmer for 90 seconds
           - delay:
-              seconds: 30
+              seconds: 90
           - choose:
               - conditions:
                   - condition: state
