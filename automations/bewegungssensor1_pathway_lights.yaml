@@ -10,15 +10,15 @@ triggers:
     to: "off"
     trigger: state
     id: motion_off
-conditions:
-  - condition: numeric_state
-    entity_id: sensor.bewegungssensor1_illuminance
-    below: 50
+conditions: []
 actions:
   - choose:
       - conditions:
           - condition: trigger
             id: motion_on
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor1_illuminance
+            below: 150
           - condition: not
             conditions:
               - condition: time

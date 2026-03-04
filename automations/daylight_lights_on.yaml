@@ -1,0 +1,74 @@
+# Daylight Lights On
+#
+# When it gets dark again (illuminance drops below 150 lux),
+# turn on lights in occupied rooms.
+#
+id: daylight_lights_on
+alias: Daylight Lights On
+description: Turn on lights in occupied rooms when it gets dark again
+triggers:
+  - entity_id: sensor.bewegungssensor1_illuminance
+    below: 150
+    for:
+      minutes: 2
+    trigger: numeric_state
+conditions:
+  - condition: state
+    entity_id: input_boolean.keep_lights_on
+    state: "off"
+  - condition: not
+    conditions:
+      - condition: time
+        after: "23:00:00"
+        before: "07:00:00"
+actions:
+  # Wohnzimmer: if occupied, turn on lights
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "on"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.wohnzimmerlampe
+            data:
+              brightness_pct: 100
+              transition: 3
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.vintage_lampe
+                - light.stehlampe
+            data:
+              brightness_pct: 20
+              transition: 3
+  # Küche: if occupied, turn on light
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor_presence
+            state: "on"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.kuchenlampe
+            data:
+              brightness_pct: 100
+              transition: 3
+  # Durchgangszimmer: if occupied, turn on lights
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "on"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              brightness_pct: 100
+              transition: 3
+mode: single
