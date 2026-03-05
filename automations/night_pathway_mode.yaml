@@ -108,6 +108,13 @@ actions:
                     for:
                       minutes: 2
                 sequence:
+                  - service: switch.turn_off
+                    target:
+                      entity_id: switch.afrika_stehlampe
+                  # Only dim if lights are actually on (prevent flash)
+                  - condition: state
+                    entity_id: light.durchgangszimmer1
+                    state: "on"
                   - service: light.turn_on
                     target:
                       entity_id:
@@ -116,9 +123,6 @@ actions:
                     data:
                       brightness_pct: 15
                       transition: 3
-                  - service: switch.turn_off
-                    target:
-                      entity_id: switch.afrika_stehlampe
           - delay:
               seconds: 10
           - condition: state
@@ -171,7 +175,14 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"
-          # Dim + turn off stehlampe
+          # Turn off stehlampe
+          - service: switch.turn_off
+            target:
+              entity_id: switch.afrika_stehlampe
+          # Only dim→off if lights are actually on
+          - condition: state
+            entity_id: light.durchgangszimmer1
+            state: "on"
           - service: light.turn_on
             target:
               entity_id:
@@ -180,9 +191,6 @@ actions:
             data:
               brightness_pct: 15
               transition: 3
-          - service: switch.turn_off
-            target:
-              entity_id: switch.afrika_stehlampe
           - delay:
               seconds: 10
           - condition: state
