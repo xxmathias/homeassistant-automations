@@ -2,12 +2,12 @@
 #
 # Sensors:
 #   - binary_sensor.praesenzsensor3_presence (presence detection)
-#   - sensor.bewegungssensor1_illuminance (global light level check)
+#   - sensor.bewegungssensor2_licht_illuminance (global light level check)
 #
 # Behavior:
 #   Presence detected:
 #     - Night (23:00-07:00): Only wohnzimmerlampe at 10% warm
-#     - Day (illuminance < 100 lux): All lights (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
+#     - Day (illuminance < 40 lux): All lights (desklamp, wohnzimmerlampe 100%, vintage+stehlampe 20%)
 #
 #   Presence lost:
 #     - Night (23:00-07:00): Turn off after 2min (skip if extra lights manually on)
@@ -47,8 +47,8 @@ actions:
           - condition: trigger
             id: an
           - condition: numeric_state
-            entity_id: sensor.bewegungssensor1_illuminance
-            below: 100
+            entity_id: sensor.bewegungssensor2_licht_illuminance
+            below: 40
         sequence:
           - service: light.turn_on
             target:

@@ -32,8 +32,8 @@ conditions:
           - condition: trigger
             id: motion
           - condition: numeric_state
-            entity_id: sensor.bewegungssensor1_illuminance
-            below: 100
+            entity_id: sensor.bewegungssensor2_licht_illuminance
+            below: 40
 actions:
   - choose:
       # Presence/motion detected - turn on lights (skip during night mode)

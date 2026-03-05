@@ -1,14 +1,14 @@
 # Daylight Lights On
 #
-# When it gets dark again (illuminance drops below 100 lux),
+# When it gets dark again (illuminance drops below 40 lux),
 # turn on lights in occupied rooms.
 #
 id: daylight_lights_on
 alias: Daylight Lights On
 description: Turn on lights in occupied rooms when it gets dark again
 triggers:
-  - entity_id: sensor.bewegungssensor1_illuminance
-    below: 100
+  - entity_id: sensor.bewegungssensor2_licht_illuminance
+    below: 40
     for:
       minutes: 2
     trigger: numeric_state
