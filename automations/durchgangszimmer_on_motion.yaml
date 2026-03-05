@@ -133,4 +133,16 @@ actions:
                 - light.durchgangszimmer2
             data:
               transition: 3
+          # Turn off kitchen pathway light if no presence there
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor_presence
+                    state: "off"
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      transition: 3
 mode: restart
