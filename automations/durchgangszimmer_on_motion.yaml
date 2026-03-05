@@ -36,7 +36,26 @@ conditions:
             below: 50
 actions:
   - choose:
-      # Presence/motion detected - turn on lights (skip during night mode)
+      # Presence/motion detected - night mode
+      - conditions:
+          - condition: trigger
+            id:
+              - motion
+              - presence
+          - condition: time
+            after: "23:00:00"
+            before: "07:00:00"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 3
+              brightness_pct: 30
+              kelvin: 2700
+      # Presence/motion detected - day mode
       - conditions:
           - condition: trigger
             id:
