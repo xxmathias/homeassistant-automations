@@ -16,6 +16,11 @@ conditions:
   - condition: state
     entity_id: input_boolean.keep_lights_on
     state: "off"
+  - condition: not
+    conditions:
+      - condition: time
+        after: "23:00:00"
+        before: "07:00:00"
 actions:
   - service: script.turn_on
     target:
