@@ -33,7 +33,7 @@ conditions:
             id: motion
           - condition: numeric_state
             entity_id: sensor.bewegungssensor1_illuminance
-            below: 150
+            below: 100
 actions:
   - choose:
       # Presence/motion detected - turn on lights (skip during night mode)

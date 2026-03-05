@@ -18,7 +18,7 @@ actions:
             id: motion_on
           - condition: numeric_state
             entity_id: sensor.bewegungssensor1_illuminance
-            below: 150
+            below: 100
           - condition: not
             conditions:
               - condition: time

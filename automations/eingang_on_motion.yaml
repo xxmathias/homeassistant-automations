@@ -7,7 +7,7 @@
 # Note: Skips during night mode (23:00-07:00) - handled by night_pathway_mode
 #
 # Behavior:
-#   Motion detected (illuminance < 150 lux):
+#   Motion detected (illuminance < 100 lux):
 #     - Turn on entrance lights at 100%
 #     - Turn on durchgangszimmer as pathway at 60% (or keep current if higher)
 #
@@ -51,7 +51,7 @@ actions:
             id: motion_on
           - condition: numeric_state
             entity_id: sensor.bewegungssensor1_illuminance
-            below: 150
+            below: 100
         sequence:
           # Turn on entrance lights with adaptive settings
           - service: light.turn_on
