@@ -18,6 +18,12 @@ conditions:
   - condition: state
     entity_id: input_boolean.keep_lights_on
     state: "off"
+  # Skip at night — night_pathway_mode handles shutdown with its own dim levels
+  - condition: not
+    conditions:
+      - condition: time
+        after: "23:00:00"
+        before: "07:00:00"
 actions:
   # Check and fix entrance
   - choose:
