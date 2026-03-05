@@ -5,7 +5,7 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Turn on at 100% (when illuminance < 40 lux or light at pathway brightness)
+#     - Turn on at 100% (when illuminance < 50 lux or light at pathway brightness)
 #     - Boost from 60% pathway to 100% when presence turns on
 #
 #   Presence lost:
@@ -48,7 +48,7 @@ conditions:
       # Normal illuminance conditions
       - condition: numeric_state
         entity_id: sensor.bewegungssensor2_licht_illuminance
-        below: 40
+        below: 50
 actions:
   - choose:
       - conditions:

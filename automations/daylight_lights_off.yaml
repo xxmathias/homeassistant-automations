@@ -1,6 +1,6 @@
 # Daylight Lights Off
 #
-# When natural daylight is sufficient (>40 lux for 5 minutes),
+# When natural daylight is sufficient (>50 lux for 5 minutes),
 # turn off all lights to save energy.
 #
 id: daylight_lights_off
@@ -8,7 +8,7 @@ alias: Daylight Lights Off
 description: Turn off all lights when bright for 5 minutes
 triggers:
   - entity_id: sensor.bewegungssensor2_licht_illuminance
-    above: 40
+    above: 50
     for:
       minutes: 5
     trigger: numeric_state
