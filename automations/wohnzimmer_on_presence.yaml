@@ -40,7 +40,7 @@ actions:
               entity_id: light.wohnzimmerlampe
             data:
               brightness_pct: 20
-              kelvin: 2700
+              color_temp_kelvin: 2700
               transition: 3
       # Presence ON - day mode (only when dark)
       - conditions:

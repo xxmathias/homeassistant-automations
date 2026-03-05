@@ -35,7 +35,7 @@ actions:
             data:
               transition: 3
               brightness_pct: 40
-              kelvin: 2700 # Warm light for night
+              color_temp_kelvin: 2700 # Warm light for night
           # Turn on durchgangszimmer at 20% only if no presence
           - choose:
               - conditions:
@@ -51,7 +51,7 @@ actions:
                     data:
                       transition: 3
                       brightness_pct: 30
-                      kelvin: 2700
+                      color_temp_kelvin: 2700
           # Turn on stehlampe if person stays in durchgangszimmer for 90 seconds
           - delay:
               seconds: 90
@@ -77,7 +77,7 @@ actions:
                     data:
                       transition: 3
                       brightness_pct: 30
-                      kelvin: 2700
+                      color_temp_kelvin: 2700
       - conditions:
           - condition: trigger
             id: motion_off

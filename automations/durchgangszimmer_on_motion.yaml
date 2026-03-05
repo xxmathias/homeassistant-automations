@@ -54,7 +54,7 @@ actions:
             data:
               transition: 3
               brightness_pct: 30
-              kelvin: 2700
+              color_temp_kelvin: 2700
       # Presence/motion detected - day mode
       - conditions:
           - condition: trigger
