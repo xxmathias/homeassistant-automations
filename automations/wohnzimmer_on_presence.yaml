@@ -64,9 +64,9 @@ actions:
             data:
               brightness_pct: 20
               transition: 3
-          # Turn on desklamp if person stays for 90 seconds
+          # Turn on desklamp if person stays for 45 seconds
           - delay:
-              seconds: 90
+              seconds: 45
           - choose:
               - conditions:
                   - condition: state

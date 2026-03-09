@@ -60,7 +60,7 @@ actions:
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 100
+              brightness_pct: 80
               transition: 3
       - conditions:
           - condition: trigger
