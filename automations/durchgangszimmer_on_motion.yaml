@@ -34,6 +34,12 @@ conditions:
           - condition: numeric_state
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
+          # Skip motion at night - handled by night_pathway_mode
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
 actions:
   - choose:
       # Presence/motion detected - night mode

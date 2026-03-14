@@ -54,7 +54,7 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 100
+              brightness_pct: 50
               transition: 3
           - service: light.turn_on
             target:
@@ -62,7 +62,7 @@ actions:
                 - light.vintage_lampe
                 - light.stehlampe
             data:
-              brightness_pct: 20
+              brightness_pct: 30
               transition: 3
           # Turn on desklamp if person stays for 45 seconds
           - delay:

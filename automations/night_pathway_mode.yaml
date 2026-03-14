@@ -92,13 +92,19 @@ actions:
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Dim entrance to 20%
-          - service: light.turn_on
-            target:
-              area_id: entrance
-            data:
-              brightness_pct: 20
-              transition: 3
+          # Dim entrance to 20% only if still on (prevent flash)
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: light.entrance
+                    state: "on"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      area_id: entrance
+                    data:
+                      brightness_pct: 20
+                      transition: 3
           # Dim durchgangszimmer + turn off stehlampe if no presence
           - choose:
               - conditions:

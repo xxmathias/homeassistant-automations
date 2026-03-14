@@ -88,6 +88,10 @@ actions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
+          # Skip shutdown if light already off (prevent flash)
+          - condition: state
+            entity_id: light.kuchenlampe
+            state: "on"
           # Dim to 50%
           - service: light.turn_on
             target:
