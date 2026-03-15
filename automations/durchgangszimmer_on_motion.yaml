@@ -23,8 +23,16 @@ conditions:
   # Only require low light for motion trigger (presence/absence always works)
   - condition: or
     conditions:
-      - condition: trigger
-        id: presence
+      # Presence: skip night (handled by night_pathway_mode)
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: presence
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
       - condition: trigger
         id: absence
       - condition: and
@@ -42,26 +50,7 @@ conditions:
                 before: "07:00:00"
 actions:
   - choose:
-      # Presence/motion detected - night mode
-      - conditions:
-          - condition: trigger
-            id:
-              - motion
-              - presence
-          - condition: time
-            after: "23:00:00"
-            before: "07:00:00"
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 3
-              brightness_pct: 30
-              color_temp_kelvin: 2700
-      # Presence/motion detected - day mode
+      # Presence/motion detected - day mode (night handled by night_pathway_mode)
       - conditions:
           - condition: trigger
             id:

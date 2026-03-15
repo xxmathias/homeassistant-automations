@@ -33,7 +33,8 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 50
+              brightness_pct: >
+                {{ states('input_number.wohnzimmerlampe_brightness') | int(100) }}
               transition: 3
           - service: light.turn_on
             target:

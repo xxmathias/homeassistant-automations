@@ -10,6 +10,11 @@ triggers:
     to: "off"
     trigger: state
     id: motion_off
+  # Turn on durchgangszimmer when presence detected (e.g. entering from wohnzimmer)
+  - entity_id: binary_sensor.praesenzsensor2_presence
+    to: "on"
+    trigger: state
+    id: presence_on
   # Turn off durchgangszimmer lights + stehlampe when presence clears
   - entity_id: binary_sensor.praesenzsensor2_presence
     to: "off"
@@ -78,6 +83,32 @@ actions:
                       transition: 3
                       brightness_pct: 30
                       color_temp_kelvin: 2700
+      # Presence detected in durchgangszimmer (e.g. entering from wohnzimmer)
+      - conditions:
+          - condition: trigger
+            id: presence_on
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 3
+              brightness_pct: 30
+              color_temp_kelvin: 2700
+          # Turn on stehlampe if person stays for 90 seconds
+          - delay:
+              seconds: 90
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor2_presence
+                    state: "on"
+                sequence:
+                  - service: switch.turn_on
+                    target:
+                      entity_id: switch.afrika_stehlampe
       - conditions:
           - condition: trigger
             id: motion_off
