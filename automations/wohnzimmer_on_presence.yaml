@@ -63,7 +63,7 @@ actions:
                 - light.vintage_lampe
                 - light.stehlampe
             data:
-              brightness_pct: 30
+              brightness_pct: 40
               transition: 3
           # Turn on desklamp if person stays for 45 seconds
           - delay:
