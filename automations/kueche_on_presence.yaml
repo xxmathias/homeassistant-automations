@@ -9,7 +9,7 @@
 #     - Boost from 60% pathway to 100% when presence turns on
 #
 #   Presence lost:
-#     - Night (23:00-07:00): 2min grace → dim → off
+#     - Night (23:00-07:00): 2min grace → off
 #     - Day: 4min grace → dim to 50% → flash → off
 #
 id: kitchen_on_presence
@@ -74,68 +74,64 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          # Night: turn off after 2min. Day: wait 2 more min (4min total), then dim→flash→off.
-          - choose:
-              - conditions:
-                  - condition: not
-                    conditions:
-                      - condition: time
-                        after: "23:00:00"
-                        before: "07:00:00"
-                sequence:
-                  - delay:
-                      minutes: 2
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor_presence
-                    state: "off"
           # Skip shutdown if light already off (prevent flash)
           - condition: state
             entity_id: light.kuchenlampe
             state: "on"
-          # Dim to 50%
-          - service: light.turn_on
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              brightness_pct: 50
-              transition: 3
-          - delay:
-              seconds: 10
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "off"
-          # Flash warning (skip at night)
+          # Night: just turn off. Day: extra delay + dim→flash→off.
           - choose:
               - conditions:
-                  - condition: not
-                    conditions:
-                      - condition: time
-                        after: "23:00:00"
-                        before: "07:00:00"
+                  - condition: time
+                    after: "23:00:00"
+                    before: "07:00:00"
                 sequence:
-                  - service: light.turn_on
+                  - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
                     data:
-                      brightness_pct: 20
-                      transition: 1
-                  - delay:
-                      seconds: 1
-                  - service: light.turn_on
-                    target:
-                      entity_id: light.kuchenlampe
-                    data:
-                      brightness_pct: 50
-                      transition: 1
-          - delay:
-              seconds: 10
-          - condition: state
-            entity_id: binary_sensor.praesenzsensor_presence
-            state: "off"
-          # Turn off
-          - service: light.turn_off
-            target:
-              entity_id: light.kuchenlampe
-            data:
-              transition: 3
+                      transition: 3
+            default:
+              - delay:
+                  minutes: 2
+              - condition: state
+                entity_id: binary_sensor.praesenzsensor_presence
+                state: "off"
+              # Dim to 50%
+              - service: light.turn_on
+                target:
+                  entity_id: light.kuchenlampe
+                data:
+                  brightness_pct: 50
+                  transition: 3
+              - delay:
+                  seconds: 10
+              - condition: state
+                entity_id: binary_sensor.praesenzsensor_presence
+                state: "off"
+              # Flash warning
+              - service: light.turn_on
+                target:
+                  entity_id: light.kuchenlampe
+                data:
+                  brightness_pct: 20
+                  transition: 1
+              - delay:
+                  seconds: 1
+              - service: light.turn_on
+                target:
+                  entity_id: light.kuchenlampe
+                data:
+                  brightness_pct: 50
+                  transition: 1
+              - delay:
+                  seconds: 10
+              - condition: state
+                entity_id: binary_sensor.praesenzsensor_presence
+                state: "off"
+              # Turn off
+              - service: light.turn_off
+                target:
+                  entity_id: light.kuchenlampe
+                data:
+                  transition: 3
 mode: restart
