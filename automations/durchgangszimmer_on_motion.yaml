@@ -151,12 +151,16 @@ actions:
                 - light.durchgangszimmer2
             data:
               transition: 3
-          # Turn off kitchen pathway light if no presence there
+          # Turn off kitchen only if at pathway brightness (≤62%), not if presence automation set it higher
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
+                  - condition: template
+                    value_template: >
+                      {% set b = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+                      {{ (b / 255 * 100)|round(0) <= 62 }}
                 sequence:
                   - service: light.turn_off
                     target:
