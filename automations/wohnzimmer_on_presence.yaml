@@ -127,6 +127,10 @@ actions:
                 - light.stehlampe
             data:
               transition: 3
+          # Skip shutdown if light already off (prevent flash)
+          - condition: state
+            entity_id: light.wohnzimmerlampe
+            state: "on"
           # Dim main light to 50%
           - service: light.turn_on
             target:

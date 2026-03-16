@@ -122,6 +122,10 @@ actions:
           - service: switch.turn_off
             target:
               entity_id: switch.afrika_stehlampe
+          # Skip shutdown if lights already off (prevent flash)
+          - condition: state
+            entity_id: light.durchgangszimmer1
+            state: "on"
           # Dim to 50%
           - service: light.turn_on
             target:

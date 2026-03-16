@@ -9,7 +9,6 @@
 # Behavior:
 #   Motion detected (illuminance < 50 lux):
 #     - Turn on entrance lights at 100%
-#     - Turn on durchgangszimmer as pathway at 60% (or keep current if higher)
 #
 #   Motion lost:
 #     - Wait 3min → dim entrance to 50%
@@ -53,31 +52,13 @@ actions:
             entity_id: sensor.bewegungssensor2_licht_illuminance
             below: 50
         sequence:
-          # Turn on entrance lights with adaptive settings
+          # Turn on entrance lights (DZ handled by durchgangszimmer_on_motion)
           - service: light.turn_on
             target:
               area_id: entrance
             data:
               transition: 3
               brightness_pct: 100
-          # Turn on durchgangszimmer as pathway light
-          - service: light.turn_on
-            target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
-            data:
-              transition: 3
-              brightness_pct: >
-                {% if is_state('light.durchgangszimmer1', 'off') and
-                is_state('light.durchgangszimmer2', 'off') %}
-                  60
-                {% else %}
-                  {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
-                  {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
-                  {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
-                  {{ [current_pct, 60]|max }}
-                {% endif %}
       - conditions:
           - condition: trigger
             id: motion_off
@@ -91,6 +72,10 @@ actions:
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
+          # Skip shutdown if lights already off (prevent flash)
+          - condition: state
+            entity_id: light.entrance
+            state: "on"
           # Dim to 50%
           - service: light.turn_on
             target:
