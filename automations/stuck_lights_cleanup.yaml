@@ -4,9 +4,9 @@
 # due to automation failures or edge cases.
 #
 # Runs every 15 minutes and turns off any light that:
-#   - Is at dimmed brightness (up to 60%)
-#   - Has no presence/motion detected
-#   - Has been in this state for more than 5 minutes
+#   - Has no presence/motion detected for 5+ minutes
+#   - Entrance: any brightness (passageway, no presence sensor)
+#   - Other rooms: dimmed brightness only (up to 60%)
 #
 id: stuck_lights_cleanup
 alias: Stuck Lights Cleanup
@@ -25,20 +25,22 @@ conditions:
         after: "23:00:00"
         before: "07:00:00"
 actions:
-  # Check and fix entrance
+  # Check and fix entrance (no presence sensor, check both motion sensors)
   - choose:
       - conditions:
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+            for:
+              minutes: 5
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
             for:
               minutes: 5
-          - condition: template
-            value_template: >
-              {% set brightness1 = state_attr('light.entrance', 'brightness')|default(0)|int %}
-              {% set brightness2 = state_attr('light.bewegungssensor2_licht', 'brightness')|default(0)|int %}
-              {% set brightness_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
-              {{ brightness_pct > 0 and brightness_pct <= 60 }}
+          - condition: state
+            entity_id: light.entrance
+            state: "on"
         sequence:
           - service: light.turn_off
             target:
