@@ -112,6 +112,15 @@ actions:
                   - service: switch.turn_off
                     target:
                       entity_id: switch.afrika_stehlampe
+          # Entrance needs longer timeout - wait another 2min (3min total)
+          - delay:
+              seconds: 120
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
           # Turn off entrance lights
           - service: light.turn_off
             target:
