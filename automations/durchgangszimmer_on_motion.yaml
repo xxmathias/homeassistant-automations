@@ -62,6 +62,13 @@ actions:
                 after: "23:00:00"
                 before: "07:00:00"
         sequence:
+          # Turn on entrance at full brightness
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 3
+              brightness_pct: 100
           # Turn on durchgangszimmer lights at full brightness
           - service: light.turn_on
             target:
@@ -167,4 +174,13 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
+          # Turn off entrance if bewegungssensor1 is also off
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 3
 mode: restart
