@@ -57,7 +57,7 @@ actions:
               minutes: 5
           - condition: template
             value_template: >
-              {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+              {% set brightness = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
               {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
               {{ brightness_pct > 0 and brightness_pct <= 60 }}
         sequence:
@@ -81,8 +81,8 @@ actions:
               minutes: 5
           - condition: template
             value_template: >
-              {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
-              {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+              {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|int(0) %}
+              {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|int(0) %}
               {% set brightness_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
               {{ brightness_pct > 0 and brightness_pct <= 60 }}
         sequence:
@@ -103,7 +103,7 @@ actions:
               minutes: 5
           - condition: template
             value_template: >
-              {% set brightness = state_attr('light.wohnzimmerlampe', 'brightness')|default(0)|int %}
+              {% set brightness = state_attr('light.wohnzimmerlampe', 'brightness')|int(0) %}
               {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
               {{ brightness_pct > 0 and brightness_pct <= 60 }}
         sequence:

@@ -166,7 +166,7 @@ actions:
                     state: "off"
                   - condition: template
                     value_template: >
-                      {% set b = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+                      {% set b = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
                       {{ (b / 255 * 100)|round(0) <= 62 }}
                 sequence:
                   - service: light.turn_off

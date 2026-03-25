@@ -45,8 +45,8 @@ actions:
                 is_state('light.durchgangszimmer2', 'off') %}
                   60
                 {% else %}
-                  {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|default(0)|int %}
-                  {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|default(0)|int %}
+                  {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|int(0) %}
+                  {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|int(0) %}
                   {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
                   {{ [current_pct, 60]|max }}
                 {% endif %}
@@ -85,7 +85,7 @@ actions:
                     state: "off"
                   - condition: template
                     value_template: >
-                      {% set b = state_attr('light.kuchenlampe', 'brightness')|default(0)|int %}
+                      {% set b = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
                       {{ (b / 255 * 100)|round(0) <= 62 }}
                 sequence:
                   - service: light.turn_off
