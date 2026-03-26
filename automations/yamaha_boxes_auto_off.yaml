@@ -1,0 +1,26 @@
+id: yamaha_boxes_auto_off
+alias: Yamaha Boxes Auto Off
+description: Turn off Yamaha boxes after 2 hours of no wohnzimmer presence
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.praesenzsensor3_presence
+    to: "off"
+    for:
+      hours: 2
+    id: no_presence
+conditions:
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: switch.box_left
+        state: "on"
+      - condition: state
+        entity_id: switch.box_right
+        state: "on"
+actions:
+  - service: switch.turn_off
+    target:
+      entity_id:
+        - switch.box_left
+        - switch.box_right
+mode: single
