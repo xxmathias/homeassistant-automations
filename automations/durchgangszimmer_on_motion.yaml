@@ -39,9 +39,15 @@ conditions:
         conditions:
           - condition: trigger
             id: motion
-          - condition: numeric_state
-            entity_id: sensor.bewegungssensor2_licht_illuminance
-            below: 50
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.bewegungssensor2_licht_illuminance
+                below: 50
+              - condition: numeric_state
+                entity_id: sun.sun
+                attribute: elevation
+                below: 3
           # Skip motion at night - handled by night_pathway_mode
           - condition: not
             conditions:

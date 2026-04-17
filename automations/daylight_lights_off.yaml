@@ -21,6 +21,10 @@ conditions:
       - condition: time
         after: "23:00:00"
         before: "07:00:00"
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    above: 3
 actions:
   - service: script.turn_on
     target:

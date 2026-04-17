@@ -42,13 +42,19 @@ actions:
               brightness_pct: 20
               color_temp_kelvin: 2700
               transition: 3
-      # Presence ON - day mode (only when dark)
+      # Presence ON - day mode (only when dark or sun below horizon)
       - conditions:
           - condition: trigger
             id: an
-          - condition: numeric_state
-            entity_id: sensor.bewegungssensor2_licht_illuminance
-            below: 50
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.bewegungssensor2_licht_illuminance
+                below: 50
+              - condition: numeric_state
+                entity_id: sun.sun
+                attribute: elevation
+                below: 3
         sequence:
           - service: light.turn_on
             target:

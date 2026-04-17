@@ -12,6 +12,10 @@ triggers:
     for:
       minutes: 2
     trigger: numeric_state
+  - entity_id: sun.sun
+    attribute: elevation
+    below: 3
+    trigger: numeric_state
 conditions:
   - condition: state
     entity_id: input_boolean.keep_lights_on
