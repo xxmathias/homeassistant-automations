@@ -37,7 +37,7 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 50
+              brightness_pct: 100
               transition: 3
           - service: light.turn_on
             target:

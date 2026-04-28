@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 4min grace→dim 50%→flash→off (day only)
+description: Motion-activated durchgangszimmer lighting - 10min grace→dim 50%→off (day only)
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -10,14 +10,14 @@ triggers:
     to: "on"
     trigger: state
     id: presence
-  # Fires when BOTH sensors have been continuously off for 4 minutes,
+  # Fires when BOTH sensors have been continuously off for 10 minutes,
   # so brief presence sensor dropouts don't trigger the shutdown sequence
   - trigger: template
     value_template: >-
       {{ is_state('binary_sensor.praesenzsensor2_presence', 'off')
          and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
     for:
-      minutes: 4
+      minutes: 10
     id: absence
 conditions:
   # Only require low light for motion trigger (presence/absence always works)
@@ -111,7 +111,7 @@ actions:
                   - service: switch.turn_on
                     target:
                       entity_id: switch.afrika_stehlampe
-      # Both sensors off for 3+ minutes - shutdown sequence (skip at night)
+      # Both sensors off for 10+ minutes - shutdown sequence (skip at night)
       - conditions:
           - condition: trigger
             id: absence
