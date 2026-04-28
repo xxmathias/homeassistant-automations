@@ -46,7 +46,7 @@ Layout top-to-bottom: Wohnzimmer → Durchgangszimmer + Kitchen → Entrance + K
 |------|-----------|-------------|-------|
 | Wohnzimmer | 10 min → dim 50% → 30s → off | 5 min → off | Skips dim if light already off |
 | Kitchen | 4 min (2+2) → dim 50% → flash → off | 2 min → off | `aus` trigger has 2min `for:`, day adds 2min delay |
-| Durchgangszimmer | 10 min → dim 50% → off | — | Template trigger: both sensors off for 10 min. Night handled by night_pathway_mode |
+| Durchgangszimmer | 10 min → off | — | Template trigger: both sensors off for 10 min. Night handled by night_pathway_mode |
 | Entrance | 3 min (60s + 120s) → off | 2 min → off | Day: bewegungssensor1_pathway_lights, requires both sensors clear. Night: night_pathway_mode |
 
 ## Known Pitfalls
