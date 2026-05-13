@@ -7,7 +7,7 @@
 # Behavior:
 #   Presence detected:
 #     - Night (23:00-07:00): Only wohnzimmerlampe at 10% warm
-#     - Day (illuminance < 50 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%, desklamp on after 45s
+#     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%, desklamp on after 45s
 #
 #   Presence lost:
 #     - Night (23:00-07:00): Turn off everything after 5min
@@ -50,7 +50,7 @@ actions:
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 50
+                below: 30
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation

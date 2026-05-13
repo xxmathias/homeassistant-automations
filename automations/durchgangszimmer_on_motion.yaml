@@ -43,7 +43,7 @@ conditions:
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 50
+                below: 30
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation
