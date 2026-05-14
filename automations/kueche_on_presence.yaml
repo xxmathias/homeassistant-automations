@@ -2,10 +2,11 @@
 #
 # Sensors:
 #   - binary_sensor.praesenzsensor_presence (presence detection)
+#   - sensor.bewegungssensor2_licht_illuminance (global light level check)
 #
 # Behavior:
 #   Presence detected:
-#     - Turn on at 100% (when sun < 30° or light at pathway brightness)
+#     - Turn on at 100% (when illuminance < 30 lux or sun elevation < 3°, or light at pathway brightness)
 #     - Boost from 60% pathway to 100% when presence turns on
 #
 #   Presence lost:
@@ -45,10 +46,20 @@ conditions:
               {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
               {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
               {{ brightness_pct >= 58 and brightness_pct <= 62 }}
-      # Normal: only turn on when sun is low
-      - condition: numeric_state
-        entity_id: sensor.sun_solar_elevation
-        below: 30
+      # Normal: turn on when dark (matches wohnzimmer/durchgangszimmer/entrance logic)
+      - condition: and
+        conditions:
+          - condition: trigger
+            id: an
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.bewegungssensor2_licht_illuminance
+                below: 30
+              - condition: numeric_state
+                entity_id: sun.sun
+                attribute: elevation
+                below: 3
 actions:
   - choose:
       - conditions:
