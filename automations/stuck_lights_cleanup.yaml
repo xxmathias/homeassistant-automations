@@ -54,11 +54,9 @@ actions:
             state: "off"
             for:
               minutes: 10
-          - condition: template
-            value_template: >
-              {% set brightness = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
-              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
-              {{ brightness_pct > 0 and brightness_pct <= 60 }}
+          - condition: state
+            entity_id: light.kuchenlampe
+            state: "on"
         sequence:
           - service: light.turn_off
             target:
@@ -87,6 +85,9 @@ actions:
                 entity_id: light.durchgangszimmer2
                 state: "on"
         sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.afrika_stehlampe
           - service: light.turn_off
             target:
               entity_id:
@@ -102,11 +103,9 @@ actions:
             state: "off"
             for:
               minutes: 10
-          - condition: template
-            value_template: >
-              {% set brightness = state_attr('light.wohnzimmerlampe', 'brightness')|int(0) %}
-              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
-              {{ brightness_pct > 0 and brightness_pct <= 60 }}
+          - condition: state
+            entity_id: light.wohnzimmerlampe
+            state: "on"
         sequence:
           - service: light.turn_off
             target:

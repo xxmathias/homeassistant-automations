@@ -17,6 +17,11 @@ conditions:
     state: "off"
     for:
       hours: 6
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor3_presence
+    state: "off"
+    for:
+      hours: 6
 actions:
   - action: script.turn_off_all
   # Turn off Yamaha boxes (not assigned to an area)
