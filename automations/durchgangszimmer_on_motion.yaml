@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 10min grace→off (day only)
+description: Motion-activated durchgangszimmer lighting - 3min (pass-through) / 7min (presence) grace→off (day only)
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -10,15 +10,22 @@ triggers:
     to: "on"
     trigger: state
     id: presence
-  # Fires when BOTH sensors have been continuously off for 10 minutes,
-  # so brief presence sensor dropouts don't trigger the shutdown sequence
+  # 3-min absence: motion-only pass-through (stehlampe never turned on)
   - trigger: template
     value_template: >-
       {{ is_state('binary_sensor.praesenzsensor2_presence', 'off')
          and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
     for:
-      minutes: 10
-    id: absence
+      minutes: 3
+    id: absence_short
+  # 7-min absence: presence was detected (stehlampe came on, someone was actually there)
+  - trigger: template
+    value_template: >-
+      {{ is_state('binary_sensor.praesenzsensor2_presence', 'off')
+         and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
+    for:
+      minutes: 7
+    id: absence_long
 conditions:
   # Only require low light for motion trigger (presence/absence always works)
   - condition: or
@@ -34,7 +41,9 @@ conditions:
                 after: "23:00:00"
                 before: "07:00:00"
       - condition: trigger
-        id: absence
+        id:
+          - absence_short
+          - absence_long
       - condition: and
         conditions:
           - condition: trigger
@@ -111,10 +120,13 @@ actions:
                   - service: switch.turn_on
                     target:
                       entity_id: switch.afrika_stehlampe
-      # Both sensors off for 10+ minutes - shutdown sequence (skip at night)
+      # 3-min absence: motion-only pass-through (stehlampe off = no prolonged presence)
       - conditions:
           - condition: trigger
-            id: absence
+            id: absence_short
+          - condition: state
+            entity_id: switch.afrika_stehlampe
+            state: "off"
           - condition: state
             entity_id: input_boolean.keep_lights_on
             state: "off"
@@ -124,18 +136,12 @@ actions:
                 after: "23:00:00"
                 before: "07:00:00"
         sequence:
-          # Confirm both sensors still off
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Turn off stehlampe
-          - service: switch.turn_off
-            target:
-              entity_id: switch.afrika_stehlampe
-          # Turn off main lights directly (no dim warning - user prefers full brightness until off)
           - service: light.turn_off
             target:
               entity_id:
@@ -143,7 +149,6 @@ actions:
                 - light.durchgangszimmer2
             data:
               transition: 3
-          # Turn off kitchen only if at pathway brightness (≤62%), not if presence automation set it higher
           - choose:
               - conditions:
                   - condition: state
@@ -159,7 +164,58 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
-          # Turn off entrance if bewegungssensor1 is also off
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor1_occupancy
+            state: "off"
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 3
+      # 7-min absence: presence was detected (stehlampe on = someone was actually there)
+      - conditions:
+          - condition: trigger
+            id: absence_long
+          - condition: state
+            entity_id: input_boolean.keep_lights_on
+            state: "off"
+          - condition: not
+            conditions:
+              - condition: time
+                after: "23:00:00"
+                before: "07:00:00"
+        sequence:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          - service: switch.turn_off
+            target:
+              entity_id: switch.afrika_stehlampe
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 3
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.praesenzsensor_presence
+                    state: "off"
+                  - condition: template
+                    value_template: >
+                      {% set b = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
+                      {{ (b / 255 * 100)|round(0) <= 62 }}
+                sequence:
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.kuchenlampe
+                    data:
+                      transition: 3
           - condition: state
             entity_id: binary_sensor.bewegungssensor1_occupancy
             state: "off"
