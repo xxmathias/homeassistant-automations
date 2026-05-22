@@ -114,7 +114,7 @@ actions:
                   brightness_pct: 50
                   transition: 3
               - delay:
-                  seconds: 10
+                  seconds: 30
               - condition: state
                 entity_id: binary_sensor.praesenzsensor_presence
                 state: "off"

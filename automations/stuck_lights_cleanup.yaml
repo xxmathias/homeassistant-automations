@@ -103,13 +103,30 @@ actions:
             state: "off"
             for:
               minutes: 10
-          - condition: state
-            entity_id: light.wohnzimmerlampe
-            state: "on"
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: light.wohnzimmerlampe
+                state: "on"
+              - condition: state
+                entity_id: light.vintage_lampe
+                state: "on"
+              - condition: state
+                entity_id: light.stehlampe
+                state: "on"
+              - condition: state
+                entity_id: switch.desklamp
+                state: "on"
         sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.desklamp
           - service: light.turn_off
             target:
-              entity_id: light.wohnzimmerlampe
+              entity_id:
+                - light.wohnzimmerlampe
+                - light.vintage_lampe
+                - light.stehlampe
             data:
               transition: 3
 mode: single

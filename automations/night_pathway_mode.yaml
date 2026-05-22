@@ -33,7 +33,7 @@ actions:
           - condition: trigger
             id: motion_on
         sequence:
-          # Turn on entrance at 70%
+          # Turn on entrance at 40%
           - service: light.turn_on
             target:
               area_id: entrance
