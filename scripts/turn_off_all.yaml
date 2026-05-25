@@ -19,5 +19,8 @@ turn_off_all:
           - durchgangszimmer
           - entrance
           - kuche
-          - wohnzimmer
+    # Wohnzimmer switches listed explicitly to avoid turning off Yamaha boxes
+    - action: switch.turn_off
+      target:
+        entity_id: switch.desklamp
   mode: single
