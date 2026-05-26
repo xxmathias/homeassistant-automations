@@ -26,7 +26,23 @@ conditions:
     attribute: elevation
     above: 3
 actions:
-  - service: script.turn_on
+  # Skip durchgangszimmer: it's the dark hallway, global daylight sensor doesn't represent it
+  - service: light.turn_off
     target:
-      entity_id: script.turn_off_all
+      area_id:
+        - schlafzimmer
+        - entrance
+        - kuche
+        - wohnzimmer
+    data:
+      transition: 2
+  - service: switch.turn_off
+    target:
+      area_id:
+        - schlafzimmer
+        - entrance
+        - kuche
+  - service: switch.turn_off
+    target:
+      entity_id: switch.desklamp
 mode: single
