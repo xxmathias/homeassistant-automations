@@ -22,7 +22,7 @@ actions:
           - condition: not
             conditions:
               - condition: time
-                after: "23:00:00"
+                after: "22:30:00"
                 before: "07:00:00"
         sequence:
           # Turn on entrance at full brightness

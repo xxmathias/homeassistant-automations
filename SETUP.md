@@ -34,8 +34,8 @@ Layout top-to-bottom: Wohnzimmer → Durchgangszimmer + Kitchen → Entrance + K
 | `kueche_on_presence.yaml` | Kitchen | praesenzsensor |
 | `durchgangszimmer_on_motion.yaml` | Durchgangszimmer | praesenzsensor2 + bewegungssensor2 (day only, night handled by night_pathway_mode) |
 | `bewegungssensor1_pathway_lights.yaml` | Entrance + pathway | bewegungssensor1 (turns on entrance + durchgangszimmer + kitchen pathway lights) |
-| `night_pathway_mode.yaml` | All pathway rooms | bewegungssensor2 + praesenzsensor2 (23:00-07:00 only) |
-| `stuck_lights_cleanup.yaml` | All rooms | 15-min timer (entrance: any brightness, other rooms: 0-60%) |
+| `night_pathway_mode.yaml` | All pathway rooms | bewegungssensor2 + praesenzsensor2 (22:30-07:00 only) |
+| `stuck_lights_cleanup.yaml` | All rooms | 15-min timer (any brightness) |
 | `daylight_lights_off.yaml` | All rooms | illuminance > 50 lux for 5 min |
 | `daylight_lights_on.yaml` | Occupied rooms | illuminance < 30 lux for 2 min |
 | `turn_off_everything_on_6h_no_motion.yaml` | All | praesenzsensor off for 6h |

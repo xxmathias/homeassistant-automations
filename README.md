@@ -52,7 +52,7 @@ Entrance → Kitchen / Bathroom / Durchgangszimmer → Livingroom → Bedroom
 - **tuya_button_switch**: 4-button Zigbee remote for manual light control
 
 ## Key Features
-- Adaptive brightness: 100% day / 30% night (23:00-07:00)
+- Adaptive brightness: 100% day / 30% night (22:30-07:00)
 - Pathway lighting between rooms
 - Presence-aware turn-off with grace periods (no dimming while present)
 - All transitions use 1-2 second fades

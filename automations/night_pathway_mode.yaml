@@ -23,9 +23,9 @@ triggers:
     trigger: state
     id: presence_off
 conditions:
-  # Night mode: 23:00-07:00
+  # Night mode: 22:30-07:00
   - condition: time
-    after: "23:00:00"
+    after: "22:30:00"
     before: "07:00:00"
 actions:
   - choose:

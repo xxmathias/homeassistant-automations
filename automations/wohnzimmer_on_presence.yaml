@@ -6,11 +6,11 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Night (23:00-07:00): Only wohnzimmerlampe at 10% warm
+#     - Night (22:30-07:00): Only wohnzimmerlampe at 10% warm
 #     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%, desklamp on after 45s
 #
 #   Presence lost:
-#     - Night (23:00-07:00): Turn off everything after 5min
+#     - Night (22:30-07:00): Turn off everything after 5min
 #     - Day: Wait 10min → dim to 50% + turn off others → wait 30s → off
 #
 id: wohnzimmer_on_presence
@@ -32,7 +32,7 @@ actions:
           - condition: trigger
             id: an
           - condition: time
-            after: "23:00:00"
+            after: "22:30:00"
             before: "07:00:00"
         sequence:
           - service: light.turn_on
@@ -90,7 +90,7 @@ actions:
             entity_id: input_boolean.keep_lights_on
             state: "off"
           - condition: time
-            after: "23:00:00"
+            after: "22:30:00"
             before: "07:00:00"
         sequence:
           - delay:

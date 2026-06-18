@@ -7,10 +7,10 @@
 # Behavior:
 #   Presence detected:
 #     - Turn on at 100% (when illuminance < 30 lux or sun elevation < 3°, or light at pathway brightness)
-#     - Boost from 60% pathway to 100% when presence turns on
+#     - Boost any pathway brightness (60% day / 30% night) to 100% when presence turns on
 #
 #   Presence lost:
-#     - Night (23:00-07:00): 2min grace → off
+#     - Night (22:30-07:00): 2min grace → off
 #     - Day: 4min grace → dim to 50% → off
 #
 id: kitchen_on_presence
@@ -33,7 +33,9 @@ conditions:
       # Always allow off trigger through (lights must turn off regardless of sun)
       - condition: trigger
         id: aus
-      # Allow presence trigger when light is already on at pathway brightness (boost needed)
+      # Allow presence trigger when light is already on below full brightness (boost needed).
+      # Covers any pathway level (60% day, 30% night) and mid-transition values; only
+      # skips when already near full so an active boost isn't re-triggered.
       - condition: and
         conditions:
           - condition: trigger
@@ -45,7 +47,7 @@ conditions:
             value_template: >
               {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
               {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
-              {{ brightness_pct >= 58 and brightness_pct <= 62 }}
+              {{ brightness_pct < 95 }}
       # Normal: turn on when dark (matches wohnzimmer/durchgangszimmer/entrance logic)
       - condition: and
         conditions:
@@ -92,7 +94,7 @@ actions:
           - choose:
               - conditions:
                   - condition: time
-                    after: "23:00:00"
+                    after: "22:30:00"
                     before: "07:00:00"
                 sequence:
                   - service: light.turn_off
