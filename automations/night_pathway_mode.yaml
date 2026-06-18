@@ -55,7 +55,7 @@ actions:
                         - light.durchgangszimmer2
                     data:
                       transition: 3
-                      brightness_pct: 30
+                      brightness_pct: 20
                       color_temp_kelvin: 2700
           # Turn on stehlampe if person stays in durchgangszimmer for 90 seconds
           - delay:
@@ -95,7 +95,7 @@ actions:
                 - light.durchgangszimmer2
             data:
               transition: 3
-              brightness_pct: 30
+              brightness_pct: 20
               color_temp_kelvin: 2700
           # Turn on stehlampe if person stays for 90 seconds
           - delay:
