@@ -48,14 +48,22 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                 sequence:
+                  # Lamp2 first, then lamp1 3s later (sequential)
                   - service: light.turn_on
                     target:
-                      entity_id:
-                        - light.durchgangszimmer1
-                        - light.durchgangszimmer2
+                      entity_id: light.durchgangszimmer2
                     data:
                       transition: 3
-                      brightness_pct: 20
+                      brightness_pct: 10
+                      color_temp_kelvin: 2700
+                  - delay:
+                      seconds: 3
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.durchgangszimmer1
+                    data:
+                      transition: 3
+                      brightness_pct: 10
                       color_temp_kelvin: 2700
           # Turn on stehlampe if person stays in durchgangszimmer for 90 seconds
           - delay:
@@ -88,14 +96,22 @@ actions:
           - condition: trigger
             id: presence_on
         sequence:
+          # Lamp2 first, then lamp1 3s later (sequential)
           - service: light.turn_on
             target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
+              entity_id: light.durchgangszimmer2
             data:
               transition: 3
-              brightness_pct: 20
+              brightness_pct: 10
+              color_temp_kelvin: 2700
+          - delay:
+              seconds: 3
+          - service: light.turn_on
+            target:
+              entity_id: light.durchgangszimmer1
+            data:
+              transition: 3
+              brightness_pct: 10
               color_temp_kelvin: 2700
           # Turn on stehlampe if person stays for 90 seconds
           - delay:
@@ -141,11 +157,17 @@ actions:
                   - service: switch.turn_off
                     target:
                       entity_id: switch.afrika_stehlampe
+                  # Turn off sequentially: lamp1 then lamp2 3s later
                   - service: light.turn_off
                     target:
-                      entity_id:
-                        - light.durchgangszimmer1
-                        - light.durchgangszimmer2
+                      entity_id: light.durchgangszimmer1
+                    data:
+                      transition: 3
+                  - delay:
+                      seconds: 3
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.durchgangszimmer2
                     data:
                       transition: 3
           # Turn off kitchen if no presence
@@ -177,11 +199,17 @@ actions:
           - service: switch.turn_off
             target:
               entity_id: switch.afrika_stehlampe
+          # Turn off sequentially: lamp1 then lamp2 3s later
           - service: light.turn_off
             target:
-              entity_id:
-                - light.durchgangszimmer1
-                - light.durchgangszimmer2
+              entity_id: light.durchgangszimmer1
+            data:
+              transition: 3
+          - delay:
+              seconds: 3
+          - service: light.turn_off
+            target:
+              entity_id: light.durchgangszimmer2
             data:
               transition: 3
 mode: restart
