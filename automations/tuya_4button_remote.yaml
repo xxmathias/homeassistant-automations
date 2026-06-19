@@ -11,12 +11,11 @@ use_blueprint:
         target:
           device_id: eefddc4491452c82bb3e629a92e02e79
     button_2_short_press:
-      - action: light.toggle
+      - action: switch.toggle
         metadata: {}
-        data:
-          transition: 3
+        data: {}
         target:
-          device_id: d42c2cdf70ae19c86a572152f31066fd
+          entity_id: switch.rgb_plug
     button_3_short_press:
       - action: light.toggle
         metadata: {}
