@@ -6,8 +6,9 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Night (23:00-06:00): wohnzimmerlampe 30%, vintage_lampe + stehlampe 10% + desk lamp on
-#     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%, desklamp on after 45s
+#     - Desk lamp: always on (independent of daylight/brightness)
+#     - Night (23:00-06:00): wohnzimmerlampe 30%, vintage_lampe + stehlampe 10%
+#     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%
 #
 #   Presence lost:
 #     - Night (23:00-06:00): Turn off everything after 5min
@@ -26,6 +27,14 @@ triggers:
     trigger: state
 conditions: []
 actions:
+  # Desk lamp: always on with presence, regardless of daylight/brightness
+  - if:
+      - condition: trigger
+        id: an
+    then:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.desklamp
   - choose:
       # Presence ON - night mode
       - conditions:
@@ -55,10 +64,6 @@ actions:
             data:
               brightness_pct: 10
               transition: 3
-          # Desk lamp on for the night too
-          - service: switch.turn_on
-            target:
-              entity_id: switch.desklamp
       # Presence ON - day mode (only when dark or sun below horizon)
       - conditions:
           - condition: trigger
@@ -87,18 +92,6 @@ actions:
             data:
               brightness_pct: 40
               transition: 3
-          # Turn on desklamp if person stays for 45 seconds
-          - delay:
-              seconds: 45
-          - choose:
-              - conditions:
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor3_presence
-                    state: "on"
-                sequence:
-                  - service: switch.turn_on
-                    target:
-                      entity_id: switch.desklamp
       # Presence OFF - night mode
       - conditions:
           - condition: trigger

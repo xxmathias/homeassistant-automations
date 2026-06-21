@@ -42,7 +42,6 @@ actions:
         - schlafzimmer
         - entrance
         - kuche
-  - service: switch.turn_off
-    target:
-      entity_id: switch.desklamp
+  # Desklamp intentionally NOT turned off here — it stays on whenever the
+  # wohnzimmer is occupied, regardless of daylight (see wohnzimmer_on_presence).
 mode: single
