@@ -12,13 +12,30 @@ triggers:
   - trigger: time_pattern
     hours: "/1"
 conditions:
+  # Require ALL presence/motion sensors clear for 6h, so a single occupied room
+  # (e.g. sitting in the durchgangszimmer/Kreativzimmer) blocks the all-off.
   - condition: state
-    entity_id: binary_sensor.praesenzsensor_presence
+    entity_id: binary_sensor.praesenzsensor_presence # kitchen
     state: "off"
     for:
       hours: 6
   - condition: state
-    entity_id: binary_sensor.praesenzsensor3_presence
+    entity_id: binary_sensor.praesenzsensor3_presence # wohnzimmer
+    state: "off"
+    for:
+      hours: 6
+  - condition: state
+    entity_id: binary_sensor.praesenzsensor2_presence # durchgangszimmer/Kreativzimmer
+    state: "off"
+    for:
+      hours: 6
+  - condition: state
+    entity_id: binary_sensor.bewegungssensor2_licht_occupancy # entrance/pathway traffic
+    state: "off"
+    for:
+      hours: 6
+  - condition: state
+    entity_id: binary_sensor.bewegungssensor1_occupancy # entrance/bathroom
     state: "off"
     for:
       hours: 6
