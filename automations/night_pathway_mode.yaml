@@ -33,15 +33,15 @@ actions:
           - condition: trigger
             id: motion_on
         sequence:
-          # Turn on entrance at 40%
+          # Turn on entrance at 50%
           - service: light.turn_on
             target:
               area_id: entrance
             data:
               transition: 3
-              brightness_pct: 40
+              brightness_pct: 50
               color_temp_kelvin: 2700 # Warm light for night
-          # Turn on durchgangszimmer at 1% only if no presence
+          # Turn on durchgangszimmer at 10% only if no presence
           - choose:
               - conditions:
                   - condition: state
@@ -54,7 +54,7 @@ actions:
                       entity_id: light.durchgangszimmer2
                     data:
                       transition: 1
-                      brightness_pct: 1
+                      brightness_pct: 10
                       color_temp_kelvin: 2700
                   - delay:
                       seconds: 1
@@ -63,7 +63,7 @@ actions:
                       entity_id: light.durchgangszimmer1
                     data:
                       transition: 1
-                      brightness_pct: 1
+                      brightness_pct: 10
                       color_temp_kelvin: 2700
           # Turn on kitchen at 30% only if no presence
           - choose:
@@ -90,7 +90,7 @@ actions:
               entity_id: light.durchgangszimmer2
             data:
               transition: 1
-              brightness_pct: 1
+              brightness_pct: 10
               color_temp_kelvin: 2700
           - delay:
               seconds: 1
@@ -99,7 +99,7 @@ actions:
               entity_id: light.durchgangszimmer1
             data:
               transition: 1
-              brightness_pct: 1
+              brightness_pct: 10
               color_temp_kelvin: 2700
       - conditions:
           - condition: trigger
