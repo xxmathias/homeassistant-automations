@@ -6,8 +6,8 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Desk lamp: always on (independent of daylight/brightness)
-#     - Night (23:00-06:00): wohnzimmerlampe 30%, vintage_lampe + stehlampe 10%
+#     - Desk lamp: on with presence during the day, OFF at night (23:00-06:00)
+#     - Night (23:00-06:00): wohnzimmerlampe + vintage_lampe + stehlampe all 1%
 #     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%
 #
 #   Presence lost:
@@ -27,10 +27,15 @@ triggers:
     trigger: state
 conditions: []
 actions:
-  # Desk lamp: always on with presence, regardless of daylight/brightness
+  # Desk lamp: on with presence during the day, but NOT at night (23:00-06:00)
   - if:
       - condition: trigger
         id: an
+      - condition: not
+        conditions:
+          - condition: time
+            after: "23:00:00"
+            before: "06:00:00"
     then:
       - service: switch.turn_on
         target:
@@ -48,21 +53,21 @@ actions:
             target:
               entity_id: light.wohnzimmerlampe
             data:
-              brightness_pct: 30
+              brightness_pct: 1
               color_temp_kelvin: 2700
               transition: 3
           - service: light.turn_on
             target:
               entity_id: light.vintage_lampe
             data:
-              brightness_pct: 10
+              brightness_pct: 1
               color_temp_kelvin: 2700
               transition: 3
           - service: light.turn_on
             target:
               entity_id: light.stehlampe
             data:
-              brightness_pct: 10
+              brightness_pct: 1
               transition: 3
       # Presence ON - day mode (only when dark or sun below horizon)
       - conditions:

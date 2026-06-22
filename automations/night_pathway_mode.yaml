@@ -41,7 +41,7 @@ actions:
               transition: 3
               brightness_pct: 40
               color_temp_kelvin: 2700 # Warm light for night
-          # Turn on durchgangszimmer at 20% only if no presence
+          # Turn on durchgangszimmer at 1% only if no presence
           - choose:
               - conditions:
                   - condition: state
@@ -54,7 +54,7 @@ actions:
                       entity_id: light.durchgangszimmer2
                     data:
                       transition: 1
-                      brightness_pct: 10
+                      brightness_pct: 1
                       color_temp_kelvin: 2700
                   - delay:
                       seconds: 1
@@ -63,20 +63,8 @@ actions:
                       entity_id: light.durchgangszimmer1
                     data:
                       transition: 1
-                      brightness_pct: 10
+                      brightness_pct: 1
                       color_temp_kelvin: 2700
-          # Turn on stehlampe if person stays in durchgangszimmer for 90 seconds
-          - delay:
-              seconds: 90
-          - choose:
-              - conditions:
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor2_presence
-                    state: "on"
-                sequence:
-                  - service: switch.turn_on
-                    target:
-                      entity_id: switch.afrika_stehlampe
           # Turn on kitchen at 30% only if no presence
           - choose:
               - conditions:
@@ -102,7 +90,7 @@ actions:
               entity_id: light.durchgangszimmer2
             data:
               transition: 1
-              brightness_pct: 10
+              brightness_pct: 1
               color_temp_kelvin: 2700
           - delay:
               seconds: 1
@@ -111,20 +99,8 @@ actions:
               entity_id: light.durchgangszimmer1
             data:
               transition: 1
-              brightness_pct: 10
+              brightness_pct: 1
               color_temp_kelvin: 2700
-          # Turn on stehlampe if person stays for 90 seconds
-          - delay:
-              seconds: 90
-          - choose:
-              - conditions:
-                  - condition: state
-                    entity_id: binary_sensor.praesenzsensor2_presence
-                    state: "on"
-                sequence:
-                  - service: switch.turn_on
-                    target:
-                      entity_id: switch.afrika_stehlampe
       - conditions:
           - condition: trigger
             id: motion_off
