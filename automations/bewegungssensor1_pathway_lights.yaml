@@ -47,7 +47,7 @@ actions:
                 {% else %}
                   {% set brightness1 = state_attr('light.durchgangszimmer1', 'brightness')|int(0) %}
                   {% set brightness2 = state_attr('light.durchgangszimmer2', 'brightness')|int(0) %}
-                  {% set current_pct = [brightness1, brightness2]|max / 255 * 100|round(0) %}
+                  {% set current_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
                   {{ [current_pct, 60]|max }}
                 {% endif %}
           # Turn on kitchen at 60% only if no presence detected

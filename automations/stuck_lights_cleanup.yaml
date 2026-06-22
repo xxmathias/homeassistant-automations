@@ -2,7 +2,7 @@
 #
 # Safety net for lights that got stuck on due to automation failures or edge cases.
 #
-# Runs every 15 minutes and turns off any light that:
+# Runs every 5 minutes and turns off any light that:
 #   - Has no presence/motion detected for 10+ minutes
 #   - Any brightness (presence has been clear 10+ min, so a manual level is moot)
 #
@@ -11,7 +11,7 @@ alias: Stuck Lights Cleanup
 description: Turn off lights stuck on (any brightness) with no presence
 triggers:
   - trigger: time_pattern
-    minutes: "/15"
+    minutes: "/5"
 conditions:
   - condition: state
     entity_id: input_boolean.keep_lights_on
