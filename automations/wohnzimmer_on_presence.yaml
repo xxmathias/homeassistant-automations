@@ -7,7 +7,7 @@
 # Behavior:
 #   Presence detected:
 #     - Desk lamp: on with presence during the day, OFF at night (23:00-06:00)
-#     - Night (23:00-06:00): wohnzimmerlampe + vintage_lampe + stehlampe all 1%
+#     - Night (23:00-06:00): wohnzimmerlampe + vintage_lampe 1%, stehlampe 10%
 #     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%
 #
 #   Presence lost:
@@ -67,7 +67,7 @@ actions:
             target:
               entity_id: light.stehlampe
             data:
-              brightness_pct: 1
+              brightness_pct: 10
               transition: 3
       # Presence ON - day mode (only when dark or sun below horizon)
       - conditions:
