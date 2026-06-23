@@ -11,7 +11,7 @@
 #     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%
 #
 #   Presence lost:
-#     - Night (23:00-06:00): Turn off everything after 5min
+#     - Night (23:00-06:00): Turn off everything after 3min
 #     - Day: Wait 10min → dim to 50% + turn off others → wait 30s → off
 #
 id: wohnzimmer_on_presence
@@ -109,7 +109,7 @@ actions:
             before: "06:00:00"
         sequence:
           - delay:
-              minutes: 5
+              minutes: 3
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
