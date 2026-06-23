@@ -6,8 +6,8 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Turn on at 100% (when illuminance < 40 lux or sun elevation < 3°, or light at pathway brightness)
-#     - Boost any pathway brightness (60% day / 30% night) to 100% when presence turns on
+#     - Turn on at 100% day / 60% night (22:30-07:00) (when illuminance < 40 lux or sun elevation < 3°, or light at pathway brightness)
+#     - Boost any pathway brightness (60% day / 30% night) to full level (100% day / 60% night) when presence turns on
 #
 #   Presence lost:
 #     - Night (22:30-07:00): 2min grace → off
@@ -68,11 +68,14 @@ actions:
           - condition: trigger
             id: an
         sequence:
+          # Night (22:30-07:00): cap at 60%. Day: full brightness.
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: 100
+              brightness_pct: >
+                {% set t = now().strftime('%H:%M') %}
+                {{ 60 if (t >= '22:30' or t < '07:00') else 100 }}
               transition: 3
       - conditions:
           - condition: trigger
