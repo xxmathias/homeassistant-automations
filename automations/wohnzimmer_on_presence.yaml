@@ -6,12 +6,12 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Desk lamp: on with presence during the day, OFF at night (23:00-06:00)
-#     - Night (23:00-06:00): wohnzimmerlampe + vintage_lampe 1%, stehlampe 10%
-#     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage+stehlampe 40%
+#     - Desk lamp: on with presence during the day, OFF at night (22:30-06:00)
+#     - Night (22:30-06:00): wohnzimmerlampe + vintage_lampe 1%, stehlampe 10%
+#     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage 40%, stehlampe 20%
 #
 #   Presence lost:
-#     - Night (23:00-06:00): Turn off everything after 3min
+#     - Night (22:30-06:00): Turn off everything after 3min
 #     - Day: Wait 10min → dim to 50% + turn off others → wait 30s → off
 #
 id: wohnzimmer_on_presence
@@ -27,14 +27,14 @@ triggers:
     trigger: state
 conditions: []
 actions:
-  # Desk lamp: on with presence during the day, but NOT at night (23:00-06:00)
+  # Desk lamp: on with presence during the day, but NOT at night (22:30-06:00)
   - if:
       - condition: trigger
         id: an
       - condition: not
         conditions:
           - condition: time
-            after: "23:00:00"
+            after: "22:30:00"
             before: "06:00:00"
     then:
       - service: switch.turn_on
@@ -46,7 +46,7 @@ actions:
           - condition: trigger
             id: an
           - condition: time
-            after: "23:00:00"
+            after: "22:30:00"
             before: "06:00:00"
         sequence:
           - service: light.turn_on
@@ -91,11 +91,15 @@ actions:
               transition: 3
           - service: light.turn_on
             target:
-              entity_id:
-                - light.vintage_lampe
-                - light.stehlampe
+              entity_id: light.vintage_lampe
             data:
               brightness_pct: 40
+              transition: 3
+          - service: light.turn_on
+            target:
+              entity_id: light.stehlampe
+            data:
+              brightness_pct: 20
               transition: 3
       # Presence OFF - night mode
       - conditions:
@@ -105,7 +109,7 @@ actions:
             entity_id: input_boolean.keep_lights_on
             state: "off"
           - condition: time
-            after: "23:00:00"
+            after: "22:30:00"
             before: "06:00:00"
         sequence:
           - delay:
