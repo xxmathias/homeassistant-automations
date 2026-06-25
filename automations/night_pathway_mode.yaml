@@ -84,6 +84,14 @@ actions:
           - condition: trigger
             id: presence_on
         sequence:
+          # Turn on entrance at 50% (align with daytime: presence lights the entrance too)
+          - service: light.turn_on
+            target:
+              area_id: entrance
+            data:
+              transition: 3
+              brightness_pct: 50
+              color_temp_kelvin: 2700
           # Lamp2 first, then lamp1 1s later (sequential)
           - service: light.turn_on
             target:
@@ -171,6 +179,17 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"
+          # Turn off entrance too if no entrance motion (presence may have lit it)
+          - if:
+              - condition: state
+                entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+                state: "off"
+            then:
+              - service: light.turn_off
+                target:
+                  area_id: entrance
+                data:
+                  transition: 3
           # Turn off stehlampe + durchgangszimmer
           - service: switch.turn_off
             target:
