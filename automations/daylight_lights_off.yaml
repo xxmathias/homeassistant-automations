@@ -42,6 +42,15 @@ actions:
         - schlafzimmer
         - entrance
         - kuche
-  # Desklamp intentionally NOT turned off here — it stays on whenever the
-  # wohnzimmer is occupied, regardless of daylight (see wohnzimmer_on_presence).
+  # Desklamp follows presence: keep it on as a task light while the wohnzimmer is
+  # occupied (daylight makes the ceiling lights redundant, but not the desk lamp),
+  # but turn it off when the room is empty — otherwise daylight-off strands it on.
+  - if:
+      - condition: state
+        entity_id: binary_sensor.praesenzsensor3_presence
+        state: "off"
+    then:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.desklamp
 mode: single
