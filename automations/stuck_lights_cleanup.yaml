@@ -102,6 +102,10 @@ actions:
             state: "off"
             for:
               minutes: 10
+          # Respect a hand-set brightness hold (released at 2h, see wohnzimmer_manual_override)
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "off"
           - condition: or
             conditions:
               - condition: state

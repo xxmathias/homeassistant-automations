@@ -32,6 +32,10 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "on"
+          # Don't stomp a hand-set brightness (see wohnzimmer_manual_override)
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "off"
         sequence:
           - service: light.turn_on
             target:

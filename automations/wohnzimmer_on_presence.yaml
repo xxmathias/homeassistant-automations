@@ -48,6 +48,10 @@ actions:
           - condition: time
             after: "22:30:00"
             before: "06:00:00"
+          # Skip if a hand-set brightness is being held (see wohnzimmer_manual_override)
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "off"
         sequence:
           - service: light.turn_on
             target:
@@ -60,7 +64,7 @@ actions:
             target:
               entity_id: light.vintage_lampe
             data:
-              brightness_pct: 1
+              brightness_pct: 20
               color_temp_kelvin: 2700
               transition: 3
           - service: light.turn_on
@@ -73,6 +77,10 @@ actions:
       - conditions:
           - condition: trigger
             id: an
+          # Skip if a hand-set brightness is being held (see wohnzimmer_manual_override)
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "off"
           - condition: or
             conditions:
               - condition: numeric_state
@@ -108,6 +116,9 @@ actions:
           - condition: state
             entity_id: input_boolean.keep_lights_on
             state: "off"
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "off"
           - condition: time
             after: "22:30:00"
             before: "06:00:00"
@@ -116,6 +127,10 @@ actions:
               minutes: 3
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          # Abort if a brightness was touched during the countdown
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
             state: "off"
           - service: light.turn_off
             target:
@@ -135,11 +150,18 @@ actions:
           - condition: state
             entity_id: input_boolean.keep_lights_on
             state: "off"
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "off"
         sequence:
           - delay:
               minutes: 15
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+          # Abort if a brightness was touched during the countdown
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
             state: "off"
           # Turn off accent lights + desklamp immediately
           - service: switch.turn_off
