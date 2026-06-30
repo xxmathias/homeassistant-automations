@@ -76,7 +76,8 @@ actions:
             data:
               brightness_pct: 100
               transition: 3
-  # Durchgangszimmer: if occupied, turn on lights
+  # Durchgangszimmer: if occupied, turn on lights (darker room — left at the global
+  # threshold, not the tighter wohnzimmer 20/0 gate)
   - choose:
       - conditions:
           - condition: state
