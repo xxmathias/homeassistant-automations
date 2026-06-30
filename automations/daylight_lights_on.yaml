@@ -36,14 +36,14 @@ actions:
           - condition: state
             entity_id: input_boolean.wohnzimmer_keep_on
             state: "off"
-          # Wohnzimmer only turns on when genuinely dark — tighter than the global
-          # < 30 lux / sun < 3° trigger, which fired here while it was still bright
-          # (it stays light at the windows during summer evenings).
+          # Wohnzimmer keeps the global < 30 lux turn-on, but its sun fallback is
+          # tightened to below the horizon (< 0° instead of < 3°): the +3° fallback
+          # was firing while it was still bright at the windows on summer evenings.
           - condition: or
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 20
+                below: 30
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation
