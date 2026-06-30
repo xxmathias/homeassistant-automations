@@ -6,9 +6,9 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Desk lamp: on with presence during the day, OFF at night (22:30-06:00)
+#     - Desk lamp: on with presence during the day WHEN DARK, OFF at night (22:30-06:00)
 #     - Night (22:30-06:00): wohnzimmerlampe + vintage_lampe 1%, stehlampe 10%
-#     - Day (illuminance < 30 lux): wohnzimmerlampe 100%, vintage 40%, stehlampe 20%
+#     - Day (illuminance < 20 lux, or sun below horizon): wohnzimmerlampe 100%, vintage 40%, stehlampe 20%
 #
 #   Presence lost:
 #     - Night (22:30-06:00): Turn off everything after 3min
@@ -27,7 +27,8 @@ triggers:
     trigger: state
 conditions: []
 actions:
-  # Desk lamp: on with presence during the day, but NOT at night (22:30-06:00)
+  # Desk lamp: on with presence during the day, but NOT at night (22:30-06:00),
+  # and only when it's actually dark (same gate as the ceiling lights below).
   - if:
       - condition: trigger
         id: an
@@ -36,6 +37,15 @@ actions:
           - condition: time
             after: "22:30:00"
             before: "06:00:00"
+      - condition: or
+        conditions:
+          - condition: numeric_state
+            entity_id: sensor.bewegungssensor2_licht_illuminance
+            below: 20
+          - condition: numeric_state
+            entity_id: sun.sun
+            attribute: elevation
+            below: 0
     then:
       - service: switch.turn_on
         target:
@@ -85,11 +95,13 @@ actions:
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 30
+                below: 20
+              # Fallback only once the sun is actually below the horizon — in summer
+              # it's still bright at +3° elevation, which turned lights on too early.
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation
-                below: 3
+                below: 0
         sequence:
           - service: light.turn_on
             target:
