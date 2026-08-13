@@ -93,7 +93,10 @@ actions:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
-          # Turn off durchgangszimmer only if no presence there
+          # Turn off durchgangszimmer only if no presence there — and never while a
+          # hand-set brightness is held (see durchgangszimmer_manual_override). This
+          # path is exactly the failure mode the hold exists for: praesenzsensor2
+          # drops when you sit still, so entrance traffic would strand your level off.
           - choose:
               - conditions:
                   - condition: state
@@ -101,6 +104,9 @@ actions:
                     state: "off"
                     for:
                       minutes: 5
+                  - condition: state
+                    entity_id: input_boolean.durchgangszimmer_keep_on
+                    state: "off"
                 sequence:
                   - service: light.turn_off
                     target:
