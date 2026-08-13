@@ -11,7 +11,7 @@
 # gated — night pathway lighting is transient and should keep behaving normally.
 #
 # The hold is released when:
-#   - the room goes fully dark (both lamps + stehlampe off, by any means), or
+#   - both ceiling lamps go off, by any means (stehlampe not required — see below), or
 #   - presence has been gone for 2 hours (then it also turns the room off).
 #
 # Only frontend/app/voice changes carry a context user_id, so this never engages
@@ -54,8 +54,14 @@ actions:
           - service: input_boolean.turn_on
             target:
               entity_id: input_boolean.durchgangszimmer_keep_on
-      # Room fully dark (any cause) -> release the hold so the next motion/presence
-      # cycle behaves normally again.
+      # Both ceiling lamps off (any cause) -> release the hold so the next
+      # motion/presence cycle behaves normally again.
+      #
+      # Keyed on the two lamps only, NOT switch.afrika_stehlampe — same shape as
+      # wohnzimmer_manual_override, which ignores switch.desklamp. Requiring the
+      # stehlampe too would strand the hold on: script.bedtime_mode turns off
+      # `light` in area durchgangszimmer but only `switch` in area wohnzimmer, so
+      # the stehlampe survives bedtime and the release would never fire.
       - conditions:
           - condition: trigger
             id: light_change
@@ -64,9 +70,6 @@ actions:
             state: "off"
           - condition: state
             entity_id: light.durchgangszimmer2
-            state: "off"
-          - condition: state
-            entity_id: switch.afrika_stehlampe
             state: "off"
         sequence:
           - service: input_boolean.turn_off
