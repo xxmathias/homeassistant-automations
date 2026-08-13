@@ -11,9 +11,14 @@ bedtime_mode:
           - entrance
           - kuche
           - wohnzimmer
+    # Switches: wohnzimmer (desklamp) + durchgangszimmer (afrika_stehlampe).
+    # The stehlampe used to survive bedtime because only wohnzimmer switches were
+    # turned off here, leaving it burning all night.
     - action: switch.turn_off
       target:
-        area_id: wohnzimmer
+        area_id:
+          - wohnzimmer
+          - durchgangszimmer
     - action: switch.turn_off
       target:
         entity_id:
