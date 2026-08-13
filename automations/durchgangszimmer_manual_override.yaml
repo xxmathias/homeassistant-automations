@@ -1,0 +1,93 @@
+# Durchgangszimmer Manual Override
+#
+# Same pattern as wohnzimmer_manual_override.yaml, for the durchgangszimmer
+# (a.k.a. Kreativzimmer): touching any durchgangszimmer light flips
+# input_boolean.durchgangszimmer_keep_on, which pauses the motion/presence-based
+# reset and turn-off in durchgangszimmer_on_motion.yaml, daylight_lights_on.yaml
+# and stuck_lights_cleanup.yaml. Without it, sitting still in the room drops
+# praesenzsensor2 and the absence timers snap your hand-set level back off.
+#
+# Scope: DAY paths only. night_pathway_mode (22:30-07:00) is deliberately NOT
+# gated — night pathway lighting is transient and should keep behaving normally.
+#
+# The hold is released when:
+#   - the room goes fully dark (both lamps + stehlampe off, by any means), or
+#   - presence has been gone for 2 hours (then it also turns the room off).
+#
+# Only frontend/app/voice changes carry a context user_id, so this never engages
+# on our own automation service calls. A physical Zigbee dimmer/remote change has
+# user_id == none and will NOT engage the hold (same limitation as wohnzimmer).
+#
+# REQUIRES helper: input_boolean.durchgangszimmer_keep_on
+#   (Settings -> Devices & Services -> Helpers -> Create -> Toggle)
+#
+id: durchgangszimmer_manual_override
+alias: Durchgangszimmer manual override
+description: Hold hand-set durchgangszimmer brightness against motion/presence-based reset/turn-off
+triggers:
+  # Any change to a durchgangszimmer light (used to detect manual touches + full-off)
+  - entity_id:
+      - light.durchgangszimmer1
+      - light.durchgangszimmer2
+      - switch.afrika_stehlampe
+    trigger: state
+    id: light_change
+  # Presence gone long enough that the manual hold should be released
+  - entity_id: binary_sensor.praesenzsensor2_presence
+    to: "off"
+    for:
+      hours: 2
+    trigger: state
+    id: release
+conditions: []
+actions:
+  - choose:
+      # Manual (human-initiated) on/brightness change -> engage the hold.
+      - conditions:
+          - condition: trigger
+            id: light_change
+          - condition: template
+            value_template: >
+              {{ trigger.to_state.state == 'on'
+                 and trigger.to_state.context.user_id is not none }}
+        sequence:
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.durchgangszimmer_keep_on
+      # Room fully dark (any cause) -> release the hold so the next motion/presence
+      # cycle behaves normally again.
+      - conditions:
+          - condition: trigger
+            id: light_change
+          - condition: state
+            entity_id: light.durchgangszimmer1
+            state: "off"
+          - condition: state
+            entity_id: light.durchgangszimmer2
+            state: "off"
+          - condition: state
+            entity_id: switch.afrika_stehlampe
+            state: "off"
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.durchgangszimmer_keep_on
+      # Presence gone 2h -> release the hold and turn the room off.
+      - conditions:
+          - condition: trigger
+            id: release
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.durchgangszimmer_keep_on
+          - service: switch.turn_off
+            target:
+              entity_id: switch.afrika_stehlampe
+          - service: light.turn_off
+            target:
+              entity_id:
+                - light.durchgangszimmer1
+                - light.durchgangszimmer2
+            data:
+              transition: 3
+mode: queued

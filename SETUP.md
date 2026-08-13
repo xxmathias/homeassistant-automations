@@ -37,7 +37,7 @@ Layout top-to-bottom: Wohnzimmer → Durchgangszimmer + Kitchen → Entrance + K
 | `bewegungssensor1_pathway_lights.yaml` | Entrance + pathway | bewegungssensor1 (turns on entrance + durchgangszimmer + kitchen pathway lights) |
 | `night_pathway_mode.yaml` | All pathway rooms | bewegungssensor2 + praesenzsensor2 (22:30-07:00 only) |
 | `stuck_lights_cleanup.yaml` | All rooms | 15-min timer (any brightness) |
-| `daylight_lights_off.yaml` | All rooms | illuminance > 50 lux for 5 min |
+| `daylight_lights_off.yaml` | All rooms (wohnzimmer skipped while held) | illuminance > 50 lux for 5 min |
 | `daylight_lights_on.yaml` | Occupied rooms | illuminance < 30 lux for 2 min |
 | `turn_off_everything_on_6h_no_motion.yaml` | All | praesenzsensor off for 6h |
 
@@ -47,7 +47,7 @@ Layout top-to-bottom: Wohnzimmer → Durchgangszimmer + Kitchen → Entrance + K
 |------|-----------|-------------|-------|
 | Wohnzimmer | 10 min → dim 50% → 30s → off | 3 min → off | Skips dim if light already off. A manual brightness touch sets `input_boolean.wohnzimmer_keep_on`, which pauses reset/turn-off until the room goes fully dark or presence is off 2h |
 | Kitchen | 4 min (2+2) → dim 50% → flash → off | 2 min → off | `aus` trigger has 2min `for:`, day adds 2min delay |
-| Durchgangszimmer | 10 min → off | — | Template trigger: both sensors off for 10 min. Night handled by night_pathway_mode |
+| Durchgangszimmer | 10 min → off | — | Template trigger: both sensors off for 10 min. Night handled by night_pathway_mode. A manual brightness touch sets `input_boolean.durchgangszimmer_keep_on`, which pauses the day reset/turn-off until the room goes fully dark or presence is off 2h |
 | Entrance | 3 min (60s + 120s) → off | 2 min → off | Day: bewegungssensor1_pathway_lights, requires both sensors clear. Night: night_pathway_mode |
 
 ## Known Pitfalls
@@ -57,5 +57,7 @@ Layout top-to-bottom: Wohnzimmer → Durchgangszimmer + Kitchen → Entrance + K
 - **Pathway brightness conflicts** — pathway automations set kitchen to 60%, presence sets 80%. Shutdown only cleans up pathway brightness (≤62%) to avoid overriding the presence automation's grace period.
 - **bewegungssensor2 fires on all room-to-room traffic** — not used for entrance ON (too noisy), only for entrance OFF check and durchgangszimmer/night pathway triggers
 - **Top-level conditions block ALL trigger handlers** — put illuminance/time checks inside choose branches, not at the top level
-- **Manual-touch detection via `context.user_id`** — `wohnzimmer_manual_override` treats a light change as manual only when `trigger.to_state.context.user_id is not none`. Frontend/app/voice calls carry a user_id; automation `light.turn_on` calls do not, so our own presence/daylight actions never trip the hold. A physical Zigbee remote bound directly to the bulb would NOT carry a user_id (it'd be missed), but the Tuya remotes here only toggle, and brightness is set from the app.
-- **`wohnzimmer_keep_on` must be checked everywhere wohnzimmer can be turned off** — `wohnzimmer_on_presence` (both presence-off branches, re-checked after the delay) AND `stuck_lights_cleanup` (fires at 10 min). Miss one and the hold leaks. The hold is released when all 3 wohnzimmer lights go off (any cause) or presence is off 2h.
+- **Manual-touch detection via `context.user_id`** — `wohnzimmer_manual_override` and `durchgangszimmer_manual_override` treat a light change as manual only when `trigger.to_state.context.user_id is not none`. Frontend/app/voice calls carry a user_id; automation `light.turn_on` calls do not, so our own presence/daylight actions never trip the hold. A physical Zigbee remote bound directly to the bulb would NOT carry a user_id (it'd be missed), but the Tuya remotes here only toggle, and brightness is set from the app.
+- **`wohnzimmer_keep_on` must be checked everywhere wohnzimmer can be turned off** — `wohnzimmer_on_presence` (both presence-off branches, re-checked after the delay), `stuck_lights_cleanup` (fires at 10 min) AND `daylight_lights_off` (>50 lux, incl. the desklamp sub-branch). Miss one and the hold leaks. The hold is released when all 3 wohnzimmer lights go off (any cause) or presence is off 2h.
+- **`durchgangszimmer_keep_on` covers the DAY paths only** — checked in `durchgangszimmer_on_motion` (the 100% turn-on plus both absence branches), `daylight_lights_on` and `stuck_lights_cleanup`. `night_pathway_mode` (22:30-07:00) is deliberately NOT gated: night pathway lighting is transient. `daylight_lights_off` never touches the durchgangszimmer at all. Released when both lamps + `switch.afrika_stehlampe` are off, or presence is off 2h.
+- **Both `*_keep_on` helpers MUST exist in HA** — a `condition: state ... state: "off"` against a missing entity evaluates false, which silently disables every gated branch (i.e. the room stops lighting up). Create them under Settings → Devices & Services → Helpers → Toggle.

@@ -3,6 +3,9 @@
 # When natural daylight is sufficient (>50 lux for 5 minutes),
 # turn off all lights to save energy.
 #
+# The wohnzimmer is exempt while input_boolean.wohnzimmer_keep_on is on — a
+# hand-set brightness wins over the daylight sweep (see wohnzimmer_manual_override).
+#
 id: daylight_lights_off
 alias: Daylight Lights Off
 description: Turn off all lights when bright for 5 minutes
@@ -33,7 +36,6 @@ actions:
         - schlafzimmer
         - entrance
         - kuche
-        - wohnzimmer
     data:
       transition: 2
   - service: switch.turn_off
@@ -42,15 +44,28 @@ actions:
         - schlafzimmer
         - entrance
         - kuche
-  # Desklamp follows presence: keep it on as a task light while the wohnzimmer is
-  # occupied (daylight makes the ceiling lights redundant, but not the desk lamp),
-  # but turn it off when the room is empty — otherwise daylight-off strands it on.
+  # Wohnzimmer: skip entirely while a hand-set brightness is being held
+  # (see wohnzimmer_manual_override). Without this, a partly cloudy day re-crosses
+  # the 50-lux threshold and stomps a level you just set by hand.
   - if:
       - condition: state
-        entity_id: binary_sensor.praesenzsensor3_presence
+        entity_id: input_boolean.wohnzimmer_keep_on
         state: "off"
     then:
-      - service: switch.turn_off
+      - service: light.turn_off
         target:
-          entity_id: switch.desklamp
+          area_id: wohnzimmer
+        data:
+          transition: 2
+      # Desklamp follows presence: keep it on as a task light while the wohnzimmer is
+      # occupied (daylight makes the ceiling lights redundant, but not the desk lamp),
+      # but turn it off when the room is empty — otherwise daylight-off strands it on.
+      - if:
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+        then:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.desklamp
 mode: single
