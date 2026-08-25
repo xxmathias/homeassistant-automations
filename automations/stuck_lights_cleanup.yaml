@@ -53,13 +53,20 @@ actions:
             state: "off"
             for:
               minutes: 10
-          - condition: state
-            entity_id: light.kuchenlampe
-            state: "on"
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: light.kuchenlampe
+                state: "on"
+              - condition: state
+                entity_id: light.billy_tischleuchte
+                state: "on"
         sequence:
           - service: light.turn_off
             target:
-              entity_id: light.kuchenlampe
+              entity_id:
+                - light.kuchenlampe
+                - light.billy_tischleuchte
             data:
               transition: 3
   # Check and fix durchgangszimmer

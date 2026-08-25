@@ -35,15 +35,18 @@ actions:
       area_id:
         - schlafzimmer
         - entrance
-        - kuche
+        - kueche
     data:
       transition: 2
+  # kueche deliberately NOT in this switch sweep: the area holds no switch-driven
+  # lamp, only the Kitchen Adaptive Lighting switches (and praesenzsensor config).
+  # Sweeping it would silently disable Adaptive Lighting. Same spirit as the
+  # explicit wohnzimmer switch list in script.turn_off_all (Yamaha boxes).
   - service: switch.turn_off
     target:
       area_id:
         - schlafzimmer
         - entrance
-        - kuche
   # Wohnzimmer: skip entirely while a hand-set brightness is being held
   # (see wohnzimmer_manual_override). Without this, a partly cloudy day re-crosses
   # the 50-lux threshold and stomps a level you just set by hand.

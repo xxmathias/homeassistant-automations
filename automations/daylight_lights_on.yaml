@@ -70,6 +70,15 @@ actions:
             entity_id: binary_sensor.praesenzsensor_presence
             state: "on"
         sequence:
+          # Billy first, kuchenlampe 1s later
+          - service: light.turn_on
+            target:
+              entity_id: light.billy_tischleuchte
+            data:
+              brightness_pct: 100
+              transition: 3
+          - delay:
+              seconds: 1
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe

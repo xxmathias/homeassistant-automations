@@ -102,7 +102,7 @@ actions:
                 data:
                   transition: 3
                   brightness_pct: 100
-          # Turn on kitchen as pathway light (only for motion trigger, non-blocking)
+          # Turn on kitchen as pathway light at 50% (only for motion trigger, non-blocking)
           - choose:
               - conditions:
                   - condition: trigger
@@ -111,12 +111,21 @@ actions:
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
                 sequence:
+                  # Billy first, kuchenlampe 1s later
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.billy_tischleuchte
+                    data:
+                      transition: 3
+                      brightness_pct: 50
+                  - delay:
+                      seconds: 1
                   - service: light.turn_on
                     target:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
-                      brightness_pct: 60
+                      brightness_pct: 50
           # Turn on stehlampe if person stays for 90 seconds
           - delay:
               seconds: 90
@@ -173,12 +182,21 @@ actions:
                     state: "off"
                   - condition: template
                     value_template: >
-                      {% set b = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
-                      {{ (b / 255 * 100)|round(0) <= 62 }}
+                      {% set k = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
+                      {% set b = state_attr('light.billy_tischleuchte', 'brightness')|int(0) %}
+                      {{ ([k, b]|max / 255 * 100)|round(0) <= 62 }}
                 sequence:
+                  # Ceiling light off first, billy 1s later
                   - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
+                    data:
+                      transition: 3
+                  - delay:
+                      seconds: 1
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
           - condition: state
@@ -233,12 +251,21 @@ actions:
                     state: "off"
                   - condition: template
                     value_template: >
-                      {% set b = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
-                      {{ (b / 255 * 100)|round(0) <= 62 }}
+                      {% set k = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
+                      {% set b = state_attr('light.billy_tischleuchte', 'brightness')|int(0) %}
+                      {{ ([k, b]|max / 255 * 100)|round(0) <= 62 }}
                 sequence:
+                  # Ceiling light off first, billy 1s later
                   - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
+                    data:
+                      transition: 3
+                  - delay:
+                      seconds: 1
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
           - condition: state

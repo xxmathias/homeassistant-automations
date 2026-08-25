@@ -4,10 +4,13 @@
 #   - binary_sensor.praesenzsensor_presence (presence detection)
 #   - sensor.bewegungssensor2_licht_illuminance (global light level check)
 #
+# Lights: light.kuchenlampe + light.billy_tischleuchte (moved into the kueche area,
+# mirrors the kuchenlampe at every level — full, pathway and shutdown)
+#
 # Behavior:
 #   Presence detected:
 #     - Turn on at 100% day / 60% night (22:30-07:00) (when illuminance < 40 lux or sun elevation < 3°, or light at pathway brightness)
-#     - Boost any pathway brightness (60% day / 30% night) to full level (100% day / 60% night) when presence turns on
+#     - Boost any pathway brightness (50% day / 20% night) to full level (100% day / 60% night) when presence turns on
 #
 #   Presence lost:
 #     - Night (22:30-07:00): 2min grace → off
@@ -33,21 +36,20 @@ conditions:
       # Always allow off trigger through (lights must turn off regardless of sun)
       - condition: trigger
         id: aus
-      # Allow presence trigger when light is already on below full brightness (boost needed).
-      # Covers any pathway level (60% day, 30% night) and mid-transition values; only
-      # skips when already near full so an active boost isn't re-triggered.
+      # Allow presence trigger when either kitchen light is already on below full
+      # brightness (boost needed). Covers any pathway level (50% day, 20% night)
+      # and mid-transition values; only skips when both are already near full so
+      # an active boost isn't re-triggered.
       - condition: and
         conditions:
           - condition: trigger
             id: an
-          - condition: state
-            entity_id: light.kuchenlampe
-            state: "on"
           - condition: template
             value_template: >
-              {% set brightness = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
-              {% set brightness_pct = (brightness / 255 * 100)|round(0) %}
-              {{ brightness_pct < 95 }}
+              {% set k = state_attr('light.kuchenlampe', 'brightness')|default(255)|int %}
+              {% set b = state_attr('light.billy_tischleuchte', 'brightness')|default(255)|int %}
+              {{ (is_state('light.kuchenlampe', 'on') and (k / 255 * 100)|round(0) < 95)
+                 or (is_state('light.billy_tischleuchte', 'on') and (b / 255 * 100)|round(0) < 95) }}
       # Normal: turn on when dark (kitchen uses 40 lux — more eager than the 30-lux default)
       - condition: and
         conditions:
@@ -69,13 +71,25 @@ actions:
             id: an
         sequence:
           # Night (22:30-07:00): cap at 60%. Day: full brightness.
+          - variables:
+              kitchen_pct: >
+                {% set t = now().strftime('%H:%M') %}
+                {{ 60 if (t >= '22:30' or t < '07:00') else 100 }}
+          # Billy first, kuchenlampe 1s later (sequential — the warm table lamp
+          # leads, the ceiling light follows)
+          - service: light.turn_on
+            target:
+              entity_id: light.billy_tischleuchte
+            data:
+              brightness_pct: "{{ kitchen_pct }}"
+              transition: 3
+          - delay:
+              seconds: 1
           - service: light.turn_on
             target:
               entity_id: light.kuchenlampe
             data:
-              brightness_pct: >
-                {% set t = now().strftime('%H:%M') %}
-                {{ 60 if (t >= '22:30' or t < '07:00') else 100 }}
+              brightness_pct: "{{ kitchen_pct }}"
               transition: 3
       - conditions:
           - condition: trigger
@@ -89,10 +103,15 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "off"
-          # Skip shutdown if light already off
-          - condition: state
-            entity_id: light.kuchenlampe
-            state: "on"
+          # Skip shutdown if both kitchen lights are already off
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: light.kuchenlampe
+                state: "on"
+              - condition: state
+                entity_id: light.billy_tischleuchte
+                state: "on"
           # Night: just turn off. Day: extra delay + dim→off.
           - choose:
               - conditions:
@@ -100,9 +119,17 @@ actions:
                     after: "22:30:00"
                     before: "07:00:00"
                 sequence:
+                  # Ceiling light off first, billy 1s later
                   - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
+                    data:
+                      transition: 3
+                  - delay:
+                      seconds: 1
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
             default:
@@ -114,7 +141,9 @@ actions:
               # Dim to 50%
               - service: light.turn_on
                 target:
-                  entity_id: light.kuchenlampe
+                  entity_id:
+                    - light.kuchenlampe
+                    - light.billy_tischleuchte
                 data:
                   brightness_pct: 50
                   transition: 3
@@ -123,10 +152,17 @@ actions:
               - condition: state
                 entity_id: binary_sensor.praesenzsensor_presence
                 state: "off"
-              # Turn off
+              # Turn off: ceiling light first, billy 1s later
               - service: light.turn_off
                 target:
                   entity_id: light.kuchenlampe
+                data:
+                  transition: 3
+              - delay:
+                  seconds: 1
+              - service: light.turn_off
+                target:
+                  entity_id: light.billy_tischleuchte
                 data:
                   transition: 3
 mode: restart

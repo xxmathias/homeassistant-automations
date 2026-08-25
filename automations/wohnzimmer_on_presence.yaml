@@ -11,8 +11,8 @@
 #     - Day (illuminance < 30 lux, or sun below horizon): wohnzimmerlampe 100%, vintage 40%, stehlampe 20%
 #
 #   Presence lost:
-#     - Night (22:30-06:00): Turn off everything after 3min
-#     - Day: Wait 10min → dim to 50% + turn off others → wait 30s → off
+#     - Night (22:30-06:00): Turn off everything after 1min
+#     - Day: Wait 15min → dim to 50% + turn off others → wait 30s → off
 #
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
@@ -135,8 +135,10 @@ actions:
             after: "22:30:00"
             before: "06:00:00"
         sequence:
+          # Night grace: 1 min (shortened from 3 — at night the room should go
+          # dark quickly once presence clears)
           - delay:
-              minutes: 3
+              minutes: 1
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"

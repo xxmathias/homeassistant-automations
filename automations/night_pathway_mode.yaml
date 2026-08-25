@@ -1,6 +1,6 @@
 id: night_pathway_mode
 alias: Night Pathway Mode
-description: Minimal pathway lighting when living room is off and motion detected at entrance
+description: Minimal pathway lighting when living room is off and motion detected at entrance (durchgangszimmer night grace 1 min)
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -15,11 +15,12 @@ triggers:
     to: "on"
     trigger: state
     id: presence_on
-  # Turn off durchgangszimmer lights + stehlampe when presence clears
+  # Turn off durchgangszimmer lights + stehlampe when presence clears.
+  # Night grace: 1 min (shortened from 2 — at night the pathway should clear fast)
   - entity_id: binary_sensor.praesenzsensor2_presence
     to: "off"
     for:
-      minutes: 2
+      minutes: 1
     trigger: state
     id: presence_off
 conditions:
@@ -70,19 +71,28 @@ actions:
                       transition: 1
                       brightness_pct: 20
                       color_temp_kelvin: 2700
-          # Turn on kitchen at 30% only if no presence
+          # Turn on kitchen at 20% only if no presence (boosts to 60% on presence)
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
                 sequence:
+                  # Billy first, kuchenlampe 1s later
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.billy_tischleuchte
+                    data:
+                      transition: 3
+                      brightness_pct: 20
+                  - delay:
+                      seconds: 1
                   - service: light.turn_on
                     target:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
-                      brightness_pct: 30
+                      brightness_pct: 20
                       color_temp_kelvin: 2700
       # Presence detected in durchgangszimmer (e.g. entering from wohnzimmer)
       - conditions:
@@ -149,7 +159,7 @@ actions:
                     entity_id: binary_sensor.praesenzsensor2_presence
                     state: "off"
                     for:
-                      minutes: 2
+                      minutes: 1
                   - condition: state
                     entity_id: input_boolean.durchgangszimmer_keep_on
                     state: "off"
@@ -179,12 +189,20 @@ actions:
                     for:
                       minutes: 2
                 sequence:
+                  # Ceiling light off first, billy 1s later
                   - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
-      # Durchgangszimmer presence off for 2+ minutes - dim→off
+                  - delay:
+                      seconds: 1
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.billy_tischleuchte
+                    data:
+                      transition: 3
+      # Durchgangszimmer presence off for 1+ minutes - dim→off
       - conditions:
           - condition: trigger
             id: presence_off

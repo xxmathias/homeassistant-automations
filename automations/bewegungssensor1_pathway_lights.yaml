@@ -58,19 +58,28 @@ actions:
                       {% set current_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
                       {{ [current_pct, 60]|max }}
                     {% endif %}
-          # Turn on kitchen at 60% only if no presence detected
+          # Turn on kitchen at 50% only if no presence detected (boosts to 100% on presence)
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
                 sequence:
+                  # Billy first, kuchenlampe 1s later
+                  - service: light.turn_on
+                    target:
+                      entity_id: light.billy_tischleuchte
+                    data:
+                      transition: 3
+                      brightness_pct: 50
+                  - delay:
+                      seconds: 1
                   - service: light.turn_on
                     target:
                       entity_id: light.kuchenlampe
                     data:
                       transition: 3
-                      brightness_pct: 60
+                      brightness_pct: 50
       - conditions:
           - condition: trigger
             id: motion_off
@@ -93,12 +102,21 @@ actions:
                     state: "off"
                   - condition: template
                     value_template: >
-                      {% set b = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
-                      {{ (b / 255 * 100)|round(0) <= 62 }}
+                      {% set k = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
+                      {% set b = state_attr('light.billy_tischleuchte', 'brightness')|int(0) %}
+                      {{ ([k, b]|max / 255 * 100)|round(0) <= 62 }}
                 sequence:
+                  # Ceiling light off first, billy 1s later
                   - service: light.turn_off
                     target:
                       entity_id: light.kuchenlampe
+                    data:
+                      transition: 3
+                  - delay:
+                      seconds: 1
+                  - service: light.turn_off
+                    target:
+                      entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
           # Turn off durchgangszimmer only if no presence there — and never while a

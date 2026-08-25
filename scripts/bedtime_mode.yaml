@@ -9,7 +9,7 @@ bedtime_mode:
         area_id:
           - durchgangszimmer
           - entrance
-          - kuche
+          - kueche
           - wohnzimmer
     # Switches: wohnzimmer (desklamp) + durchgangszimmer (afrika_stehlampe).
     # The stehlampe used to survive bedtime because only wohnzimmer switches were
