@@ -8,18 +8,17 @@ turn_off_all:
           - schlafzimmer
           - durchgangszimmer
           - entrance
-          - kueche
+          - kuche
           - wohnzimmer
       data:
         transition: 2
-    # kueche omitted on purpose — no switch-driven lamp there, only the Kitchen
-    # Adaptive Lighting switches, which this must not disable.
     - action: switch.turn_off
       target:
         area_id:
           - schlafzimmer
           - durchgangszimmer
           - entrance
+          - kuche
     # Wohnzimmer switches listed explicitly to avoid turning off Yamaha boxes
     - action: switch.turn_off
       target:

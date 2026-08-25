@@ -32,10 +32,8 @@ use_blueprint:
             - schlafzimmer
             - wohnzimmer
             - durchgangszimmer
-            - kueche
+            - kuche
             - entrance
-      # kueche omitted on purpose — no switch-driven lamp there, only the Kitchen
-      # Adaptive Lighting switches, which this must not disable.
       - action: switch.turn_off
         metadata: {}
         data: {}
@@ -44,5 +42,6 @@ use_blueprint:
             - schlafzimmer
             - wohnzimmer
             - durchgangszimmer
+            - kuche
             - entrance
     switch: sensor.tuya_mobil_action

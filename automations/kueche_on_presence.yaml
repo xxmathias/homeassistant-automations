@@ -4,7 +4,7 @@
 #   - binary_sensor.praesenzsensor_presence (presence detection)
 #   - sensor.bewegungssensor2_licht_illuminance (global light level check)
 #
-# Lights: light.kuchenlampe + light.billy_tischleuchte (moved into the kueche area,
+# Lights: light.kuchenlampe + light.billy_tischleuchte (moved into the kitchen area,
 # mirrors the kuchenlampe at every level — full, pathway and shutdown)
 #
 # Behavior:
