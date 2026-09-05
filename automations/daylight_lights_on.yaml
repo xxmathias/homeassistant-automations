@@ -36,9 +36,9 @@ actions:
           - condition: state
             entity_id: input_boolean.wohnzimmer_keep_on
             state: "off"
-          # Wohnzimmer keeps the global < 30 lux turn-on, but its sun fallback is
-          # tightened to below the horizon (< 0° instead of < 3°): the +3° fallback
-          # was firing while it was still bright at the windows on summer evenings.
+          # Wohnzimmer keeps the global < 30 lux turn-on (do NOT lower it — 20 was
+          # tried and reverted). Only the sun fallback is tightened: -2° instead of
+          # 0°, because right at the horizon it is still bright at the windows.
           - condition: or
             conditions:
               - condition: numeric_state
@@ -47,7 +47,7 @@ actions:
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation
-                below: 0
+                below: -2
         sequence:
           - service: light.turn_on
             target:
@@ -69,6 +69,17 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "on"
+          # Same gate as the wohnzimmer. Without it this branch fired on the bare
+          # sun < 3° trigger and lit the kitchen while it was still bright.
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                entity_id: sensor.bewegungssensor2_licht_illuminance
+                below: 30
+              - condition: numeric_state
+                entity_id: sun.sun
+                attribute: elevation
+                below: 0
         sequence:
           # Billy first, kuchenlampe 1s later
           - service: light.turn_on

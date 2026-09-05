@@ -9,7 +9,7 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Turn on at 100% day / 60% night (22:30-07:00) (when illuminance < 40 lux or sun elevation < 3°, or light at pathway brightness)
+#     - Turn on at 100% day / 60% night (22:30-07:00) (when illuminance < 30 lux or sun elevation < 0°, or light at pathway brightness)
 #     - Boost any pathway brightness (50% day / 20% night) to full level (100% day / 60% night) when presence turns on
 #
 #   Presence lost:
@@ -50,7 +50,10 @@ conditions:
               {% set b = state_attr('light.billy_tischleuchte', 'brightness')|default(255)|int %}
               {{ (is_state('light.kuchenlampe', 'on') and (k / 255 * 100)|round(0) < 95)
                  or (is_state('light.billy_tischleuchte', 'on') and (b / 255 * 100)|round(0) < 95) }}
-      # Normal: turn on when dark (kitchen uses 40 lux — more eager than the 30-lux default)
+      # Normal: turn on when dark. Aligned to the global 30-lux gate (was 40 —
+      # too eager, the kitchen lit up while it was still bright). The sun fallback
+      # is the wohnzimmer one (< 0°, sun below the horizon): at +3° elevation it
+      # is still clearly bright in summer.
       - condition: and
         conditions:
           - condition: trigger
@@ -59,11 +62,11 @@ conditions:
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 40
+                below: 30
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation
-                below: 3
+                below: 0
 actions:
   - choose:
       - conditions:
