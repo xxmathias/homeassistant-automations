@@ -1,28 +1,43 @@
 # Wohnzimmer Manual Override
 #
-# Lets a hand-set brightness "stick": touching any wohnzimmer light flips
-# input_boolean.wohnzimmer_keep_on, which pauses the presence-based reset and
-# turn-off in wohnzimmer_on_presence.yaml + stuck_lights_cleanup.yaml. Without
-# this, praesenzsensor3 drops presence when you sit still (it struggles with
-# stationary detection beyond ~3m, see SETUP.md), so the automation snaps your
-# light back to the night level or turns it off.
+# Makes ANY hand-set state "stick" — on, off, or a brightness change. Touching
+# a wohnzimmer light (or the desk lamp) flips input_boolean.wohnzimmer_keep_on,
+# which pauses every automatic turn-on AND turn-off in the room:
+# wohnzimmer_on_presence.yaml, daylight_lights_on/off.yaml and
+# stuck_lights_cleanup.yaml all skip the wohnzimmer while the hold is on.
+#
+# Two problems this solves:
+#   - praesenzsensor3 drops presence when you sit still (it struggles with
+#     stationary detection beyond ~3m, see SETUP.md), so presence snapped a
+#     hand-set light back to the night level or turned it off.
+#   - a light switched off by hand (typically switch.desklamp) was turned
+#     straight back on by the next presence event.
+#
+# switch.desklamp is part of the hold, both as a trigger and as a release
+# condition — turning it off by hand must stop presence from re-enabling it.
 #
 # The hold is released when:
-#   - the room goes fully dark (all 3 lights off, by any means), or
+#   - an automation leaves the room fully dark (all 3 lights + desklamp off),
+#     which cannot happen while the hold is on, so in practice only the 6h
+#     all-off / bedtime scripts do this, or
 #   - presence has been gone for 2 hours (then it also turns the room off).
+#
+# A manual off never releases the hold: the first choose branch below matches
+# any user-initiated change and wins over the release branch.
 #
 # REQUIRES helper: input_boolean.wohnzimmer_keep_on
 #   (Settings -> Devices & Services -> Helpers -> Create -> Toggle)
 #
 id: wohnzimmer_manual_override
 alias: Wohnzimmer manual override
-description: Hold hand-set wohnzimmer brightness against presence-based reset/turn-off
+description: Hold any hand-set wohnzimmer state (on/off/brightness) against presence + daylight automation
 triggers:
-  # Any change to a wohnzimmer light (used to detect manual touches + full-off)
+  # Any change to a wohnzimmer light or the desk lamp (manual touches + full-off)
   - entity_id:
       - light.wohnzimmerlampe
       - light.vintage_lampe
       - light.stehlampe
+      - switch.desklamp
     trigger: state
     id: light_change
   # Presence gone long enough that the manual hold should be released
@@ -35,23 +50,30 @@ triggers:
 conditions: []
 actions:
   - choose:
-      # Manual (human-initiated) on/brightness change -> engage the hold.
+      # Any manual (human-initiated) change -> engage the hold. On, off and
+      # brightness all count: switching a lamp off by hand must stop presence
+      # from turning it back on, exactly like a hand-set brightness.
       # Only frontend/app/voice calls carry a user_id; automation service
       # calls (presence, daylight, stuck-lights) have user_id == none, so this
-      # never fires on our own light.turn_on actions.
+      # never fires on our own turn_on/turn_off actions.
+      # This branch is listed first, so a manual off engages the hold instead
+      # of falling through to the "room fully dark" release below.
       - conditions:
           - condition: trigger
             id: light_change
           - condition: template
             value_template: >
-              {{ trigger.to_state.state == 'on'
+              {{ trigger.to_state.state in ['on', 'off']
                  and trigger.to_state.context.user_id is not none }}
         sequence:
           - service: input_boolean.turn_on
             target:
               entity_id: input_boolean.wohnzimmer_keep_on
-      # Room fully dark (any cause) -> release the hold so the next presence
-      # cycle behaves normally again.
+      # Room fully dark by automation (bedtime/turn_off_all/6h sweep) -> release
+      # the hold so the next presence cycle behaves normally again.
+      # The desk lamp counts here: leaving it on means the room is still in use,
+      # and the hold must survive. Both shutdown scripts turn it off (bedtime_mode
+      # kills every wohnzimmer switch, turn_off_all lists it), so it cannot strand.
       - conditions:
           - condition: trigger
             id: light_change
@@ -63,6 +85,9 @@ actions:
             state: "off"
           - condition: state
             entity_id: light.stehlampe
+            state: "off"
+          - condition: state
+            entity_id: switch.desklamp
             state: "off"
         sequence:
           - service: input_boolean.turn_off

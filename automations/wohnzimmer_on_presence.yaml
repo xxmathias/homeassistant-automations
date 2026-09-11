@@ -5,6 +5,10 @@
 #   - sensor.bewegungssensor2_licht_illuminance (global light level check)
 #
 # Behavior:
+#   Nothing below runs while input_boolean.wohnzimmer_keep_on is on — any light
+#   touched by hand (on, off or brightness) holds the whole room, desk lamp
+#   included. See wohnzimmer_manual_override.yaml.
+#
 #   Presence detected:
 #     - Desk lamp: on with presence during the day WHEN DARK, OFF at night (22:30-06:00)
 #     - Night (22:30-06:00): wohnzimmerlampe + vintage_lampe 1%, stehlampe 10%
@@ -32,6 +36,12 @@ actions:
   - if:
       - condition: trigger
         id: an
+      # Skip while a manual state is being held — this is the case the hold was
+      # widened for: a desk lamp switched off by hand must stay off, instead of
+      # being switched straight back on by the next presence event.
+      - condition: state
+        entity_id: input_boolean.wohnzimmer_keep_on
+        state: "off"
       - condition: not
         conditions:
           - condition: time
