@@ -49,7 +49,7 @@ Entrance → Kitchen / Bathroom / Durchgangszimmer → Livingroom → Bedroom
 - **turn_off_everything_on_6h_no_motion**: Turns off all lights after 4 hours of no motion
 
 ### Remote Control
-- **tuya_button_switch**: 4-button Zigbee remote for manual light control
+- **tuya_button_switch**: 4-button Zigbee remote. Buttons 1+2 toggle the LED stripe, buttons 3+4 turn everything off. The pairs are redundant on purpose. Presses do not count as a manual touch, so they never engage a room hold.
 
 ## Key Features
 - Adaptive brightness: 100% day / 30% night (22:30-07:00)

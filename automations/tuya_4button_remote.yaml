@@ -1,47 +1,59 @@
+# Tuya Zigbee 4 button remote (sensor.tuya_mobil_action)
+#
+# Layout: the top pair and the bottom pair are deliberately redundant, so you
+# never have to look at the remote.
+#   Buttons 1 + 2 -> toggle the LED stripe (light.plug, "LED stripe")
+#   Buttons 3 + 4 -> turn everything off
+#
+# The remote is NOT treated as a manual touch. Its calls run in an automation
+# context, so context.user_id is null and wohnzimmer_manual_override /
+# durchgangszimmer_manual_override ignore them. Pressing a button therefore
+# never engages input_boolean.wohnzimmer_keep_on — only the app, the frontend
+# or voice do. This is intentional: see SETUP.md.
+#
+# All-off reuses script.turn_off_all (which leaves the Yamaha boxes alone on
+# purpose) plus an explicit box turn-off, the same pair that
+# turn_off_everything_on_6h_no_motion.yaml uses.
+#
 alias: Tuya Zigbee 4 button remote
-description: "Controls various lights in the bedroom area"
+description: "Top pair toggles the LED stripe, bottom pair turns everything off"
 use_blueprint:
   path: Soulfly999/tuya-4-button-remote-switch-ts0044-1-zigbee2mqtt.yaml
   input:
     button_1_short_press:
       - action: light.toggle
         metadata: {}
-        data:
-          transition: 3
-        target:
-          device_id: eefddc4491452c82bb3e629a92e02e79
-    button_2_short_press:
-      - action: switch.toggle
-        metadata: {}
         data: {}
         target:
-          entity_id: switch.rgb_plug
-    button_3_short_press:
+          entity_id: light.plug
+    button_2_short_press:
       - action: light.toggle
         metadata: {}
         data: {}
         target:
-          device_id: 45dcd00e46b1d70ee57ba860bebc4af8
-    button_4_short_press:
-      - action: light.turn_off
+          entity_id: light.plug
+    button_3_short_press:
+      - action: script.turn_off_all
         metadata: {}
-        data:
-          transition: 3
-        target:
-          area_id:
-            - schlafzimmer
-            - wohnzimmer
-            - durchgangszimmer
-            - kuche
-            - entrance
+        data: {}
+      # Yamaha boxes are not in script.turn_off_all (it protects them), so kill
+      # them here to keep the remote's "everything off" literal.
       - action: switch.turn_off
         metadata: {}
         data: {}
         target:
-          area_id:
-            - schlafzimmer
-            - wohnzimmer
-            - durchgangszimmer
-            - kuche
-            - entrance
+          entity_id:
+            - switch.box_left
+            - switch.box_right
+    button_4_short_press:
+      - action: script.turn_off_all
+        metadata: {}
+        data: {}
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+            - switch.box_left
+            - switch.box_right
     switch: sensor.tuya_mobil_action
