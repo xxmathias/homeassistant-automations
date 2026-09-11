@@ -2,7 +2,7 @@
 #
 # Layout: the top pair and the bottom pair are deliberately redundant, so you
 # never have to look at the remote.
-#   Buttons 1 + 2 -> toggle the LED stripe (light.plug, "LED stripe")
+#   Buttons 1 + 2 -> toggle the RGB plug (switch.rgb_plug, Schlafzimmer)
 #   Buttons 3 + 4 -> turn everything off
 #
 # The remote is NOT treated as a manual touch. Its calls run in an automation
@@ -16,22 +16,22 @@
 # turn_off_everything_on_6h_no_motion.yaml uses.
 #
 alias: Tuya Zigbee 4 button remote
-description: "Top pair toggles the LED stripe, bottom pair turns everything off"
+description: "Top pair toggles the RGB plug, bottom pair turns everything off"
 use_blueprint:
   path: Soulfly999/tuya-4-button-remote-switch-ts0044-1-zigbee2mqtt.yaml
   input:
     button_1_short_press:
-      - action: light.toggle
+      - action: switch.toggle
         metadata: {}
         data: {}
         target:
-          entity_id: light.plug
+          entity_id: switch.rgb_plug
     button_2_short_press:
-      - action: light.toggle
+      - action: switch.toggle
         metadata: {}
         data: {}
         target:
-          entity_id: light.plug
+          entity_id: switch.rgb_plug
     button_3_short_press:
       - action: script.turn_off_all
         metadata: {}
