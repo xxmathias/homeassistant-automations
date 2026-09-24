@@ -69,13 +69,14 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor_presence
             state: "on"
-          # Same gate as the wohnzimmer. Without it this branch fired on the bare
-          # sun < 3° trigger and lit the kitchen while it was still bright.
+          # Same gate as kueche_on_presence (35 lux / sun < 0°). Without it this
+          # branch fired on the bare sun < 3° trigger and lit the kitchen while it
+          # was still bright.
           - condition: or
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 30
+                below: 35
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation

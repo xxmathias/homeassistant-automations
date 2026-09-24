@@ -9,12 +9,12 @@
 #
 # Behavior:
 #   Presence detected:
-#     - Turn on at 100% day / 60% night (22:30-07:00) (when illuminance < 30 lux or sun elevation < 0°, or light at pathway brightness)
+#     - Turn on at 100% day / 60% night (22:30-07:00) (when illuminance < 35 lux or sun elevation < 0°, or light at pathway brightness)
 #     - Boost any pathway brightness (50% day / 20% night) to full level (100% day / 60% night) when presence turns on
 #
 #   Presence lost:
 #     - Night (22:30-07:00): 2min grace → off
-#     - Day: 4min grace → dim to 50% → off
+#     - Day: 4min grace → off
 #
 id: kitchen_on_presence
 alias: Kitchen on presence
@@ -50,8 +50,8 @@ conditions:
               {% set b = state_attr('light.billy_tischleuchte', 'brightness')|default(255)|int %}
               {{ (is_state('light.kuchenlampe', 'on') and (k / 255 * 100)|round(0) < 95)
                  or (is_state('light.billy_tischleuchte', 'on') and (b / 255 * 100)|round(0) < 95) }}
-      # Normal: turn on when dark. Aligned to the global 30-lux gate (was 40 —
-      # too eager, the kitchen lit up while it was still bright). The sun fallback
+      # Normal: turn on when dark. 35 lux: 40 lit the kitchen while it was still
+      # bright, 30 was too strict (user, 2026-09-24). The sun fallback
       # is the wohnzimmer one (< 0°, sun below the horizon): at +3° elevation it
       # is still clearly bright in summer.
       - condition: and
@@ -62,7 +62,7 @@ conditions:
             conditions:
               - condition: numeric_state
                 entity_id: sensor.bewegungssensor2_licht_illuminance
-                below: 30
+                below: 35
               - condition: numeric_state
                 entity_id: sun.sun
                 attribute: elevation
@@ -115,7 +115,8 @@ actions:
               - condition: state
                 entity_id: light.billy_tischleuchte
                 state: "on"
-          # Night: just turn off. Day: extra delay + dim→off.
+          # Night: just turn off. Day: extra delay, then off. No dim step — it
+          # also switched on billy at 50% when only the kuchenlampe was lit.
           - choose:
               - conditions:
                   - condition: time
@@ -138,20 +139,6 @@ actions:
             default:
               - delay:
                   minutes: 2
-              - condition: state
-                entity_id: binary_sensor.praesenzsensor_presence
-                state: "off"
-              # Dim to 50%
-              - service: light.turn_on
-                target:
-                  entity_id:
-                    - light.kuchenlampe
-                    - light.billy_tischleuchte
-                data:
-                  brightness_pct: 50
-                  transition: 3
-              - delay:
-                  seconds: 30
               - condition: state
                 entity_id: binary_sensor.praesenzsensor_presence
                 state: "off"
