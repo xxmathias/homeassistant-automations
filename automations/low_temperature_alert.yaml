@@ -20,7 +20,7 @@ actions:
     data:
       title: "Temperatur Warnung"
       message: "{{ trigger.id }} ist bei {{ trigger.to_state.state | round(1) }}°C"
-  - service: notify.mobile_app_oppo_sandra
+  - service: notify.mobile_app_pixel_9_sandra
     data:
       title: "Temperatur Warnung"
       message: "{{ trigger.id }} ist bei {{ trigger.to_state.state | round(1) }}°C"
