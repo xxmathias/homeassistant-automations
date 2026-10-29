@@ -45,9 +45,9 @@ Layout top-to-bottom: Wohnzimmer → Durchgangszimmer + Kitchen → Entrance + K
 
 | Room | Day grace | Night grace | Notes |
 |------|-----------|-------------|-------|
-| Wohnzimmer | 15 min → dim 50% → 30s → off | 1 min → off | Skips dim if light already off. ANY manual touch (on, off or brightness, desk lamp included) sets `input_boolean.wohnzimmer_keep_on`, which pauses every automatic turn-on AND turn-off until an automation leaves the room fully dark or presence is off 30 min (polled every 5 min) |
+| Wohnzimmer | 3 min (short visit) / 10 min (stay) → dim 50% → 30s → off | 1 min → off | Short visit = the presence that just ended lasted < 3 min AND `light.wohnzimmerlampe` came on < 4 min ago. Skips dim if light already off. ANY manual touch (on, off or brightness, desk lamp included) sets `input_boolean.wohnzimmer_keep_on`, which pauses every automatic turn-on AND turn-off until an automation leaves the room fully dark or presence is off 30 min (polled every 5 min) |
 | Kitchen | 4 min (2+2) → off | 2 min → off | `aus` trigger has 2min `for:`, day adds 2min delay. Both kuchenlampe *and* billy_tischleuchte |
-| Durchgangszimmer | 3 min (pass-through) / 7 min (presence) → off | 1 min → off | Template triggers: both sensors off for 3 min (pass-through) / 7 min (presence). Night handled by night_pathway_mode (praesenzsensor2 off 1 min). A manual brightness touch sets `input_boolean.durchgangszimmer_keep_on`, which pauses the day reset/turn-off until the room goes fully dark or presence is off 30 min (polled every 5 min) |
+| Durchgangszimmer | 2 min (pass-through) / 7 min (presence) → off | 1 min → off | Template triggers: both sensors off for 2 min (pass-through) / 7 min (presence). Night handled by night_pathway_mode (praesenzsensor2 off 1 min). A manual brightness touch sets `input_boolean.durchgangszimmer_keep_on`, which pauses the day reset/turn-off until the room goes fully dark or presence is off 30 min (polled every 5 min) |
 | Entrance | 3 min (60s + 120s) → off | 2 min → off | Day: bewegungssensor1_pathway_lights, requires both sensors clear. Night: night_pathway_mode |
 
 ## Known Pitfalls

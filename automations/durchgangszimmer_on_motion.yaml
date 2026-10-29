@@ -1,6 +1,6 @@
 id: durchgangszimmer_on_motion
 alias: Durchgangszimmer on Motion
-description: Motion-activated durchgangszimmer lighting - 3min (pass-through) / 7min (presence) grace→off (day only)
+description: Motion-activated durchgangszimmer lighting - 2min (pass-through) / 7min (presence) grace→off (day only)
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -10,13 +10,14 @@ triggers:
     to: "on"
     trigger: state
     id: presence
-  # 3-min absence: motion-only pass-through (stehlampe never turned on)
+  # 2-min absence: motion-only pass-through (stehlampe never turned on).
+  # Was 3 min; 2 is enough for walking through and cuts the idle tail.
   - trigger: template
     value_template: >-
       {{ is_state('binary_sensor.praesenzsensor2_presence', 'off')
          and is_state('binary_sensor.bewegungssensor2_licht_occupancy', 'off') }}
     for:
-      minutes: 3
+      minutes: 2
     id: absence_short
   # 7-min absence: presence was detected (stehlampe came on, someone was actually there)
   - trigger: template
@@ -138,7 +139,7 @@ actions:
                   - service: switch.turn_on
                     target:
                       entity_id: switch.afrika_stehlampe
-      # 3-min absence: motion-only pass-through (stehlampe off = no prolonged presence)
+      # 2-min absence: motion-only pass-through (stehlampe off = no prolonged presence)
       - conditions:
           - condition: trigger
             id: absence_short

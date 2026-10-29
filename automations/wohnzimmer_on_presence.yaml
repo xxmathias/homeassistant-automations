@@ -16,7 +16,8 @@
 #
 #   Presence lost:
 #     - Night (22:30-06:00): Turn off everything after 1min
-#     - Day: Wait 15min → dim to 50% + turn off others → wait 30s → off
+#     - Day: Wait 3min (short visit) / 10min (stay) → dim to 50% + turn off
+#       others → wait 30s → off
 #
 id: wohnzimmer_on_presence
 alias: Wohnzimmer on presence
@@ -180,8 +181,17 @@ actions:
             entity_id: input_boolean.wohnzimmer_keep_on
             state: "off"
         sequence:
+          # Grace: 3 min after a short visit, 10 min after a stay. A visit is short
+          # when the presence that just ended lasted under 3 min AND the main light
+          # came on under 4 min ago — someone walked in and out, and a flat 15 min
+          # kept the room lit for nobody. The light-age check keeps a seated person
+          # on the long grace when the FP1E chops a long stay into short pieces.
+          # 10 min matches stuck_lights_cleanup, which used to cut 15 to 10-15.
           - delay:
-              minutes: 15
+              minutes: >-
+                {% set seg = (trigger.to_state.last_changed - trigger.from_state.last_changed).total_seconds() %}
+                {% set lit = (now() - states.light.wohnzimmerlampe.last_changed).total_seconds() %}
+                {{ 3 if seg < 180 and lit < 240 else 10 }}
           - condition: state
             entity_id: binary_sensor.praesenzsensor3_presence
             state: "off"
