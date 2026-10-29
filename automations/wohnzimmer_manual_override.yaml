@@ -20,7 +20,10 @@
 #   - an automation leaves the room fully dark (all 3 lights + desklamp off),
 #     which cannot happen while the hold is on, so in practice only the 6h
 #     all-off / bedtime scripts do this, or
-#   - presence has been gone for 2 hours (then it also turns the room off).
+#   - presence has been gone for 30 min and the hold is 30 min old (then it
+#     also turns the room off). Checked every 5 min, not on a presence change:
+#     a hold set while the room is already empty sees no change and would
+#     otherwise never release.
 #
 # A manual off never releases the hold: the first choose branch below matches
 # any user-initiated change and wins over the release branch.
@@ -40,12 +43,11 @@ triggers:
       - switch.desklamp
     trigger: state
     id: light_change
-  # Presence gone long enough that the manual hold should be released
-  - entity_id: binary_sensor.praesenzsensor3_presence
-    to: "off"
-    for:
-      hours: 2
-    trigger: state
+  # Release check. Polled instead of a presence `to: off` trigger: a hold set
+  # from the app/voice while the room is already empty never sees presence
+  # change, so a state trigger would leave the room lit indefinitely.
+  - trigger: time_pattern
+    minutes: "/5"
     id: release
 conditions: []
 actions:
@@ -93,10 +95,22 @@ actions:
           - service: input_boolean.turn_off
             target:
               entity_id: input_boolean.wohnzimmer_keep_on
-      # Presence gone 2h -> release the hold and turn the room off.
+      # Presence gone 30 min -> release the hold and turn the room off.
+      # The hold must be 30 min old too, so a light switched on from the app
+      # just before walking in is not killed by the next 5-min check.
       - conditions:
           - condition: trigger
             id: release
+          - condition: state
+            entity_id: input_boolean.wohnzimmer_keep_on
+            state: "on"
+            for:
+              minutes: 30
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor3_presence
+            state: "off"
+            for:
+              minutes: 30
         sequence:
           - service: input_boolean.turn_off
             target:

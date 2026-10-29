@@ -7,12 +7,14 @@
 # and stuck_lights_cleanup.yaml. Without it, sitting still in the room drops
 # praesenzsensor2 and the absence timers snap your hand-set level back off.
 #
-# Scope: DAY paths only. night_pathway_mode (22:30-07:00) is deliberately NOT
-# gated — night pathway lighting is transient and should keep behaving normally.
+# Scope: day AND night. night_pathway_mode skips the durchgangszimmer lamps
+# while the hold is on, like the day paths do.
 #
 # The hold is released when:
 #   - both ceiling lamps go off, by any means (stehlampe not required — see below), or
-#   - presence has been gone for 2 hours (then it also turns the room off).
+#   - presence has been gone for 30 min and the hold is 30 min old (then it also
+#     turns the room off). Checked every 5 min, not on a presence change — same
+#     reason as in wohnzimmer_manual_override.
 #
 # Only frontend/app/voice changes carry a context user_id, so this never engages
 # on our own automation service calls. A physical Zigbee dimmer/remote change has
@@ -32,12 +34,10 @@ triggers:
       - switch.afrika_stehlampe
     trigger: state
     id: light_change
-  # Presence gone long enough that the manual hold should be released
-  - entity_id: binary_sensor.praesenzsensor2_presence
-    to: "off"
-    for:
-      hours: 2
-    trigger: state
+  # Release check. Polled instead of a presence `to: off` trigger: a hold set
+  # while the room is already empty never sees presence change.
+  - trigger: time_pattern
+    minutes: "/5"
     id: release
 conditions: []
 actions:
@@ -75,10 +75,22 @@ actions:
           - service: input_boolean.turn_off
             target:
               entity_id: input_boolean.durchgangszimmer_keep_on
-      # Presence gone 2h -> release the hold and turn the room off.
+      # Presence gone 30 min -> release the hold and turn the room off.
+      # The hold must be 30 min old too, so a level set from the app just
+      # before walking in is not killed by the next 5-min check.
       - conditions:
           - condition: trigger
             id: release
+          - condition: state
+            entity_id: input_boolean.durchgangszimmer_keep_on
+            state: "on"
+            for:
+              minutes: 30
+          - condition: state
+            entity_id: binary_sensor.praesenzsensor2_presence
+            state: "off"
+            for:
+              minutes: 30
         sequence:
           - service: input_boolean.turn_off
             target:
