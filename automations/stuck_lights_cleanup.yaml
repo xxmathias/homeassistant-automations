@@ -86,6 +86,8 @@ actions:
           - condition: state
             entity_id: input_boolean.durchgangszimmer_keep_on
             state: "off"
+          # The stehlampe counts on its own: with both ceiling lamps off it was
+          # never caught here and burned until the 6h all-off.
           - condition: or
             conditions:
               - condition: state
@@ -93,6 +95,9 @@ actions:
                 state: "on"
               - condition: state
                 entity_id: light.durchgangszimmer2
+                state: "on"
+              - condition: state
+                entity_id: switch.afrika_stehlampe
                 state: "on"
         sequence:
           - service: switch.turn_off
