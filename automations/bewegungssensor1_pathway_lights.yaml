@@ -144,9 +144,10 @@ actions:
                   - service: switch.turn_off
                     target:
                       entity_id: switch.afrika_stehlampe
-          # Entrance needs longer timeout - wait another 2min (3min total)
+          # Entrance has only PIRs (no presence sensor) — standing still (shoes, jacket)
+          # reads as "clear", so it needs a long timeout: wait another 4min (5min total)
           - delay:
-              seconds: 120
+              seconds: 240
           - condition: state
             entity_id: binary_sensor.bewegungssensor1_occupancy
             state: "off"

@@ -1,6 +1,6 @@
 id: night_pathway_mode
 alias: Night Pathway Mode
-description: Minimal pathway lighting when living room is off and motion detected at entrance (durchgangszimmer night grace 1 min)
+description: Minimal pathway lighting when living room is off and motion detected at entrance (durchgangszimmer night grace 1 min, entrance 3 min)
 triggers:
   - entity_id: binary_sensor.bewegungssensor2_licht_occupancy
     to: "on"
@@ -144,12 +144,6 @@ actions:
           - condition: state
             entity_id: binary_sensor.bewegungssensor2_licht_occupancy
             state: "off"
-          # Turn off entrance
-          - service: light.turn_off
-            target:
-              area_id: entrance
-            data:
-              transition: 3
           # Turn off durchgangszimmer + stehlampe if no presence — and never while a
           # hand-set brightness is held (see durchgangszimmer_manual_override).
           # Entrance/küche are not part of the hold and still turn off.
@@ -202,6 +196,18 @@ actions:
                       entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
+          # Entrance gets 3 min (entrance has only PIRs): 1 more min, then off.
+          # Kept last so the durchgangszimmer/kitchen 2-min timing above is unchanged.
+          - delay:
+              minutes: 1
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 3
       # Durchgangszimmer presence off for 1+ minutes - dim→off
       - conditions:
           - condition: trigger
@@ -213,20 +219,9 @@ actions:
           - condition: state
             entity_id: binary_sensor.praesenzsensor2_presence
             state: "off"
-          # Turn off entrance too if no entrance motion (presence may have lit it)
-          - if:
-              - condition: state
-                entity_id: binary_sensor.bewegungssensor2_licht_occupancy
-                state: "off"
-            then:
-              - service: light.turn_off
-                target:
-                  area_id: entrance
-                data:
-                  transition: 3
           # Turn off stehlampe + durchgangszimmer — skipped while a hand-set
           # brightness is held (see durchgangszimmer_manual_override). The entrance
-          # turn-off above is not part of the hold and still runs.
+          # turn-off below is not part of the hold and still runs.
           - if:
               - condition: state
                 entity_id: input_boolean.durchgangszimmer_keep_on
@@ -248,4 +243,24 @@ actions:
                   entity_id: light.durchgangszimmer2
                 data:
                   transition: 1
+          # Turn off entrance too (presence may have lit it), but only once
+          # bewegungssensor2 has been clear 3 min. Wait out the rest here: this
+          # trigger restarts the automation and cancels a running motion_off wait,
+          # so a plain "skip if not 3 min yet" would strand the entrance light.
+          # If bewegungssensor2 is on now, skip: its motion_off handles the entrance.
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          - delay:
+              seconds: >-
+                {{ [0, 180 - (now() - states.binary_sensor.bewegungssensor2_licht_occupancy.last_changed).total_seconds()]
+                   | max | int }}
+          - condition: state
+            entity_id: binary_sensor.bewegungssensor2_licht_occupancy
+            state: "off"
+          - service: light.turn_off
+            target:
+              area_id: entrance
+            data:
+              transition: 3
 mode: restart

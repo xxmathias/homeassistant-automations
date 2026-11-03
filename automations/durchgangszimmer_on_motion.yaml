@@ -200,9 +200,13 @@ actions:
                       entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
+          # Entrance: only once bewegungssensor1 has been clear 5 min (entrance has
+          # only PIRs). If not yet, bewegungssensor1_pathway_lights turns it off later.
           - condition: state
             entity_id: binary_sensor.bewegungssensor1_occupancy
             state: "off"
+            for:
+              minutes: 5
           - service: light.turn_off
             target:
               area_id: entrance
@@ -269,9 +273,13 @@ actions:
                       entity_id: light.billy_tischleuchte
                     data:
                       transition: 3
+          # Entrance: only once bewegungssensor1 has been clear 5 min (entrance has
+          # only PIRs). If not yet, bewegungssensor1_pathway_lights turns it off later.
           - condition: state
             entity_id: binary_sensor.bewegungssensor1_occupancy
             state: "off"
+            for:
+              minutes: 5
           - service: light.turn_off
             target:
               area_id: entrance
