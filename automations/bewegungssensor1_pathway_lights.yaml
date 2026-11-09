@@ -58,12 +58,18 @@ actions:
                       {% set current_pct = ([brightness1, brightness2]|max / 255 * 100)|round(0) %}
                       {{ [current_pct, 60]|max }}
                     {% endif %}
-          # Turn on kitchen at 50% only if no presence detected (boosts to 100% on presence)
+          # Turn on kitchen at 50% only if no presence detected (boosts to 100% on presence).
+          # Never dim: a kitchen still lit above pathway level keeps its level.
           - choose:
               - conditions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
+                  - condition: template
+                    value_template: >
+                      {% set k = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
+                      {% set b = state_attr('light.billy_tischleuchte', 'brightness')|int(0) %}
+                      {{ ([k, b]|max / 255 * 100)|round(0) <= 52 }}
                 sequence:
                   # Billy first, kuchenlampe 1s later
                   - service: light.turn_on

@@ -103,7 +103,8 @@ actions:
                 data:
                   transition: 3
                   brightness_pct: 100
-          # Turn on kitchen as pathway light at 50% (only for motion trigger, non-blocking)
+          # Turn on kitchen as pathway light at 50% (only for motion trigger, non-blocking).
+          # Never dim: a kitchen still lit above pathway level keeps its level.
           - choose:
               - conditions:
                   - condition: trigger
@@ -111,6 +112,11 @@ actions:
                   - condition: state
                     entity_id: binary_sensor.praesenzsensor_presence
                     state: "off"
+                  - condition: template
+                    value_template: >
+                      {% set k = state_attr('light.kuchenlampe', 'brightness')|int(0) %}
+                      {% set b = state_attr('light.billy_tischleuchte', 'brightness')|int(0) %}
+                      {{ ([k, b]|max / 255 * 100)|round(0) <= 52 }}
                 sequence:
                   # Billy first, kuchenlampe 1s later
                   - service: light.turn_on
